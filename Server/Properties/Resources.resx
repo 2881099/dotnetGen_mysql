@@ -1,0 +1,415 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="FastExcel_Cell_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\Cell.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_FastExcel_Add_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\FastExcel.Add.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_FastExcel_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\FastExcel.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_FastExcel_Delete_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\FastExcel.Delete.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_FastExcel_Read_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\FastExcel.Read.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_FastExcel_Update_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\FastExcel.Update.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_FastExcel_Worksheets_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\FastExcel.Worksheets.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_FastExcel_Write_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\FastExcel.Write.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_Row_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\Row.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_SharedStrings_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\SharedStrings.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_WorksheetAddSettings_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\WorksheetAddSettings.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="FastExcel_Worksheet_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FastExcel\Worksheet.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="htm_zip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\htm.zip;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="NPinyin_Pinyin_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\NPinyin\Pinyin.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="NPinyin_PyCode_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\NPinyin\PyCode.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="NPinyin_PyHash_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\NPinyin\PyHash.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_ASCIIPropertyListParser_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\ASCIIPropertyListParser.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_BinaryPropertyListParser_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\BinaryPropertyListParser.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_BinaryPropertyListWriter_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\BinaryPropertyListWriter.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_NSArray_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\NSArray.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_NSArray_IList_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\NSArray.IList.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_NSData_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\NSData.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_NSDate_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\NSDate.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_NSDictionary_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\NSDictionary.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_NSNumber_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\NSNumber.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_NSObject_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\NSObject.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_NSSet_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\NSSet.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_NSString_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\NSString.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_PropertyListException_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\PropertyListException.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_PropertyListFormatException_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\PropertyListFormatException.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_PropertyListParser_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\PropertyListParser.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_UID_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\UID.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="plist_cil_XmlPropertyListParser_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\plist-cil\XmlPropertyListParser.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Lib_IniHelper_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Lib\IniHelper.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Lib_JSDecoder_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Lib\JSDecoder.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Lib_Lib_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Lib\Lib.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="MySql_Data_MySqlClient_ConnectionPool_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySql.Data.MySqlClient\ConnectionPool.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="MySql_Data_MySqlClient_Executer_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySql.Data.MySqlClient\Executer.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="MySql_Data_MySqlClient_SelectBuild_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySql.Data.MySqlClient\SelectBuild.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WinFormClass_Robot_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WinFormClass\Robot.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WinFormClass_Socket_BaseSocket_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WinFormClass\Socket\BaseSocket.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WinFormClass_Socket_ClientSocket_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WinFormClass\Socket\ClientSocket.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WinFormClass_Socket_ServerSocket_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WinFormClass\Socket\ServerSocket.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WinFormClass_WorkQueue_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WinFormClass\WorkQueue.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Microsoft_Extensions_Caching_Redis_RedisCache_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Microsoft.Extensions.Caching.Redis\RedisCache.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Events_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Events.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Exceptions_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Exceptions.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_IRedisClient_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\IRedisClient.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_IRedisClientAsync_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\IRedisClientAsync.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_IRedisClientSync_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\IRedisClientSync.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_QuickHelperBase_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\QuickHelperBase.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_RedisClient_Async_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\RedisClient.Async.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_RedisClient_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\RedisClient.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_RedisClient_Sync_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\RedisClient.Sync.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_RedisConnectionPool_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\RedisConnectionPool.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_RedisSentinelClient_Async_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\RedisSentinelClient.Async.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_RedisSentinelClient_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\RedisSentinelClient.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_RedisSentinelClient_Sync_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\RedisSentinelClient.Sync.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_RedisSentinelManager_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\RedisSentinelManager.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Types_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Types.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_MonitorListener_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\MonitorListener.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_RedisCommand_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\RedisCommand.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_RedisConnector_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\RedisConnector.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_RedisListener_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\RedisListener.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_RedisPipeline_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\RedisPipeline.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_RedisTransaction_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\RedisTransaction.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_SubscriptionListener_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\SubscriptionListener.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisArray_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisArray.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisBool_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisBool.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisBytes_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisBytes.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisDate_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisDate.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisFloat_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisFloat.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisHash_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisHash.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisInt_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisInt.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisIsMasterDownByAddrCommand_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisIsMasterDownByAddrCommand.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisObject_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisObject.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisRoleCommand_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisRoleCommand.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisScanCommand_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisScanCommand.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisSlowLogCommand_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisSlowLogCommand.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisStatus_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisStatus.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisString_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisString.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisSubscription_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisSubscription.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Commands_RedisTuple_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Commands\RedisTuple.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Fakes_FakeRedisSocket_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Fakes\FakeRedisSocket.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Fakes_FakeStream_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Fakes\FakeStream.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_AsyncConnector_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\AsyncConnector.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_IRedisSocket_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\IRedisSocket.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_RedisAsyncCommandToken_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\RedisAsyncCommandToken.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_RedisIO_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\RedisIO.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_RedisPooledSocket_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\RedisPooledSocket.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_RedisReader_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\RedisReader.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_RedisSocket_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\RedisSocket.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_RedisWriter_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\RedisWriter.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_SocketAsyncPool_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\SocketAsyncPool.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_IO_SocketPool_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\IO\SocketPool.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Utilities_RedisArgs_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Utilities\RedisArgs.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_Internal_Utilities_Serializer_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\Internal\Utilities\Serializer.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="CSRedis_ConnectionPool_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\ConnectionPool.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+</root>
