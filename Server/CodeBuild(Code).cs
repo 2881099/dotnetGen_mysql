@@ -353,6 +353,7 @@ namespace {0}.Model {{
 	public partial class {1}Info {{
 		#region fields
 ", solutionName, uClass_Name);
+				Dictionary<string, string> innerjoinObjs = new Dictionary<string, string>();
 				bool Is_System_ComponentModel = false;
 				int column_idx = -1;
 				foreach (ColumnInfo column in table.Columns) {
@@ -472,6 +473,34 @@ namespace {0}.Model {{
 			internal set {{ _obj_{1} = value; }}
 		}}
 ", FK_uClass_Name_full, memberName, solutionName, fkcsBy, fkcsParms, FK_uClass_Name);
+							//若不存在 Obj_外键表名，则增加，否则InnerJoin.ToList时会报错 “Obj_外键表名 不存在”
+							//比如表只有一 creator_person_id 时，需附加成生一个 Obj_person 属性
+							string fkTableClassName = fk.ReferencedTable.ClassName;
+							if (memberName == fkTableClassName) {
+								//如果有 Obj_外键表名 属性，则不增加什么代码
+								if (innerjoinObjs.ContainsKey(fkTableClassName)) innerjoinObjs.Remove(fkTableClassName);
+								innerjoinObjs.Add(fkTableClassName, "");
+							} else {
+								if (innerjoinObjs.ContainsKey(fkTableClassName))
+									//如果有多个相同外键，比如 a_person_id, b_person_id
+									innerjoinObjs[fkTableClassName] = string.Format(
+@"
+		/// <summary>
+		/// 配合 InnerJoin .ToList 查询临时使用
+		/// </summary>
+		public {0}Info Obj_{1} {{ get; internal set; }}", UFString(fkTableClassName), fkTableClassName, memberName);
+								else
+									//如果只有一个外键，比如 a_person_id
+									innerjoinObjs.Add(fkTableClassName, string.Format(
+@"
+		/// <summary>
+		/// 与 Obj_{2} 同引用
+		/// </summary>
+		public {0}Info Obj_{1} {{
+			get {{ return this.Obj_{2}; }}
+			internal set {{ this.Obj_{2} = value; }}
+		}}", UFString(fkTableClassName), fkTableClassName, memberName));
+							}
 						}
 						return fkc != null;
 					});
@@ -790,6 +819,10 @@ namespace {0}.Model {{
 				string[] dic_objs_values = new string[dic_objs.Count];
 				dic_objs.Values.CopyTo(dic_objs_values, 0);
 				sb9.Append(string.Join("", dic_objs_values));
+
+				string[] innerjoinObjs_values = new string[innerjoinObjs.Count];
+				innerjoinObjs.Values.CopyTo(innerjoinObjs_values, 0);
+				sb9.Append(string.Join("", innerjoinObjs_values));
 
 				sb6.Insert(0, string.Format(@"
 		public {0}.DAL.{1}.SqlUpdateBuild UpdateDiy {{
