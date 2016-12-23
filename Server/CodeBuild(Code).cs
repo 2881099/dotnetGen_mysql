@@ -1521,8 +1521,8 @@ namespace {0}.BLL {{
 					if (csType == "bool?") {
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
-			return this.Where1Or(""a.`{1}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType);
+			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
+		}}", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 					if (col.Type == MySqlDbType.Byte || col.Type == MySqlDbType.Int16 || col.Type == MySqlDbType.Int24 || col.Type == MySqlDbType.Int32 || col.Type == MySqlDbType.Int64 ||
@@ -1530,34 +1530,34 @@ namespace {0}.BLL {{
 						col.Type == MySqlDbType.Year) {
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
-			return this.Where1Or(""a.`{1}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType);
+			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
+		}}", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 					if (col.Type == MySqlDbType.Double || col.Type == MySqlDbType.Float || col.Type == MySqlDbType.Decimal) {
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
-			return this.Where1Or(""a.`{1}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType);
+			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
+		}}", uClass_Name, fkcsBy, csType, col.Name);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}Range({2} begin) {{
-			return base.Where(""a.`{1}` >= {{0}}"", begin) as {0}SelectBuild;
+			return base.Where(""a.`{3}` >= {{0}}"", begin) as {0}SelectBuild;
 		}}
 		public {0}SelectBuild Where{1}Range({2} begin, {2} end) {{
 			if (end == null) return Where{1}Range(begin);
-			return base.Where(""a.`{1}` between {{0}} and {{1}}"", begin, end) as {0}SelectBuild;
-		}}", uClass_Name, fkcsBy, csType);
+			return base.Where(""a.`{3}` between {{0}} and {{1}}"", begin, end) as {0}SelectBuild;
+		}}", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 					if (col.Type == MySqlDbType.Date || col.Type == MySqlDbType.Time || col.Type == MySqlDbType.Timestamp || col.Type == MySqlDbType.Datetime) {
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}Range({2} begin) {{
-			return base.Where(""a.`{1}` >= {{0}}"", begin) as {0}SelectBuild;
+			return base.Where(""a.`{3}` >= {{0}}"", begin) as {0}SelectBuild;
 		}}
 		public {0}SelectBuild Where{1}Range({2} begin, {2} end) {{
 			if (end == null) return Where{1}Range(begin);
-			return base.Where(""a.`{1}` between {{0}} and {{1}}"", begin, end) as {0}SelectBuild;
-		}}", uClass_Name, fkcsBy, csType);
+			return base.Where(""a.`{3}` between {{0}} and {{1}}"", begin, end) as {0}SelectBuild;
+		}}", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 					if ((col.Type == MySqlDbType.UInt32 || col.Type == MySqlDbType.UInt64) && (lname == "status" || lname.StartsWith("status_") || lname.EndsWith("_status"))) {
@@ -1566,14 +1566,14 @@ namespace {0}.BLL {{
 			if (_0_16 == null || _0_16.Length == 0) return this;
 			{2}[] copy = new {2}[_0_16.Length];
 			for (int a = 0; a < _0_16.Length; a++) copy[a] = ({2})Math.Pow(2, _0_16[a]);
-			return this.Where1Or(""(a.`{1}` & {{0}}) = {{0}}"", copy);
-		}}", uClass_Name, fkcsBy, csType.Replace("?", ""));
+			return this.Where1Or(""(a.`{3}` & {{0}}) = {{0}}"", copy);
+		}}", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name);
 						return;
 					}
 					if (col.Type == MySqlDbType.Set) {
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}_IN(params {2}[] {1}s) {{
-			return this.Where1Or(""(a.`{1}` & {{0}}) = {{0}}"", {1}s);
+			return this.Where1Or(""(a.`{3}` & {{0}}) = {{0}}"", {1}s);
 		}}
 		public {0}SelectBuild Where{1}({2} {1}1) {{
 			return this.Where{1}_IN({1}1);
@@ -1591,13 +1591,13 @@ namespace {0}.BLL {{
 		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4, {2} {1}5) {{
 			return this.Where{1}_IN({1}1, {1}2, {1}3, {1}4, {1}5);
 		}}
-		#endregion", uClass_Name, fkcsBy, csType);
+		#endregion", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 					if (col.Type == MySqlDbType.Enum) {
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}_IN(params {2}[] {1}s) {{
-			return this.Where1Or(""a.`{1}` = {{0}}"", {1}s);
+			return this.Where1Or(""a.`{3}` = {{0}}"", {1}s);
 		}}
 		public {0}SelectBuild Where{1}({2} {1}1) {{
 			return this.Where{1}_IN({1}1);
@@ -1615,14 +1615,20 @@ namespace {0}.BLL {{
 		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4, {2} {1}5) {{
 			return this.Where{1}_IN({1}1, {1}2, {1}3, {1}4, {1}5);
 		}}
-		#endregion", uClass_Name, fkcsBy, csType);
+		#endregion", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
-					if (col.Length > 0 && col.Length < 301 && csType == "string") {
-						sb6.AppendFormat(@"
+					if (csType == "string") {
+						if (col.Length > 0 && col.Length < 301)
+							sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
-			return this.Where1Or(""a.`{1}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType);
+			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
+		}}", uClass_Name, fkcsBy, csType, col.Name);
+						sb6.AppendFormat(@"
+		public {0}SelectBuild Where{1}Like(params {2}[] {1}) {{
+			if ({1} == null) return this;
+			return this.Where1Or(@""a.`{3}` LIKE {{0}}"", {1}.Select(a => ""%"" + a + ""%"").ToArray());
+		}}", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 				});
