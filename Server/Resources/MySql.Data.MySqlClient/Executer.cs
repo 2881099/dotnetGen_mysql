@@ -287,7 +287,7 @@ namespace MySql.Data.MySqlClient {
 public static partial class MySql_Data_MySqlClient_ExtensionMethods {
 	public static string ToDescriptionOrString(this Enum item) {
 		string name = item.ToString();
-		DescriptionAttribute desc = item.GetType().GetField(name).GetCustomAttribute<DescriptionAttribute>();
+		DescriptionAttribute desc = item.GetType().GetField(name)?.GetCustomAttribute<DescriptionAttribute>();
 		return desc?.Description ?? name;
 	}
 	public static long ToInt64(this Enum item) {
