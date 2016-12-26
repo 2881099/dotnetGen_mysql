@@ -31,3 +31,27 @@
 		<add key="nuget.org" value="http://api.nuget.org/v3/index.json" />
 		<add key="Ahoy Preview MyGet" value="https://www.myget.org/F/domaindrivendev/api/v3/index.json" />
 	```
+
+-----------------
+
+| <font color=gray>功能对比</font>          | dotnetGen     | dotnetGen_sqlserver  | dotnetGen_mysql | dotnetGen_postgresql |
+| ----------------: | -------------:| --------------------:| --------------: | -------------------: |
+| 连接池             | √ | √ | √ | √ |
+| 事务               | √ | √ | √ | √ |
+| 表                 | √ | √ | √ | √ |
+| 表关系(1对1)        | √ | √ | √ | √ |
+| 表关系(1对多)       | √ | √ | √ | √ |
+| 表关系(多对多)      | √ | √ | √ | √ |
+| 表主键             | √ | √ | √ | √ |
+| 表唯一键           | √ | √ | √ | √ |
+| 存储过程           | √ | - | - | - |
+| 视图               | - | - | - | √ |
+| 类型映射           | √ | √ | √ | √ |
+| 枚举               | - | - | √ | √ |
+| 自定义类型         | - | - | - | √ |
+| 数组               | - | - | - | √ |
+| xml               | - | - | - | - |
+| json              | - | - | - | √ |
+| 命令行生成         | - | - | - | √ |
+| RESTful           | - | - | √ | √ |
+| 后台管理功能       | √ | - | √ | √ |
