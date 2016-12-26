@@ -481,15 +481,16 @@ namespace {0}.Model {{
 								if (innerjoinObjs.ContainsKey(fkTableClassName)) innerjoinObjs.Remove(fkTableClassName);
 								innerjoinObjs.Add(fkTableClassName, "");
 							} else {
-								if (innerjoinObjs.ContainsKey(fkTableClassName))
-									//如果有多个相同外键，比如 a_person_id, b_person_id
-									innerjoinObjs[fkTableClassName] = string.Format(
+								if (innerjoinObjs.ContainsKey(fkTableClassName)) {
+									if (!string.IsNullOrEmpty(innerjoinObjs[fkTableClassName]))
+										//如果有多个相同外键，比如 a_person_id, b_person_id
+										innerjoinObjs[fkTableClassName] = string.Format(
 @"
 		/// <summary>
 		/// 配合 InnerJoin .ToList 查询临时使用
 		/// </summary>
 		public {0}Info Obj_{1} {{ get; internal set; }}", UFString(fkTableClassName), fkTableClassName, memberName);
-								else
+								} else
 									//如果只有一个外键，比如 a_person_id
 									innerjoinObjs.Add(fkTableClassName, string.Format(
 @"
