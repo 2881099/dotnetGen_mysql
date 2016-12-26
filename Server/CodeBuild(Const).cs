@@ -1385,7 +1385,7 @@ namespace Swashbuckle.Swagger.Model {{
 #endregion
 
 #region APIReturn
-public partial class APIReturn {{
+public partial class APIReturn : ContentResult {{
 	public int Code {{ get; protected set; }}
 	public string Message {{ get; protected set; }}
 	public Hashtable Data {{ get; protected set; }} = new Hashtable();
@@ -1410,6 +1410,27 @@ public partial class APIReturn {{
 		}}
 		return this;
 	}}
+	#region form 表单 target=iframe 提交回调处理
+	private void Jsonp(ActionContext context) {{
+		string json = Newtonsoft.Json.JsonConvert.SerializeObject(new {{ code = this.Code, message = this.Message, data = this.Data, success = this.Success }});
+		string __callback = context.HttpContext.Request.HasFormContentType ? context.HttpContext.Request.Form[""__callback""].ToString() : null;
+		if (string.IsNullOrEmpty(__callback)) {{
+			this.ContentType = ""text/json;charset=utf-8;"";
+			this.Content = json;
+		}}else {{
+			this.ContentType = ""text/html;charset=utf-8"";
+			this.Content = $""<script>top.{{__callback}}({{json}});</script>"";
+		}}
+	}}
+	public override void ExecuteResult(ActionContext context) {{
+		Jsonp(context);
+		base.ExecuteResult(context);
+	}}
+	public override Task ExecuteResultAsync(ActionContext context) {{
+		Jsonp(context);
+		return base.ExecuteResultAsync(context);
+	}}
+	#endregion
 
 	public static APIReturn 成功 {{ get {{ return new APIReturn(0, ""成功""); }} }}
 	public static APIReturn 失败 {{ get {{ return new APIReturn(99, ""失败""); }} }}
