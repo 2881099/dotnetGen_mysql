@@ -36,6 +36,8 @@
 
 | <font color=gray>功能对比</font> | [dotnetGen](https://github.com/2881099/dotnetGen) | [dotnetGen_sqlserver](https://github.com/2881099/dotnetGen_sqlserver) | [dotnetGen_mysql](https://github.com/2881099/dotnetGen_mysql) | [dotnetGen_postgresql](https://github.com/2881099/dotnetGen_postgresql) |
 | ----------------: | -------------:| --------------------:| --------------: | -------------------: |
+| windows            | √ | √ | √ | √ |
+| linux              | - | - | √ | √ |
 | 连接池             | √ | √ | √ | √ |
 | 事务               | √ | √ | √ | √ |
 | 表                 | √ | √ | √ | √ |
