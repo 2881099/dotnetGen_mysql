@@ -1752,7 +1752,7 @@ namespace {0}.BLL {{
 									return col88.Name.ToLower().IndexOf("name") != -1 || col88.Name.ToLower().IndexOf("title") != -1;
 								});
 								if (strNameCol == null) strNameCol = fk.ReferencedTable.Columns.Find(delegate (ColumnInfo col88) {
-									return GetCSType(col88.Type, CodeBuild.UFString(fk.ReferencedTable.ClassName) + col88.Name.ToUpper()) == "string" && col88.Length > 0 && col88.Length < 128;
+									return GetCSType(col88.Type, CodeBuild.UFString(fk.ReferencedTable.ClassName) + col88.Name.ToUpper()) == "string" && col88.Length > 0 && col88.Length < 300;
 								});
 							}
 							strName = strNameCol != null ? "." + CodeBuild.UFString(strNameCol.Name) : string.Empty;
@@ -1896,7 +1896,7 @@ namespace {0}.BLL {{
 							return col88.Name.ToLower().IndexOf("name") != -1 || col88.Name.ToLower().IndexOf("title") != -1;
 						});
 						if (strNameCol == null) strNameCol = fk2[0].ReferencedTable.Columns.Find(delegate (ColumnInfo col88) {
-							return GetCSType(col88.Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + col88.Name.ToUpper()) == "string" && col88.Length > 0 && col88.Length < 128;
+							return GetCSType(col88.Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + col88.Name.ToUpper()) == "string" && col88.Length > 0 && col88.Length < 300;
 						});
 						if (strNameCol == null) strNameCol = fk2[0].ReferencedTable.PrimaryKeys[0];
 						string strName = CodeBuild.UFString(strNameCol.Name);
@@ -2164,7 +2164,7 @@ namespace {0}.BLL {{
 								return col99.Name.ToLower().IndexOf("name") != -1 || col99.Name.ToLower().IndexOf("title") != -1;
 							});
 							if (strCol == null) strCol = fkcb.ReferencedTable.Columns.Find(delegate (ColumnInfo col99) {
-								return GetCSType(col99.Type, CodeBuild.UFString(fkcb.ReferencedTable.ClassName) + col99.Name.ToUpper()) == "string" && col99.Length > 0 && col99.Length < 128;
+								return GetCSType(col99.Type, CodeBuild.UFString(fkcb.ReferencedTable.ClassName) + col99.Name.ToUpper()) == "string" && col99.Length > 0 && col99.Length < 300;
 							});
 							string FK_Column_Text = fkcb.ReferencedTable != null && strCol != null ? CodeBuild.UFString(strCol.Name)
 								 : FK_Column;

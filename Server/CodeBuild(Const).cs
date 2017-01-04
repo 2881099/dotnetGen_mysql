@@ -1759,6 +1759,7 @@ namespace {0}.Admin.Controllers {{
 								query: qs_parseByUrl(refererUrl)
 							}};
 							top.mainViewInit = function () {{
+								if (!div) return setTimeout(top.mainViewInit, 10);
 								admin_init(function (selector) {{
 									if (/<[^>]+>/.test(selector)) return $(selector);
 									return div.find(selector);
