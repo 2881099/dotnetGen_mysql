@@ -277,6 +277,9 @@ where a.constraint_schema = '{1}' and a.table_name in ({0}) and not isnull(posit
 				this.Sort(loc4);
 				loc1.Add(loc4);
 			}
+			loc1.Sort(delegate (TableInfo t1, TableInfo t2) {
+				return t1.FullName.CompareTo(t2.FullName);
+			});
 
 			loc2.Clear();
 			loc3.Clear();

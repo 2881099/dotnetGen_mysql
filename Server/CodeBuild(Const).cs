@@ -1213,6 +1213,12 @@ namespace {0}.Admin {{
 
 			this.Configuration = builder.AddEnvironmentVariables().Build();
 			this.env = env;
+
+			Newtonsoft.Json.JsonConvert.DefaultSettings = () => {{
+				var st = new Newtonsoft.Json.JsonSerializerSettings();
+				st.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+				return st;
+			}};
 		}}
 
 		public IConfigurationRoot Configuration {{ get; }}
@@ -1290,68 +1296,75 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Swashbuckle.Swagger.Model;
 using Swashbuckle.SwaggerGen.Generator;
 using {0}.BLL;
 using {0}.Model;
 
-public partial class BaseAdminController : Controller {{
-	public ILogger _logger;
-	public ISession Session {{ get {{ return HttpContext.Session; }} }}
-	public HttpRequest Req {{ get {{ return Request; }} }}
-	public HttpResponse Res {{ get {{ return Response; }} }}
+namespace {0}.AdminControllers {{
+	public partial class BaseAdminController : Controller {{
+		public ILogger _logger;
+		public ISession Session {{ get {{ return HttpContext.Session; }} }}
+		public HttpRequest Req {{ get {{ return Request; }} }}
+		public HttpResponse Res {{ get {{ return Response; }} }}
 
-	//public SysuserInfo LoginUser {{ get; private set; }}
-	public BaseAdminController(ILogger logger) {{ _logger = logger; }}
-	public override void OnActionExecuting(ActionExecutingContext context) {{
-		#region 参数验证
-		if (context.ModelState.IsValid == false)
-			foreach(var value in context.ModelState.Values)
-				if (value.Errors.Any()) {{
-					context.Result = new JsonResult(APIReturn.参数格式不正确.SetMessage($""参数格式不正确：{{value.Errors.First().ErrorMessage}}""));
-					return;
-				}}
-		#endregion
-		#region 初始化当前登陆账号
-		//string username = Session.GetString(""login.username"");
-		//if (!string.IsNullOrEmpty(username)) LoginUser = Sysuser.GetItemByUsername(username);
-
-		//var method = (context.ActionDescriptor as ControllerActionDescriptor).MethodInfo;
-		//if (method.GetCustomAttribute<需要登陆Attribute>() != null && LoginUser == null)
-		//	context.Result = new RedirectResult(""/signin"");
-		//else if (method.GetCustomAttribute<匿名访问Attribute>() == null && LoginUser == null)
-		//	context.Result = new RedirectResult(""/signin"");
-		//ViewBag.user = LoginUser;
-		#endregion
-		base.OnActionExecuting(context);
-	}}
-	public override void OnActionExecuted(ActionExecutedContext context) {{
-		if (context.Exception != null) {{
-			#region 错误拦截，在这里记录日志
-			//this.Json(new APIReturn(-1, context.Exception.Message)).ExecuteResultAsync(context).Wait();
-			//context.Exception = null;
+		//public SysuserInfo LoginUser {{ get; private set; }}
+		public BaseAdminController(ILogger logger) {{ _logger = logger; }}
+		public override void OnActionExecuting(ActionExecutingContext context) {{
+			#region 参数验证
+			if (context.ModelState.IsValid == false)
+				foreach(var value in context.ModelState.Values)
+					if (value.Errors.Any()) {{
+						context.Result = APIReturn.参数格式不正确.SetMessage($""参数格式不正确：{{value.Errors.First().ErrorMessage}}"");
+						return;
+					}}
 			#endregion
-		}}
-		base.OnActionExecuted(context);
-	}}
+			#region 初始化当前登陆账号
+			//string username = Session.GetString(""login.username"");
+			//if (!string.IsNullOrEmpty(username)) LoginUser = Sysuser.GetItemByUsername(username);
 
-	#region 角色权限验证
-	//public bool sysrole_check(string url) {{
-	//	url = url.ToLower();
-	//	//Response.Write(url + ""<br>"");
-	//	if (url == ""/"" || url.IndexOf(""/default.aspx"") == 0) return true;
-	//	foreach(var role in this.LoginUser.Obj_sysroles) {{
-	//		//Response.Write(role.ToString());
-	//		foreach(var dir in role.Obj_sysdirs) {{
-	//			//Response.Write(""-----------------"" + dir.ToString() + ""<br>"");
-	//			string tmp = dir.Url;
-	//			if (tmp.EndsWith(""/"")) tmp += ""default.aspx"";
-	//			if (url.IndexOf(tmp) == 0) return true;
-	//		}}
-	//	}}
-	//	return false;
-	//}}
-	#endregion
+			//var method = (context.ActionDescriptor as ControllerActionDescriptor).MethodInfo;
+			//if (method.GetCustomAttribute<需要登陆Attribute>() != null && LoginUser == null)
+			//	context.Result = new RedirectResult(""/signin"");
+			//else if (method.GetCustomAttribute<匿名访问Attribute>() == null && LoginUser == null)
+			//	context.Result = new RedirectResult(""/signin"");
+			//ViewBag.user = LoginUser;
+			#endregion
+			base.OnActionExecuting(context);
+		}}
+		public override void OnActionExecuted(ActionExecutedContext context) {{
+			if (context.Exception != null) {{
+				#region 错误拦截，在这里记录日志
+				//this.Json(new APIReturn(-1, context.Exception.Message)).ExecuteResultAsync(context).Wait();
+				//context.Exception = null;
+				#endregion
+			}}
+			base.OnActionExecuted(context);
+		}}
+
+		public override ViewResult View() {{
+			return base.View($""/Views/Admin/{{this.ControllerContext.ActionDescriptor.ControllerName}}/{{this.ControllerContext.ActionDescriptor.MethodInfo.Name}}.cshtml"");
+		}}
+
+		#region 角色权限验证
+		//public bool sysrole_check(string url) {{
+		//	url = url.ToLower();
+		//	//Response.Write(url + ""<br>"");
+		//	if (url == ""/"" || url.IndexOf(""/default.aspx"") == 0) return true;
+		//	foreach(var role in this.LoginUser.Obj_sysroles) {{
+		//		//Response.Write(role.ToString());
+		//		foreach(var dir in role.Obj_sysdirs) {{
+		//			//Response.Write(""-----------------"" + dir.ToString() + ""<br>"");
+		//			string tmp = dir.Url;
+		//			if (tmp.EndsWith(""/"")) tmp += ""default.aspx"";
+		//			if (url.IndexOf(tmp) == 0) return true;
+		//		}}
+		//	}}
+		//	return false;
+		//}}
+		#endregion
+	}}
 }}
 
 #region 需要登陆、匿名访问、IgnoreObsoleteControllers、FormDataOperationFilter
@@ -1361,7 +1374,7 @@ public static class Swashbuckle_SwaggerGen_Application_SwaggerGenOptions_Extensi
 	public class IgnoreObsoleteControllersFilter : IDocumentFilter {{
 		public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context) {{
 			foreach (ApiDescription apiDescription in context.ApiDescriptionsGroups.Items.SelectMany(e => e.Items)) {{
-				if (apiDescription.ControllerAttributes().OfType<ObsoleteAttribute>().Any()) continue;
+				if (apiDescription.ControllerAttributes().OfType<ObsoleteAttribute>().Any() == false) continue;
 				var key = ""/"" + apiDescription.RelativePath.TrimEnd('/');
 				if (swaggerDoc.Paths.ContainsKey(key))
 					swaggerDoc.Paths.Remove(key);
@@ -1385,11 +1398,12 @@ namespace Swashbuckle.Swagger.Model {{
 #endregion
 
 #region APIReturn
+[JsonObject(MemberSerialization.OptIn)]
 public partial class APIReturn : ContentResult {{
-	public int Code {{ get; protected set; }}
-	public string Message {{ get; protected set; }}
-	public Hashtable Data {{ get; protected set; }} = new Hashtable();
-	public bool Success {{ get {{ return this.Code == 0; }} }}
+	[JsonProperty(""code"")] public int Code {{ get; protected set; }}
+	[JsonProperty(""message"")] public string Message {{ get; protected set; }}
+	[JsonProperty(""data"")] public Hashtable Data {{ get; protected set; }} = new Hashtable();
+	[JsonProperty(""success"")] public bool Success {{ get {{ return this.Code == 0; }} }}
 
 	public APIReturn() {{ }}
 	public APIReturn(int code) {{ this.SetCode(code); }}
@@ -1412,7 +1426,7 @@ public partial class APIReturn : ContentResult {{
 	}}
 	#region form 表单 target=iframe 提交回调处理
 	private void Jsonp(ActionContext context) {{
-		string json = Newtonsoft.Json.JsonConvert.SerializeObject(new {{ code = this.Code, message = this.Message, data = this.Data, success = this.Success }});
+		string json = JsonConvert.SerializeObject(this);
 		string __callback = context.HttpContext.Request.HasFormContentType ? context.HttpContext.Request.Form[""__callback""].ToString() : null;
 		if (string.IsNullOrEmpty(__callback)) {{
 			this.ContentType = ""text/json;charset=utf-8;"";
@@ -1453,8 +1467,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using {0}.BLL;
 using {0}.Model;
 
-namespace {0}.Admin.Controllers {{
-	[Route(""api/[controller]"")]
+namespace {0}.AdminControllers {{
+	[Route(""[controller]"")]
 	[Obsolete]
 	public class SysController : Controller {{
 		[HttpGet(@""connection"")]
@@ -1513,57 +1527,64 @@ namespace {0}.Admin.Controllers {{
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using {0}.BLL;
 using {0}.Model;
 
-namespace {0}.Admin.Controllers {{
-	[Route(""api/[controller]"")]
-	[Obsolete]
+namespace {0}.AdminControllers {{
+	[Route(""[controller]"")]
 	public class {1}Controller : BaseAdminController {{
 		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
 
 		[HttpGet]
-		public APIReturn Get_list([FromServices]IConfigurationRoot cfg, {12}[FromQuery] int limit = 20, [FromQuery] int skip = 0) {{
+		public ActionResult List([FromServices]IConfigurationRoot cfg, {12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
 			var select = {1}.Select{8};{9}
 			int count;
-			var items = select.Count(out count){14}.Skip(skip).Limit(limit).ToList();
-			return APIReturn.成功.SetData(""items"", items.ToBson(), ""count"", count{15});
+			var items = select.Count(out count){14}.Skip((page - 1) * limit).Limit(limit).ToList();
+			ViewBag.items = items;
+			ViewBag.count = count;
+			return View();
 		}}
 
-		[HttpGet(@""{3}"")]
-		public APIReturn Get_item({4}) {{
+		[HttpGet(@""add"")]
+		public ActionResult Edit() {{
+			return View();
+		}}
+		[HttpGet(@""edit"")]
+		public ActionResult Edit({4}) {{
 			{1}Info item = {1}.GetItem({5});
 			if (item == null) return APIReturn.记录不存在_或者没有权限;
-			return APIReturn.成功.SetData(""item"", item.ToBson());
+			ViewBag.item = item;
+			return View();
 		}}
 
-		[HttpPost]
-		public APIReturn Post_insert({10}) {{
+		/***************************************** POST *****************************************/
+		[HttpPost(@""add"")]
+		[ValidateAntiForgeryToken]
+		public APIReturn _Add({10}) {{
 			{1}Info item = new {1}Info();{13}{7}
 			item = {1}.Insert(item);{16}
 			return APIReturn.成功.SetData(""item"", item.ToBson());
 		}}
-
-		[HttpPut(""{3}"")]
-		public APIReturn Put_update({4}{11}) {{
-			{1}Info item = new {1}Info();{6}{7}
+		[HttpPost(@""edit"")]
+		[ValidateAntiForgeryToken]
+		public APIReturn _Edit({4}{11}) {{
+			{1}Info item = {1}.GetItem({5});
+			if (item == null) return APIReturn.记录不存在_或者没有权限;{6}{7}
 			int affrows = {1}.Update(item);{17}
-			if (affrows > 0) return APIReturn.成功;
+			if (affrows > 0) return APIReturn.成功.SetMessage($""更新成功，影响行数：{{affrows}}"");
 			return APIReturn.失败;
 		}}
 
-		[HttpDelete(""{3}"")]
-		public APIReturn Delete_delete({4}) {{
-			int affrows = {1}.Delete({5});
-			if (affrows > 0) return APIReturn.成功.SetMessage($""删除成功，影响行数：{{affrows}}"");
-			return APIReturn.失败;
-		}}
+		[HttpPost(""del"")]
+		[ValidateAntiForgeryToken]{18}
 	}}
 }}
 ";
@@ -1670,12 +1691,14 @@ namespace {0}.Admin.Controllers {{
 		<div class=""content-wrapper"">
 			<!-- Main content-->
 			<section id=""right_content"" class=""content"">
-				<!-- Your Page Content Here-->
-				<h1>这是一个测试首页</h1>
-				<h2>swagger webapi：<a href='/swagger/' target='_blank'>/swagger/</a><h2>
+				<div style=""display:none;"">
+					<!-- Your Page Content Here-->
+					<h1>这是一个测试首页</h1>
+					<h2>swagger webapi：<a href='/swagger/' target='_blank'>/swagger/</a><h2>
 
-				<h2><a href='/api/sys/connection' target='_blank'>查看 MySql连接池</a><h2>
-				<h2><a href='/api/sys/connection/redis' target='_blank'>查看 Redis连接池</a><h2>
+					<h2><a href='/sys/connection' target='_blank'>查看 Npgsql连接池</a><h2>
+					<h2><a href='/sys/connection/redis' target='_blank'>查看 Redis连接池</a><h2>
+				</div>
 			</section>
 			<!-- /.content-->
 		</div>
@@ -1685,113 +1708,115 @@ namespace {0}.Admin.Controllers {{
 	<script type=""text/javascript"" src=""./htm/js/system.js""></script>
 	<script type=""text/javascript"" src=""./htm/js/admin.js""></script>
 	<script type=""text/javascript"">
-			// 路由功能
-			//针对上面的html初始化路由列表
-			function hash_encode(str) {{ return url_encode(base64.encode(str)).replace(/%/g, '_'); }}
-			function hash_decode(str) {{ return base64.decode(url_decode(str.replace(/_/g, '%'))); }}
-			window.div_left_router = {{}};
-			$('li.treeview.active ul li a').each(function(index, ele) {{
-				var href = $(ele).attr('href');
-				$(ele).attr('href', '#base64url' + hash_encode(href));
-				window.div_left_router[href] = $(ele).text();
-			}});
-			(function () {{
-				function Vipspa() {{
-				}}
-				Vipspa.prototype.start = function (config) {{
-					Vipspa.mainView = $(config.view);
+		if (!location.hash) $('#right_content div:first').show();
+		// 路由功能
+		//针对上面的html初始化路由列表
+		function hash_encode(str) {{ return url_encode(base64.encode(str)).replace(/%/g, '_'); }}
+		function hash_decode(str) {{ return base64.decode(url_decode(str.replace(/_/g, '%'))); }}
+		window.div_left_router = {{}};
+		$('li.treeview.active ul li a').each(function(index, ele) {{
+			var href = $(ele).attr('href');
+			$(ele).attr('href', '#base64url' + hash_encode(href));
+			window.div_left_router[href] = $(ele).text();
+		}});
+		(function () {{
+			function Vipspa() {{
+			}}
+			Vipspa.prototype.start = function (config) {{
+				Vipspa.mainView = $(config.view);
+				startRouter();
+				window.onhashchange = function () {{
+					if (location._is_changed) return location._is_changed = false;
 					startRouter();
-					window.onhashchange = function () {{
-						if (location._is_changed) return location._is_changed = false;
-						startRouter();
+				}};
+			}};
+			function startRouter() {{
+				var hash = location.hash;
+				if (hash === '') return //location.hash = $('li.treeview.active ul li a:first').attr('href');//'#base64url' + hash_encode('/resume_type/');
+				if (hash.indexOf('#base64url') !== 0) return;
+				var act = hash_decode(hash.substr(10, hash.length - 10));
+				//叶湘勤增加的代码，加载或者提交form后，显示内容
+				function ajax_success(refererUrl) {{
+					if (refererUrl == location.pathname) {{ startRouter(); return function(){{}}; }}
+					var hash = '#base64url' + hash_encode(refererUrl);
+					if (location.hash != hash) {{
+						location._is_changed = true;
+						location.hash = hash;
+					}}'\''
+					return function (data, status, xhr) {{
+						var div;
+						Function.prototype.ajax = $.ajax;
+						top.mainViewNav = {{
+							url: refererUrl,
+							trans: function (url) {{
+								var act = url;
+								act = act.substr(0, 1) === '/' || act.indexOf('://') !== -1 || act.indexOf('data:') === 0 ? act : join_url(refererUrl, act);
+								return act;
+							}},
+							goto: function (url_or_form, target) {{
+								var form = url_or_form;
+								if (typeof form === 'string') {{
+									var act = this.trans(form);
+									if (String(target).toLowerCase() === '_blank') return window.open(act);
+									location.hash = '#base64url' + hash_encode(act);
+								}}
+								else {{
+									if (!window.ajax_form_iframe_max) window.ajax_form_iframe_max = 1;
+									window.ajax_form_iframe_max++;
+									var iframe = $('<iframe name=""ajax_form_iframe{{0}}""></iframe>'.format(window.ajax_form_iframe_max));
+									Vipspa.mainView.append(iframe);
+									var act = $(form).attr('action') || '';
+									act = act.substr(0, 1) === '/' || act.indexOf('://') !== -1 ? act : join_url(refererUrl, act);
+									if ($(form).find(':file[name]').length > 0) $(form).attr('enctype', 'multipart/form-data');
+									$(form).attr('action', act);
+									$(form).attr('target', iframe.attr('name'));
+									iframe.on('load', function () {{
+										var doc = this.contentWindow ? this.contentWindow.document : this.document;
+										if (doc.body.innerHTML.length === 0) return;
+										if (doc.body.innerHTML.indexOf('Error:') === 0) return alert(doc.body.innerHTML.substr(6));
+										//以下 '<script ' + '是防止与本页面相匹配，不要删除
+										if (doc.body.innerHTML.indexOf('<script ' + 'type=""text/javascript"">location.href=""') === -1) {{
+											ajax_success(doc.location.pathname + doc.location.search)(doc.body.innerHTML, 200, null);
+										}}
+									}});
+								}}
+							}},
+							query: qs_parseByUrl(refererUrl)
+						}};
+						top.mainViewInit = function () {{
+							if (!div) return setTimeout(top.mainViewInit, 10);
+							admin_init(function (selector) {{
+								if (/<[^>]+>/.test(selector)) return $(selector);
+								return div.find(selector);
+							}}, top.mainViewNav);
+						}};
+						if (/<body[^>]*>/i.test(data))
+							data = data.match(/<body[^>]*>(([^<]|<(?!\/body>))*)<\/body>/i)[1];
+						div = Vipspa.mainView.html(data);
 					}};
 				}};
-				function startRouter() {{
-					var hash = location.hash;
-					if (hash === '') return //location.hash = $('li.treeview.active ul li a:first').attr('href');//'#base64url' + hash_encode('/resume_type/');
-					if (hash.indexOf('#base64url') !== 0) return;
-					var act = hash_decode(hash.substr(10, hash.length - 10));
-					//叶湘勤增加的代码，加载或者提交form后，显示内容
-					function ajax_success(refererUrl) {{
-						if (refererUrl == location.pathname) {{ startRouter(); return function(){{}}; }}
-						var hash = '#base64url' + hash_encode(refererUrl);
-						if (location.hash != hash) {{
-							location._is_changed = true;
-							location.hash = hash;
-						}}'\''
-						return function (data, status, xhr) {{
-							var div;
-							Function.prototype.ajax = $.ajax;
-							top.mainViewNav = {{
-								url: refererUrl,
-								trans: function (url) {{
-									var act = url;
-									act = act.substr(0, 1) === '/' || act.indexOf('://') !== -1 || act.indexOf('data:') === 0 ? act : join_url(refererUrl, act);
-									return act;
-								}},
-								goto: function (url_or_form, target) {{
-									var form = url_or_form;
-									if (typeof form === 'string') {{
-										var act = this.trans(form);
-										if (String(target).toLowerCase() === '_blank') return window.open(act);
-										location.hash = '#base64url' + hash_encode(act);
-									}}
-									else {{
-										if (!window.ajax_form_iframe_max) window.ajax_form_iframe_max = 1;
-										window.ajax_form_iframe_max++;
-										var iframe = $('<iframe name=""ajax_form_iframe{{0}}""></iframe>'.format(window.ajax_form_iframe_max));
-										Vipspa.mainView.append(iframe);
-										var act = $(form).attr('action') || '';
-										act = act.substr(0, 1) === '/' || act.indexOf('://') !== -1 ? act : join_url(refererUrl, act);
-										$(form).attr('action', act);
-										$(form).attr('target', iframe.attr('name'));
-										iframe.on('load', function () {{
-											var doc = this.contentWindow ? this.contentWindow.document : this.document;
-											if (doc.body.innerHTML.length === 0) return;
-											if (doc.body.innerHTML.indexOf('Error:') === 0) return alert(doc.body.innerHTML.substr(6));
-											//以下 '<script ' + '是防止与本页面相匹配，不要删除
-											if (doc.body.innerHTML.indexOf('<script ' + 'type=""text/javascript"">location.href=""') === -1) {{
-												ajax_success(doc.location.pathname + doc.location.search)(doc.body.innerHTML, 200, null);
-											}}
-										}});
-									}}
-								}},
-								query: qs_parseByUrl(refererUrl)
-							}};
-							top.mainViewInit = function () {{
-								if (!div) return setTimeout(top.mainViewInit, 10);
-								admin_init(function (selector) {{
-									if (/<[^>]+>/.test(selector)) return $(selector);
-									return div.find(selector);
-								}}, top.mainViewNav);
-							}};
-							if (/<body[^>]*>/i.test(data))
-								data = data.match(/<body[^>]*>(([^<]|<(?!\/body>))*)<\/body>/i)[1];
-							div = Vipspa.mainView.html(data);
-						}};
-					}};
-					$.ajax({{
-						type: 'GET',
-						url: act,
-						dataType: 'html',
-						success: ajax_success(act),
-						error: function (jqXHR, textStatus, errorThrown) {{
-							var data = jqXHR.responseText;
-							if (/<body[^>]*>/i.test(data))
-								data = data.match(/<body[^>]*>(([^<]|<(?!\/body>))*)<\/body>/i)[1];
-							Vipspa.mainView.html(data);
-						}}
-					}});
-				}}
-				window.vipspa = new Vipspa();
-			}})();
-			$(function () {{
-				vipspa.start({{
-					view: '#right_content',
+				$.ajax({{
+					type: 'GET',
+					url: act,
+					dataType: 'html',
+					success: ajax_success(act),
+					error: function (jqXHR, textStatus, errorThrown) {{
+						var data = jqXHR.responseText;
+						if (/<body[^>]*>/i.test(data))
+							data = data.match(/<body[^>]*>(([^<]|<(?!\/body>))*)<\/body>/i)[1];
+						Vipspa.mainView.html(data);
+					}}
 				}});
+			}}
+			window.vipspa = new Vipspa();
+		}})();
+		$(function () {{
+			vipspa.start({{
+				view: '#right_content',
 			}});
-			// 页面加载进度条
-			$(document).ajaxStart(function() {{ Pace.restart(); }});
+		}});
+		// 页面加载进度条
+		$(document).ajaxStart(function() {{ Pace.restart(); }});
 	</script>
 </body>
 </html>";
