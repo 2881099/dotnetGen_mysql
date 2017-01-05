@@ -1041,7 +1041,7 @@ namespace {0}.DAL {{
 		public int Delete{2}({0}) {{
 			return SqlHelper.ExecuteNonQuery(string.Concat(TSQL.Delete, ""{1}""), 
 {3});
-		}}", parms, sqlParms, cs[0].IsPrimaryKey ? string.Empty : parmsBy, CodeBuild.AppendParameters(cs, "				"));
+		}}", parms, sqlParms, cs[0].IsPrimaryKey ? string.Empty : parmsBy, CodeBuild.AppendParameters(cs, "				").Replace("?.ToInt64()", ".ToInt64()"));
 				}
 				table.ForeignKeys.ForEach(delegate (ForeignKeyInfo fkk) {
 					string parms = string.Empty;
@@ -1110,7 +1110,7 @@ namespace {0}.DAL {{
 			public SqlUpdateBuild Set{0}Flag(int _0_16, bool isUnFlag = false) {{
 				{2} tmp1 = ({2})Math.Pow(2, _0_16);
 				if (_item != null) _item.{0} = isUnFlag ? ((_item.{0} ?? 0) ^ tmp1) : ((_item.{0} ?? 0) | tmp1);
-				return this.Set(""`{1}`"", $""ifnull(`{1}`,0) {{isUnFlag ? '^' : '|'}} ?{1}_{{_parameters.Count}}"", 
+				return this.Set(""`{1}`"", $""ifnull(`{1}`,0) {{(isUnFlag ? '^' : '|')}} ?{1}_{{_parameters.Count}}"", 
 					{3}tmp1));
 			}}
 			public SqlUpdateBuild Set{0}UnFlag(int _0_16) {{
@@ -1122,7 +1122,7 @@ namespace {0}.DAL {{
 								sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}Flag({4} value, bool isUnFlag = false) {{
 				if (_item != null) _item.{0} = isUnFlag ? ((_item.{0} ?? 0) ^ value) : ((_item.{0} ?? 0) | value);
-				return this.Set(""`{1}`"", ""ifnull(`{1}`+0,0) {{isUnFlag ? '^' : '|'}} ?{1}_{{_parameters.Count}}"", 
+				return this.Set(""`{1}`"", ""ifnull(`{1}`+0,0) {{(isUnFlag ? '^' : '|')}} ?{1}_{{_parameters.Count}}"", 
 					{3}value.ToInt64()));
 			}}
 			public SqlUpdateBuild Set{0}UnFlag({4} value) {{
@@ -1938,7 +1938,7 @@ namespace {0}.BLL {{
 						string pkParses = "";
 						int pk_idx = 0;
 						foreach (ColumnInfo pk in table.PrimaryKeys) {
-							pkParses += ", " + string.Format(GetStringifyParse(pk.Type), "vs[" + pk_idx++ + "]");
+							pkParses += ", " + string.Format(GetStringifyParse(pk.Type).Replace(".Replace(StringifySplit, \"|\")", ""), "vs[" + pk_idx++ + "]");
 						}
 						pkParses = pkParses.Substring(2);
 						str_mvcdel = string.Format(@"
