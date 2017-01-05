@@ -1243,10 +1243,9 @@ namespace {0}.Admin {{
 						License = new License {{ Name = ""duoyi"", Url = ""http://duoyi.com"" }}
 					}});
 					options.IgnoreObsoleteActions();
-					//options.IgnoreObsoleteControllers();
-					// 类、方法标记 [Obsolete]，可以阻止【Swagger文档】生成
+					//options.IgnoreObsoleteControllers(); // 类、方法标记 [Obsolete]，可以阻止【Swagger文档】生成
 					options.DescribeAllEnumsAsStrings();
-					options.IncludeXmlComments(AppContext.BaseDirectory + @""/Admin.xml"");
+					//options.IncludeXmlComments(AppContext.BaseDirectory + @""/Admin.xml""); // 使用前需开启项目注释 xmldoc
 					options.OperationFilter<FormDataOperationFilter>();
 				}});
 			#endregion
@@ -1696,7 +1695,7 @@ namespace {0}.AdminControllers {{
 					<h1>这是一个测试首页</h1>
 					<h2>swagger webapi：<a href='/swagger/' target='_blank'>/swagger/</a><h2>
 
-					<h2><a href='/sys/connection' target='_blank'>查看 Npgsql连接池</a><h2>
+					<h2><a href='/sys/connection' target='_blank'>查看 Mysql连接池</a><h2>
 					<h2><a href='/sys/connection/redis' target='_blank'>查看 Redis连接池</a><h2>
 				</div>
 			</section>
@@ -1864,7 +1863,7 @@ namespace {0}.AdminControllers {{
 	""buildOptions"": {{
 		""emitEntryPoint"": true,
 		""preserveCompilationContext"": true,
-		""xmlDoc"": true
+		""xmlDoc"": false
 	}},
 
 	""runtimeOptions"": {{
