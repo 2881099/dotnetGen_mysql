@@ -1287,8 +1287,9 @@ namespace {0}.Admin {{
  @"using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -1383,6 +1384,12 @@ public static class Swashbuckle_SwaggerGen_Application_SwaggerGenOptions_Extensi
 	public static void IgnoreObsoleteControllers(this Swashbuckle.SwaggerGen.Application.SwaggerGenOptions options) {{
 		options.DocumentFilter<IgnoreObsoleteControllersFilter>();
 	}}
+	public static object Json(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper html, object obj) {{
+		string str = JsonConvert.SerializeObject(obj);
+		if (!string.IsNullOrEmpty(str)) str = Regex.Replace(str, @""<(/?script[\s>])"", ""<\""+\""$1"", RegexOptions.IgnoreCase);
+		if (html == null) return str;
+		return html.Raw(str);
+	}}
 }}
 namespace Swashbuckle.Swagger.Model {{
 	public class FormDataOperationFilter : IOperationFilter {{
@@ -1425,14 +1432,13 @@ public partial class APIReturn : ContentResult {{
 	}}
 	#region form 表单 target=iframe 提交回调处理
 	private void Jsonp(ActionContext context) {{
-		string json = JsonConvert.SerializeObject(this);
 		string __callback = context.HttpContext.Request.HasFormContentType ? context.HttpContext.Request.Form[""__callback""].ToString() : null;
 		if (string.IsNullOrEmpty(__callback)) {{
 			this.ContentType = ""text/json;charset=utf-8;"";
-			this.Content = json;
+			this.Content = JsonConvert.SerializeObject(this);
 		}}else {{
 			this.ContentType = ""text/html;charset=utf-8"";
-			this.Content = $""<script>top.{{__callback}}({{json}});</script>"";
+			this.Content = $""<script>top.{{__callback}}({{Swashbuckle_SwaggerGen_Application_SwaggerGenOptions_ExtensionMethods.Json(null, this)}});</script>"";
 		}}
 	}}
 	public override void ExecuteResult(ActionContext context) {{

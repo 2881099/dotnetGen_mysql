@@ -1743,7 +1743,7 @@ namespace {0}.BLL {{
 								str_listCms2FilterFK_fkitems += string.Format(@"
 	var fk_{1}s = {0}.Select.ToList();", CodeBuild.UFString(fks[0].ReferencedTable.ClassName), CodeBuild.LFString(fks[0].ReferencedTable.ClassName));
 							str_listCms2FilterFK += string.Format(@"
-			{{ name: '{0}', field: '{4}', text: @Html.Raw(JsonConvert.SerializeObject(fk_{1}s.Select(a => a.{2}))), value: @Html.Raw(JsonConvert.SerializeObject(fk_{1}s.Select(a => a.{3}))) }},",
+			{{ name: '{0}', field: '{4}', text: @Html.Json(fk_{1}s.Select(a => a.{2})), value: @Html.Json(fk_{1}s.Select(a => a.{3})) }},",
 				CodeBuild.UFString(fks[0].ReferencedTable.ClassName), CodeBuild.LFString(fks[0].ReferencedTable.ClassName),
 				string.IsNullOrEmpty(strName) ? "ToString()" : strName.TrimStart('.'), CodeBuild.UFString(fks[0].ReferencedColumns[0].Name), CodeBuild.UFString(fks[0].Columns[0].Name));
 						} else if (csType == "string" && !ttfk_flag) {
@@ -1885,7 +1885,7 @@ namespace {0}.BLL {{
 							str_listCms2FilterFK_fkitems += string.Format(@"
 	var fk_{1}s = {0}.Select.ToList();", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName));
 						str_listCms2FilterFK += string.Format(@"
-			{{ name: '{0}', field: '{4}', text: @Html.Raw(JsonConvert.SerializeObject(fk_{1}s.Select(a => a.{2}))), value: @Html.Raw(JsonConvert.SerializeObject(fk_{1}s.Select(a => a.{3}))) }},",
+			{{ name: '{0}', field: '{4}', text: @Html.Json(fk_{1}s.Select(a => a.{2})), value: @Html.Json(fk_{1}s.Select(a => a.{3})) }},",
 			CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName),
 			string.IsNullOrEmpty(strName) ? "ToString()" : strName.TrimStart('.'), CodeBuild.UFString(fk2[0].ReferencedColumns[0].Name), CodeBuild.UFString(fk2[0].Columns[0].Name));
 						//add.html ±êÇ©¹ØÁª
@@ -1922,7 +1922,7 @@ namespace {0}.BLL {{
 							str_fk_getlist += string.Format(@"
 	var fk_{1}s = {0}.Select.ToList();", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName));
 						str_addjs_mn_initUI += string.Format(@"
-			item.mn_{0} = @Html.Raw(item.Obj_{2}s.ToJson());
+			item.mn_{0} = @Html.Json(item.Obj_{2}s);
 			for (var a = 0; a < item.mn_{0}.length; a++) $(form.mn_{0}).find('option[value=""{{0}}""]'.format(item.mn_{0}[a].{1})).attr('selected', 'selected');", CodeBuild.UFString(addname), CodeBuild.UFString(fk2[0].ReferencedColumns[0].Name), CodeBuild.LFString(addname));
 					});
 
@@ -2187,7 +2187,7 @@ namespace {0}.BLL {{
 							<td id=""{0}_td""></td>
 						</tr>", csUName, comment);
 								sb5.AppendFormat(@"
-		$('#{3}_td').html(yieldTreeSelect(yieldTreeArray(@Html.Raw(fk_{0}s.ToJson()), null, '{1}', '{2}'), '{{#{4}}}', '{1}')).find('select').attr('name', '{3}');",
+		$('#{3}_td').html(yieldTreeSelect(yieldTreeArray(@Html.Json(fk_{0}s), null, '{1}', '{2}'), '{{#{4}}}', '{1}')).find('select').attr('name', '{3}');",
 			FK_uClass_Name, CodeBuild.UFString(fkcb.ReferencedColumns[0].Name), CodeBuild.UFString(fkrr.Columns[0].Name), csUName, FK_Column_Text);
 							} else {
 								sb4.AppendFormat(@"
@@ -2334,7 +2334,7 @@ namespace {0}.BLL {{
 		var item = null;
 		@if (item != null) {{
 			<text>
-			item = @Html.Raw(item.ToJson());
+			item = @Html.Json(item);
 			fillForm(form, item);{4}
 			</text>
 		}}
