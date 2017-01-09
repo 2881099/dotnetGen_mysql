@@ -277,9 +277,10 @@ namespace Server {
 				if (table.IsOutput == false) continue;
 				if (table.Type == "P") continue;
 
-				if (table.Uniques.Count == 0) {
-					throw new Exception("检查到表 “" + table.Owner + "." + table.Name + "” 没有设定惟一键！");
-				}
+				//if (table.Uniques.Count == 0) {
+				//	throw new Exception("检查到表 “" + table.Owner + "." + table.Name + "” 没有设定惟一键！");
+				//}
+				if (table.Columns.Count == 0) continue;
 
 				#region commom variable define
 				string uClass_Name = CodeBuild.UFString(table.ClassName);
@@ -434,9 +435,11 @@ namespace {0}.Model {{
 						int fkc1idx = 0;
 						string fkcsBy = "By";
 						string fkcsParms = string.Empty;
+						string fkcsIfNull = string.Empty;
 						ColumnInfo fkc = fk.Columns.Find(delegate (ColumnInfo c1) {
 							fkc1idx++;
 							fkcsParms += string.Format(GetCSTypeValue(c1.Type), "_" + CodeBuild.UFString(c1.Name)) + ", ";
+							fkcsIfNull += " && _" + CodeBuild.UFString(c1.Name) + " != null";
 							return c1.Name == column.Name;
 						});
 						if (fk.ReferencedTable != null) {
@@ -474,12 +477,12 @@ namespace {0}.Model {{
 							tmpinfo += string.Format(
 @"		public {0}Info Obj_{1} {{
 			get {{
-				if (_obj_{1} == null) _obj_{1} = {5}.GetItem{3}({4});
+				if (_obj_{1} == null{6}) _obj_{1} = {5}.GetItem{3}({4});
 				return _obj_{1};
 			}}
 			internal set {{ _obj_{1} = value; }}
 		}}
-", FK_uClass_Name_full, memberName, solutionName, fkcsBy, fkcsParms, FK_uClass_Name);
+", FK_uClass_Name_full, memberName, solutionName, fkcsBy, fkcsParms, FK_uClass_Name, fkcsIfNull);
 							//若不存在 Obj_外键表名，则增加，否则InnerJoin.ToList时会报错 “Obj_外键表名 不存在”
 							//比如表只有一 creator_person_id 时，需附加成生一个 Obj_person 属性
 							string fkTableClassName = fk.ReferencedTable.ClassName;
@@ -762,12 +765,7 @@ namespace {0}.Model {{
 							//}
 							string objs_value = string.Format(@"
 		private List<{0}Info> _obj_{1}s;
-		public List<{0}Info> Obj_{1}s {{
-			get {{
-				if (_obj_{1}s == null) _obj_{1}s = {0}.SelectBy{5}_{4}({3}).ToList();
-				return _obj_{1}s;
-			}}
-		}}", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), solutionName, civ, table.PrimaryKeys[0].Name, CodeBuild.UFString(f5));
+		public List<{0}Info> Obj_{1}s => _obj_{1}s ?? (_obj_{1}s = {0}.SelectBy{5}_{4}({3}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), solutionName, civ, table.PrimaryKeys[0].Name, CodeBuild.UFString(f5));
 							//如果中间表字段 > 2，那么应该把其中间表也查询出来
 							if (t2.Columns.Count > 2) {
 								string _f6 = fk.Columns[0].Name;
@@ -788,12 +786,7 @@ namespace {0}.Model {{
 		/// <summary>
 		/// 遍历时，可通过 Obj_{3} 可获取中间表数据
 		/// </summary>
-		public List<{0}Info> Obj_{1}s {{
-			get {{
-				if (_obj_{1}s == null) _obj_{1}s = {0}.Select.InnerJoin<{2}>(""b"", ""b.`{6}` = a.`{5}`"").Where(""b.`{4}` = {{0}}"", {7}).ToList();
-				return _obj_{1}s;
-			}}
-		}}", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), CodeBuild.UFString(t2.ClassName), CodeBuild.LFString(t2.ClassName),
+		public List<{0}Info> Obj_{1}s =>_obj_{1}s ?? (_obj_{1}s = {0}.Select.InnerJoin<{2}>(""b"", ""b.`{6}` = a.`{5}`"").Where(""b.`{4}` = {{0}}"", {7}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), CodeBuild.UFString(t2.ClassName), CodeBuild.LFString(t2.ClassName),
 			_f6, _f7, _f8, civ);
 							}
 							string objs_key = string.Format("Obj_{0}s", CodeBuild.LFString(addname));
@@ -806,12 +799,7 @@ namespace {0}.Model {{
 						string f2 = fk.Columns[0].Name.CompareTo("parent_id") == 0 ? t2name : fk.Columns[0].Name.Replace(tablename + "_" + table.PrimaryKeys[0].Name, "") + CodeBuild.LFString(t2name);
 						string objs_value = string.Format(@"
 		private List<{0}Info> _obj_{1}s;
-		public List<{0}Info> Obj_{1}s {{
-			get {{
-				if (_obj_{1}s == null) _obj_{1}s = {0}.SelectBy{3}(_{4}).Limit(500).ToList();
-				return _obj_{1}s;
-			}}
-		}}", CodeBuild.UFString(t2.ClassName), f2, solutionName, CodeBuild.UFString(fk.Columns[0].Name), CodeBuild.UFString(table.PrimaryKeys[0].Name));
+		public List<{0}Info> Obj_{1}s => _obj_{1}s ?? (_obj_{1}s = {0}.SelectBy{3}(_{4}).Limit(500).ToList());", CodeBuild.UFString(t2.ClassName), f2, solutionName, CodeBuild.UFString(fk.Columns[0].Name), CodeBuild.UFString(table.PrimaryKeys[0].Name));
 						string objs_key = string.Format("Obj_{0}s", f2);
 						if (!dic_objs.ContainsKey(objs_key))
 							dic_objs.Add(objs_key, objs_value);
@@ -841,9 +829,7 @@ namespace {0}.Model {{
 			this." + UFString(colCreateTime.Name) + " = DateTime.Now;" : "", pkCsParamNoType.Replace(", ", " != null && this.")));
 					}
 					sb6.Insert(0, string.Format(@"
-		public {0}.DAL.{1}.SqlUpdateBuild UpdateDiy {{
-			get {{ return {1}.UpdateDiy(this, _{2}); }}
-		}}", solutionName, uClass_Name, pkCsParamNoTypeByval.Replace(", ", ", _")));
+		public {0}.DAL.{1}.SqlUpdateBuild UpdateDiy => {1}.UpdateDiy(this, _{2});", solutionName, uClass_Name, pkCsParamNoTypeByval.Replace(", ", ", _")));
 				}
 
 				sb1.AppendFormat(

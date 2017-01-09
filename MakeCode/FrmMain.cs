@@ -268,7 +268,7 @@ namespace MakeCode {
 		private void dgvGridview_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e) {
 			if (e.Button == MouseButtons.Left && e.ColumnIndex == 1 && this._tables != null) {
 				foreach (TableInfo table in _tables) table.IsOutput = !table.IsOutput && 
-					(table.PrimaryKeys.Count > 0 && table.FullName != "dbo.sysdiagrams" || table.Type == "P");
+					(table.Columns.Count > 0 && table.FullName != "dbo.sysdiagrams" || table.Type == "P");
 				this.BindGridView();
 			}
 		}
