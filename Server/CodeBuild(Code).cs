@@ -1080,12 +1080,12 @@ namespace {0}.DAL {{
 				return this.Set(""`{1}`"", $""?{1}_{{_parameters.Count}}"", 
 					{3}value{4}));
 			}}", CodeBuild.UFString(col.Name), col.Name, CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper()),
-							valueParm.Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{{_parameters.Count}}\""),
+							valueParm.Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{_parameters.Count}\""),
 							col.Type == MySqlDbType.Enum || col.Type == MySqlDbType.Set ? "?.ToInt64()" : "");
 						if (table.ForeignKeys.FindIndex(delegate (ForeignKeyInfo fkf) { return fkf.Columns.FindIndex(delegate (ColumnInfo fkfpkf) { return fkfpkf.Name == col.Name; }) != -1; }) == -1) {
 							string fptype = "";
 							string fpset_ = string.Format("_item.{0} += value;", CodeBuild.UFString(col.Name));
-							string fparam = valueParm.Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{{_parameters.Count}}\"");
+							string fparam = valueParm.Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{_parameters.Count}\"");
 							if (col.Type == MySqlDbType.Byte || col.Type == MySqlDbType.UByte) {
 								fptype = "byte";
 								fparam = fparam.Replace("MySqlDbType.UByte", "MySqlDbType.Byte");
@@ -1122,7 +1122,7 @@ namespace {0}.DAL {{
 								sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}Flag({4} value, bool isUnFlag = false) {{
 				if (_item != null) _item.{0} = isUnFlag ? ((_item.{0} ?? 0) ^ value) : ((_item.{0} ?? 0) | value);
-				return this.Set(""`{1}`"", ""ifnull(`{1}`+0,0) {{(isUnFlag ? '^' : '|')}} ?{1}_{{_parameters.Count}}"", 
+				return this.Set(""`{1}`"", $""ifnull(`{1}`+0,0) {{(isUnFlag ? '^' : '|')}} ?{1}_{{_parameters.Count}}"", 
 					{3}value.ToInt64()));
 			}}
 			public SqlUpdateBuild Set{0}UnFlag({4} value) {{
@@ -1133,7 +1133,7 @@ namespace {0}.DAL {{
 								sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}Increment({2} value) {{
 				if (_item != null) {4}
-				return this.Set(""`{1}`"", ""`{1}` + ?{1}_{{_parameters.Count}}"", 
+				return this.Set(""`{1}`"", $""`{1}` + ?{1}_{{_parameters.Count}}"", 
 					{3}value));
 			}}", CodeBuild.UFString(col.Name), col.Name, fptype, fparam, fpset_);
 							}
