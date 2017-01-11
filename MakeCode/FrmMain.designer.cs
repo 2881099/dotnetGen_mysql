@@ -145,7 +145,7 @@ namespace MakeCode {
 			// 
 			this.dgvGridview.AllowUserToAddRows = false;
 			this.dgvGridview.AllowUserToResizeRows = false;
-			this.dgvGridview.BackgroundColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.dgvGridview.BackgroundColor = System.Drawing.SystemColors.HighlightText;
 			this.dgvGridview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
 			this.dgvGridview.Location = new System.Drawing.Point(12, 12);
 			this.dgvGridview.Name = "dgvGridview";
@@ -278,7 +278,7 @@ namespace MakeCode {
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.BackColor = System.Drawing.Color.PeachPuff;
+			this.BackColor = System.Drawing.Color.NavajoWhite;
 			this.ClientSize = new System.Drawing.Size(586, 405);
 			this.Controls.Add(this.chkDownloadRes);
 			this.Controls.Add(this.panel1);
@@ -297,6 +297,7 @@ namespace MakeCode {
 			this.Controls.Add(this.btnBuild);
 			this.Controls.Add(this.btnConnect);
 			this.Controls.Add(this.dgvGridview);
+			this.ForeColor = System.Drawing.Color.Black;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.MaximizeBox = false;
 			this.Name = "FrmMain";
