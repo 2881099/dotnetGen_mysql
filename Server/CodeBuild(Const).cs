@@ -384,7 +384,7 @@ namespace {0}.Model {{
 			IEnumerator ie = items.GetEnumerator();
 			while (ie.MoveNext()) {{
 				if (ie.Current == null) ret.Add(null);
-				else if (func == null) ret.Add(ie.Current.GetType().GetMethod(""ToBson"").Invoke(ie.Current, null) as IDictionary);
+				else if (func == null) ret.Add(ie.Current.GetType().GetMethod(""ToBson"").Invoke(ie.Current, new object[] {{ false }}) as IDictionary);
 				else {{
 					object obj = func.GetMethodInfo().Invoke(func.Target, new object[] {{ ie.Current }});
 					if (obj is IDictionary) ret.Add(obj as IDictionary);

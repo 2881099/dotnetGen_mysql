@@ -278,6 +278,7 @@ namespace MakeCode {
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.BackColor = System.Drawing.Color.PeachPuff;
 			this.ClientSize = new System.Drawing.Size(586, 405);
 			this.Controls.Add(this.chkDownloadRes);
 			this.Controls.Add(this.panel1);

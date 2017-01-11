@@ -54,6 +54,7 @@
     <Compile Include="Model\DataSort.cs" />
     <Compile Include="Model\ForeignKeyInfo.cs" />
     <Compile Include="Model\TableInfo.cs" />
+    <Compile Include="MySqlDbType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

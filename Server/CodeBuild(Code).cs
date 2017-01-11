@@ -305,9 +305,10 @@ namespace Server {
 					string.Join(", ", table.Clustereds.ConvertAll<string>(delegate (ColumnInfo cli) {
 						return "a.`" + cli.Name + "`" + (cli.Orderby == DataSort.ASC ? string.Empty : string.Concat(" ", cli.Orderby));
 					}).ToArray()) :
-					string.Join(", ", table.Uniques[0].ConvertAll<string>(delegate (ColumnInfo cli) {
-						return "a.`" + cli.Name + "`" + (cli.Orderby == DataSort.ASC ? string.Empty : string.Concat(" ", cli.Orderby));
-					}).ToArray());
+					table.Uniques.Count > 0 ?
+						string.Join(", ", table.Uniques[0].ConvertAll<string>(delegate (ColumnInfo cli) {
+							return "a.`" + cli.Name + "`" + (cli.Orderby == DataSort.ASC ? string.Empty : string.Concat(" ", cli.Orderby));
+						}).ToArray()) : "";
 
 				int pkSqlParamFormat_idx = -1;
 				if (table.PrimaryKeys.Count > 0) {
