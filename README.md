@@ -11,7 +11,7 @@
 [下载生成器客户端试用](http://files.cnblogs.com/files/kellynic/%E7%94%9F%E6%88%90%E5%99%A8MySql.zip)
 
 > MakeCode 已支持命令行，查看帮助可输入 cmd -> makecode ?
-> C:/Users/Administrator/Desktop/生成器PgSql/MakeCode 10.17.65.88:5432 -U postgres -P 123456 -D 数据库 -N 项目名 -O "X:/git.oa.com/xteam/dyschool/"
+> C:/Users/Administrator/Desktop/生成器MySql/MakeCode 10.17.65.88:3066 -U root -P *** -D 数据库 -N 项目名 -O "X:/xxx/"
 > 开发过程中，修改表后执行命令可以快速更新SDK；
 
 共勉，一起学习QQ群：8578575
