@@ -1,4 +1,4 @@
-# dotnetGen_mysql
+﻿# dotnetGen_mysql
 .NETCore + Mysql 生成器
 
 本项目为生成器，用于快速创建和更新 .NETCore + Mysql 项目，非常合适敏捷开发；
@@ -9,6 +9,10 @@
  * 3、统一规范数据库操作类与方法，一条心堆业务；
 
 [下载生成器客户端试用](http://files.cnblogs.com/files/kellynic/%E7%94%9F%E6%88%90%E5%99%A8MySql.zip)
+
+> MakeCode 已支持命令行，查看帮助可输入 cmd -> makecode ?
+> C:/Users/Administrator/Desktop/生成器PgSql/MakeCode 10.17.65.88:5432 -U postgres -P 123456 -D 数据库 -N 项目名 -O "X:/git.oa.com/xteam/dyschool/"
+> 开发过程中，修改表后执行命令可以快速更新SDK；
 
 共勉，一起学习QQ群：8578575
 
@@ -40,13 +44,13 @@
 | 表主键             | √ | √ | √ | √ |
 | 表唯一键           | √ | √ | √ | √ |
 | 存储过程           | √ | - | - | - |
-| 视图               | - | - | - | √ |
+| 视图               | - | - | √ | √ |
 | 类型映射           | √ | √ | √ | √ |
 | 枚举               | - | - | √ | √ |
 | 自定义类型         | - | - | - | √ |
 | 数组               | - | - | - | √ |
 | xml               | - | - | - | - |
 | json              | - | - | - | √ |
-| 命令行生成         | - | - | - | √ |
+| 命令行生成         | - | - | √ | √ |
 | RESTful           | - | - | √ | √ |
 | 后台管理功能       | √ | - | √ | √ |
