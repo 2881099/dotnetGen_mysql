@@ -86,20 +86,20 @@ namespace MySql.Data.MySqlClient {
 			}
 			if (isCache) {
 				if (string.IsNullOrEmpty(cacheKey)) cacheKey = sql.Substring(sql.IndexOf(" \r\nFROM ") + 8);
-				ConstructorInfo[] constructors = new ConstructorInfo[_dals.Count];
+				MethodInfo[] parses = new MethodInfo[_dals.Count];
 				for (int b = 0; b < _dals.Count; b++) {
 					string modelTypeName = string.Concat(_dals[b].GetType().FullName.Replace(".DAL.", ".Model."), "Info");
-					constructors[b] = this.GetType().GetTypeInfo().Assembly.GetType(modelTypeName).GetConstructor(new Type[] { typeof(string) });
+					parses[b] = this.GetType().GetTypeInfo().Assembly.GetType(modelTypeName).GetMethod("Parse", new Type[] { typeof(string) });
 				}
 				string cacheValue = cache_get(cacheKey);
 				if (!string.IsNullOrEmpty(cacheValue)) {
 					try {
 						string[] vs = JsonConvert.DeserializeObject<string[]>(cacheValue);
 						for (int a = 0, skip = objNames.Length + 1; a < vs.Length; a += skip) {
-							TReturnInfo info = (TReturnInfo)constructors[0].Invoke(new object[] { vs[a] });
+							TReturnInfo info = (TReturnInfo)parses[0].Invoke(null, new object[] { vs[a] });
 							Type type = info.GetType();
-							for (int b = 1; b < constructors.Length; b++) {
-								object item = constructors[b].Invoke(new object[] { vs[a + b] });
+							for (int b = 1; b < parses.Length; b++) {
+								object item = parses[b].Invoke(null, new object[] { vs[a + b] });
 								PropertyInfo prop = type.GetProperty(objNames[b - 1]);
 								if (prop != null) prop.SetValue(info, item, null);
 							}
