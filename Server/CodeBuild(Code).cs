@@ -2411,6 +2411,16 @@ namespace {0}.BLL {{
 				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"AdminControllers\SysController.cs"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
+				#region LoginController.cs
+				sb1.AppendFormat(CONST.Admin_Controllers_LoginController, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"AdminControllers\LoginController.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Views\Admin\Login\Index.cshtml
+				sb1.AppendFormat(CONST.Admin_Views_Admin_Login_Index_cshtml, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Views\Admin\Login\Index.cshtml"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
 				#region Admin.xproj
 				sb1.AppendFormat(CONST.xproj, adminGuid, "Admin");
 				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Admin.xproj"), Deflate.Compress(sb1.ToString())));

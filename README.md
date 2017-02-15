@@ -18,16 +18,9 @@
 
 -----------------
 
-生成的项目运行大概需要注意以下几点：
+生成的项目运行需要注意：
 
  * 修改 /admin/appsettings.json 里面的 redis 配置（缓存、Session 使用了 redis）
- * 修改 nuget 源：（使用了 Swashbuckle.Swagger 6.0.0-preview-0035）
-
-	```xml
-		<add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
-		<add key="nuget.org" value="http://api.nuget.org/v3/index.json" />
-		<add key="Ahoy Preview MyGet" value="https://www.myget.org/F/domaindrivendev/api/v3/index.json" />
-	```
 
 -----------------
 

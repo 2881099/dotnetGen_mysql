@@ -1199,7 +1199,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Redis;
 using NLog.Extensions.Logging;
-using Swashbuckle.Swagger.Model;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace {0}.Admin {{
 	public class Startup {{
@@ -1297,8 +1297,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Swashbuckle.Swagger.Model;
-using Swashbuckle.SwaggerGen.Generator;
+using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using {0}.BLL;
 using {0}.Model;
 
@@ -1381,7 +1381,7 @@ public static class Swashbuckle_SwaggerGen_Application_SwaggerGenOptions_Extensi
 			}}
 		}}
 	}}
-	public static void IgnoreObsoleteControllers(this Swashbuckle.SwaggerGen.Application.SwaggerGenOptions options) {{
+	public static void IgnoreObsoleteControllers(this SwaggerGenOptions options) {{
 		options.DocumentFilter<IgnoreObsoleteControllersFilter>();
 	}}
 	public static object Json(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper html, object obj) {{
@@ -1391,7 +1391,7 @@ public static class Swashbuckle_SwaggerGen_Application_SwaggerGenOptions_Extensi
 		return html.Raw(str);
 	}}
 }}
-namespace Swashbuckle.Swagger.Model {{
+namespace Swashbuckle.AspNetCore.Swagger {{
 	public class FormDataOperationFilter : IOperationFilter {{
 		public void Apply(Operation operation, OperationFilterContext context) {{
 			var actattrs = context.ApiDescription.ActionAttributes();
@@ -1523,6 +1523,152 @@ namespace {0}.AdminControllers {{
 		}}
 	}}
 }}
+";
+			#endregion
+
+			public static readonly string Admin_Controllers_LoginController =
+			#region 内容太长已被收起
+ @"using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using {0}.BLL;
+using {0}.Model;
+
+namespace {0}.AdminControllers {{
+	[Route(""[controller]"")]
+	[Obsolete]
+	public class LoginController : BaseAdminController {{
+
+		public LoginController(ILogger<LoginController> logger) : base(logger) {{ }}
+
+		[HttpGet]
+		[匿名访问]
+		public ViewResult Index() {{
+			return View();
+		}}
+		[HttpPost]
+		[匿名访问]
+		public APIReturn Post(LoginModel data) {{
+			HttpContext.Session.SetString(""login.username"", data.Username);
+			return APIReturn.成功;
+		}}
+
+		public class LoginModel {{
+			[FromForm]
+			[Required(ErrorMessage = ""请输入登陆名"")]
+			public string Username {{ get; set; }}
+
+			[FromForm]
+			[Required(ErrorMessage = ""请输入密码"")]
+			public string Password {{ get; set; }}
+		}}
+	}}
+}}
+";
+			#endregion
+			public static readonly string Admin_Views_Admin_Login_Index_cshtml =
+			#region 内容太长已被收起
+ @"@{{
+	Layout = """";
+}}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset=""utf-8"">
+	<meta http-equiv=""X-UA-Compatible"" content=""IE=edge"">
+	<title>{0}后台管理中心 - 登陆</title>
+	<!-- Tell the browser to be responsive to screen width -->
+	<meta content=""width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"" name=""viewport"">
+	<link rel=""stylesheet"" href=""./htm/bootstrap/css/bootstrap.min.css"">
+	<link rel=""stylesheet"" href=""./htm/plugins/font-awesome/css/font-awesome.min.css"" />
+	<link rel=""stylesheet"" href=""./htm/css/system.css"">
+	<script type=""text/javascript"" src=""./htm/js/jQuery-2.1.4.min.js""></script>
+	<script type=""text/javascript"" src=""./htm/js/lib.js""></script>
+	<!--[if lt IE 9]>
+	<script type='text/javascript' src='./htm/plugins/html5shiv/html5shiv.min.js'></script>
+	<script type='text/javascript' src='./htm/plugins/respond/respond.min.js'></script>
+	<![endif]-->
+
+<style type=""text/css"">
+.login-box-body--has-errors{{animation:shake .5s .25s 1;-webkit-animation:shake .5s .25s 1}}
+@@keyframes shake{{0%,100%{{transform:translateX(0)}}20%,60%{{transform:translateX(-10px)}}40%,80%{{transform:translateX(10px)}}}}
+@@-webkit-keyframes shake{{0%,100%{{-webkit-transform:translateX(0)}}20%,60%{{-webkit-transform:translateX(-10px)}}40%,80%{{-webkit-transform:translateX(10px)}}}}
+</style>
+
+</head>
+<body class=""hold-transition login-page"">
+	<div class=""login-box"">
+		<div class=""login-logo"">
+			<a href=""./""><b>{0}</b>后台管理中心</a>
+		</div>
+
+		<div id=""error_msg"" style=""display:none;"">
+			<div class=""alert alert-warning alert-dismissible"">
+				<button type=""button"" class=""close"" data-dismiss=""alert"" aria-hidden=""true"">×</button>
+				<h4><i class=""icon fa fa-warning""></i>警告!</h4>
+				{{0}}
+			</div>
+		</div>
+
+		<!-- /.login-logo -->
+		<div class=""login-box-body"">
+			<p class=""login-box-msg""></p>
+
+			<iframe name=""iframe_form_login"" hidden></iframe>
+			<form id=""form_login"" method=""post"" target=""iframe_form_login"">
+				@Html.AntiForgeryToken()
+				<input type=""hidden"" name=""__callback"" value=""login_callback"" />
+				<div class=""form-group has-feedback"">
+					<input name=""username"" type=""text"" class=""form-control"" placeholder=""Username"">
+					<span class=""glyphicon glyphicon-envelope form-control-feedback""></span>
+				</div>
+				<div class=""form-group has-feedback"">
+					<input name=""password"" type=""password"" class=""form-control"" placeholder=""Password"">
+					<span class=""glyphicon glyphicon-lock form-control-feedback""></span>
+				</div>
+				<div class=""row"">
+					<div class=""col-xs-8"">
+					</div>
+					<!-- /.col -->
+					<div class=""col-xs-4"">
+						<button type=""submit"" class=""btn btn-primary btn-block btn-flat"">登 陆</button>
+					</div>
+					<!-- /.col -->
+				</div>
+			</form>
+
+		</div>
+		<!-- /.login-box-body -->
+	</div>
+	<!-- /.login-box -->
+
+	<!-- jQuery 2.2.0 -->
+	<script src=""./htm/plugins/jQuery/jQuery-2.2.0.min.js""></script>
+	<script src=""./htm/bootstrap/js/bootstrap.min.js""></script>
+
+<script type=""text/javascript"">
+	(function () {{
+		var msgtpl = $('#error_msg').html();
+		top.login_callback = function (rt) {{
+			if (rt.success) return top.mainViewNav.goto('./');
+			$('#error_msg').html(msgtpl.format(rt.message)).show();
+			$('div.login-box-body').addClass('login-box-body--has-errors');
+			setTimeout(function () {{
+				$('div.login-box-body').removeClass('login-box-body--has-errors');
+			}}, 2000);
+		}};
+	}})();
+</script>
+</body>
+</html>
 ";
 			#endregion
 
@@ -1700,6 +1846,7 @@ namespace {0}.AdminControllers {{
 					<!-- Your Page Content Here-->
 					<h1>这是一个测试首页</h1>
 					<h2>swagger webapi：<a href='/swagger/' target='_blank'>/swagger/</a><h2>
+					<h2>登陆地址：<a href='/login' target='_blank'>/login</a><h2>
 
 					<h2><a href='/sys/connection' target='_blank'>查看 Mysql连接池</a><h2>
 					<h2><a href='/sys/connection/redis' target='_blank'>查看 Redis连接池</a><h2>
@@ -1848,8 +1995,8 @@ namespace {0}.AdminControllers {{
 		""Microsoft.AspNetCore.Session"": ""1.0.0"",
 		""NLog.Extensions.Logging"": ""1.0.0-rtm-alpha4"",
 		""System.Text.Encoding.CodePages"": ""4.0.1"",
-		""Swashbuckle.SwaggerGen"": ""6.0.0-preview-0035"",
-		""Swashbuckle.SwaggerUi"": ""6.0.0-preview-0035""
+		""Swashbuckle.AspNetCore.SwaggerGen"": ""1.0.0-*"",
+		""Swashbuckle.AspNetCore.SwaggerUi"": ""1.0.0-*""
 	}},
 
 	""tools"": {{
