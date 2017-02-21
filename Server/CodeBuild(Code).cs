@@ -594,7 +594,8 @@ namespace {0}.Model {{
 								return ffk3.ReferencedTable.FullName == t2.FullName;
 							});
 							if (fk3 != null) {
-								if (fk3.Columns[0].IsPrimaryKey) return;
+								if (fk3.Columns[0].IsPrimaryKey)
+									if (fk3.Table.PrimaryKeys.Count == 1) return; //如果有外键是主键，并且它不是复合组合，则跳过
 							}
 						}
 					}
