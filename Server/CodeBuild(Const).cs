@@ -1111,12 +1111,18 @@ return rTn;"");
 	internalLogLevel=""Warn""
 	internalLogFile=""internal-nlog.txt"">
 
+	<!-- Load the ASP.NET Core plugin -->
+	<extensions>
+		<add assembly=""NLog.Web.AspNetCore""/>
+	</extensions>
+
+	<!-- Layout: https://github.com/NLog/NLog/wiki/Layout%20Renderers -->
 	<targets>
 		<target xsi:type=""File"" name=""allfile"" fileName=""../nlog/all-${{shortdate}}.log""
-			layout=""${{longdate}}|${{logger}}|${{uppercase:${{level}}}}|${{message}} ${{exception}}"" />
+			layout=""${{longdate}}|${{logger}}|${{uppercase:${{level}}}}|${{message}} ${{exception}}|${{aspnet-Request-Url}}"" />
 
 		<target xsi:type=""File"" name=""ownFile-web"" fileName=""../nlog/own-${{shortdate}}.log""
-			layout=""${{longdate}}|${{logger}}|${{uppercase:${{level}}}}|  ${{message}} ${{exception}}"" />
+			layout=""${{longdate}}|${{logger}}|${{uppercase:${{level}}}}|  ${{message}} ${{exception}}|${{aspnet-Request-Url}}"" />
 
 		<target xsi:type=""Null"" name=""blackhole"" />
 	</targets>
@@ -1193,12 +1199,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Redis;
 using NLog.Extensions.Logging;
+using NLog.Web;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace {0}.Admin {{
@@ -1249,6 +1257,7 @@ namespace {0}.Admin {{
 					options.OperationFilter<FormDataOperationFilter>();
 				}});
 			#endregion
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddSingleton<IConfigurationRoot>(Configuration);
 			services.AddSingleton<IHostingEnvironment>(env);
 		}}
@@ -1262,6 +1271,7 @@ namespace {0}.Admin {{
 			loggerFactory.AddConsole(Configuration.GetSection(""Logging""));
 			loggerFactory.AddNLog().AddDebug();
 			env.ConfigureNLog(""nlog.config"");
+			app.AddNLogWeb();
 
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
@@ -1993,7 +2003,8 @@ namespace {0}.AdminControllers {{
 		""Microsoft.Extensions.Logging.Debug"": ""1.0.0"",
 		""{0}.db"": ""1.0.0-*"",
 		""Microsoft.AspNetCore.Session"": ""1.0.0"",
-		""NLog.Extensions.Logging"": ""1.0.0-rtm-alpha4"",
+		""NLog.Extensions.Logging"": ""1.0.0-rtm-beta3"",
+		""NLog.Web.AspNetCore"": ""4.3.0"",
 		""System.Text.Encoding.CodePages"": ""4.0.1"",
 		""Swashbuckle.AspNetCore.SwaggerGen"": ""1.0.0-*"",
 		""Swashbuckle.AspNetCore.SwaggerUi"": ""1.0.0-*""
