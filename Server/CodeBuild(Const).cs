@@ -2004,7 +2004,7 @@ namespace {0}.AdminControllers {{
 		""{0}.db"": ""1.0.0-*"",
 		""Microsoft.AspNetCore.Session"": ""1.0.0"",
 		""NLog.Extensions.Logging"": ""1.0.0-rtm-beta3"",
-		""NLog.Web.AspNetCore"": ""4.3.0"",
+		""NLog.Web.AspNetCore"": ""4.3.1"",
 		""System.Text.Encoding.CodePages"": ""4.0.1"",
 		""Swashbuckle.AspNetCore.SwaggerGen"": ""1.0.0-*"",
 		""Swashbuckle.AspNetCore.SwaggerUi"": ""1.0.0-*""
