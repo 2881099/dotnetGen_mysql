@@ -1943,6 +1943,7 @@ namespace {0}.AdminControllers {{
 									}});
 								}}
 							}},
+							reload: startRouter,
 							query: qs_parseByUrl(refererUrl)
 						}};
 						top.mainViewInit = function () {{
