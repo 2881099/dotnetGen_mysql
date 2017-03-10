@@ -10,32 +10,8 @@ namespace Server {
 
 		protected class CONST {
 			public static readonly string corePath = @"src\";
-			public static readonly string adminPath = @"src\Admin\";
-			public static readonly string xproj =
-			#region 内容太长已被收起
- @"<?xml version=""1.0"" encoding=""utf-8""?>
-<Project ToolsVersion=""14.0"" DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
-  <PropertyGroup>
-    <VisualStudioVersion Condition=""'$(VisualStudioVersion)' == ''"">14.0</VisualStudioVersion>
-    <VSToolsPath Condition=""'$(VSToolsPath)' == ''"">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-  </PropertyGroup>
-
-  <Import Project=""$(VSToolsPath)\DotNet\Microsoft.DotNet.Props"" Condition=""'$(VSToolsPath)' != ''"" />
-  <PropertyGroup Label=""Globals"">
-    <ProjectGuid>{0}</ProjectGuid>
-    <RootNamespace>{1}</RootNamespace>
-    <BaseIntermediateOutputPath Condition=""'$(BaseIntermediateOutputPath)'=='' "">.\obj</BaseIntermediateOutputPath>
-    <OutputPath Condition=""'$(OutputPath)'=='' "">.\bin\</OutputPath>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <SchemaVersion>2.0</SchemaVersion>
-  </PropertyGroup>
-  <Import Project=""$(VSToolsPath)\DotNet\Microsoft.DotNet.targets"" Condition=""'$(VSToolsPath)' != ''"" />
-</Project>
-";
-			#endregion
+			public static readonly string moduleAdminPath = @"src\Module\Admin\";
+			public static readonly string webHostPath = @"src\WebHost\";
 			public static readonly string sln =
 			#region 内容太长已被收起
  @"
@@ -43,18 +19,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""src"", ""src"", ""{{{0}}}""
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""src"", ""src"", ""{{{1}}}""
 EndProject
-Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""Solution Items"", ""Solution Items"", ""{{{1}}}""
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""Solution Items"", ""Solution Items"", ""{{{2}}}""
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
+		build.bat = build.bat
+		readme.md = readme.md
 	EndProjectSection
 EndProject
-Project(""{{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}}"") = ""Common"", ""src\Common\Common.xproj"", ""{{{2}}}""
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""Module"", ""Module"", ""{{{3}}}""
 EndProject
-Project(""{{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}}"") = ""{5}.db"", ""src\{5}.db\{5}.db.xproj"", ""{{{3}}}""
+Project(""{{2150E333-8FDC-42A3-9474-1A3956D46DE8}}"") = ""Test"", ""Test"", ""{{{4}}}""
 EndProject
-Project(""{{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}}"") = ""Admin"", ""src\Admin\Admin.xproj"", ""{{{4}}}""
+Project(""{{9A19103F-16F7-4668-BE54-9A1E7A4F7556}}"") = ""Common"", ""src\Common\Common.csproj"", ""{{{5}}}""
+EndProject
+Project(""{{9A19103F-16F7-4668-BE54-9A1E7A4F7556}}"") = ""{0}.db"", ""src\{0}.db\{0}.db.csproj"", ""{{{6}}}""
+EndProject
+Project(""{{9A19103F-16F7-4668-BE54-9A1E7A4F7556}}"") = ""Infrastructure"", ""src\Infrastructure\Infrastructure.csproj"", ""{{{7}}}""
+EndProject
+Project(""{{9A19103F-16F7-4668-BE54-9A1E7A4F7556}}"") = ""WebHost"", ""src\WebHost\WebHost.csproj"", ""{{{8}}}""
+EndProject
+Project(""{{9A19103F-16F7-4668-BE54-9A1E7A4F7556}}"") = ""Admin"", ""src\Module\Admin\Admin.csproj"", ""{{{9}}}""
+EndProject
+Project(""{{9A19103F-16F7-4668-BE54-9A1E7A4F7556}}"") = ""Test"", ""src\Module\Test\Test.csproj"", ""{{{10}}}""
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,38 +49,44 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{{{2}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{{{2}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{{{2}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{{{2}}}.Release|Any CPU.Build.0 = Release|Any CPU
-		{{{3}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{{{3}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{{{3}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{{{3}}}.Release|Any CPU.Build.0 = Release|Any CPU
-		{{{4}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{{{4}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{{{4}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{{{4}}}.Release|Any CPU.Build.0 = Release|Any CPU
+		{{{5}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{{{5}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{{{5}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{{{5}}}.Release|Any CPU.Build.0 = Release|Any CPU
+		{{{6}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{{{6}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{{{6}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{{{6}}}.Release|Any CPU.Build.0 = Release|Any CPU
+		{{{7}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{{{7}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{{{7}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{{{7}}}.Release|Any CPU.Build.0 = Release|Any CPU
+		{{{8}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{{{8}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{{{8}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{{{8}}}.Release|Any CPU.Build.0 = Release|Any CPU
+		{{{9}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{{{9}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{{{9}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{{{9}}}.Release|Any CPU.Build.0 = Release|Any CPU
+		{{{10}}}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{{{10}}}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{{{10}}}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{{{10}}}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{{{2}}} = {{{0}}}
-		{{{3}}} = {{{0}}}
-		{{{4}}} = {{{0}}}
+		{{{3}}} = {{{1}}}
+		{{{5}}} = {{{1}}}
+		{{{6}}} = {{{1}}}
+		{{{7}}} = {{{1}}}
+		{{{8}}} = {{{1}}}
+		{{{9}}} = {{{3}}}
+		{{{10}}} = {{{3}}}
 	EndGlobalSection
 EndGlobal
-";
-			#endregion
-			public static readonly string global_json =
-			#region 内容太长已被收起
-@"{{
-  ""projects"": [ ""src"", ""test"" ],
-  ""sdk"": {{
-    ""version"": ""1.0.0-preview2-003121""
-  }}
-}}
 ";
 			#endregion
 
@@ -402,20 +395,17 @@ namespace {0}.Model {{
 }}";
 			#endregion
 
-			public static readonly string Db_project_json =
+			public static readonly string Db_csproj =
 			#region 内容太长已被收起
- @"{{
-	""version"": ""1.0.0-*"",
-	""dependencies"": {{
-		""Common"": ""1.0.0-*"",
-		""NETStandard.Library"": ""1.6.0""
-	}},
-	""frameworks"": {{
-		""netstandard1.6"": {{
-			""imports"": ""dnxcore50""
-		}}
-	}}
-}}
+ @"<Project Sdk=""Microsoft.NET.Sdk"">
+	<PropertyGroup>
+		<TargetFramework>netstandard1.6</TargetFramework>
+		<AssemblyName>{0}.db</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include=""..\Common\Common.csproj"" />
+	</ItemGroup>
+</Project>
 ";
 			#endregion
 
@@ -1055,55 +1045,202 @@ return rTn;"");
 }}";
 			#endregion
 
-			public static readonly string Common_project_json =
+			public static readonly string Common_csproj =
 			#region 内容太长已被收起
- @"{{
-	""version"": ""1.0.0-*"",
-	""dependencies"": {{
-		""Google.Protobuf"": ""3.1.0"",
-		""Microsoft.Extensions.Caching.Abstractions"": ""1.0.0"",
-		""Microsoft.Extensions.Logging"": ""1.0.0"",
-		""Microsoft.Extensions.Logging.Abstractions"": ""1.0.0"",
-		""Microsoft.Extensions.Options.ConfigurationExtensions"": ""1.0.0"",
-		""MySql.Data"": ""7.0.5-IR21"",
-		""NETStandard.Library"": ""1.6.0"",
-		""Newtonsoft.Json"": ""9.0.1"",
-		""System.Collections.Specialized"": ""4.0.1"",
-		""System.Diagnostics.TextWriterTraceListener"": ""4.0.0"",
-		""System.IO.FileSystem.Watcher"": ""4.0.0"",
-		""System.Runtime.Serialization.Formatters"": ""4.3.0"",
-		""System.Runtime.Serialization.Json"": ""4.0.2"",
-		""System.Threading.Thread"": ""4.0.0"",
-		""System.Xml.XmlDocument"": ""4.0.1""
-	}},
-	""frameworks"": {{
-		""netstandard1.6"": {{
-			""imports"": ""dnxcore50""
+ @"<Project Sdk=""Microsoft.NET.Sdk"">
+	<PropertyGroup>
+		<TargetFramework>netstandard1.6</TargetFramework>
+		<AssemblyName>Common</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include=""Google.Protobuf"" Version=""3.1.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Caching.Abstractions"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Abstractions"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""1.0.2"" />
+		<PackageReference Include=""MySql.Data"" Version=""7.0.5-IR21"" />
+		<PackageReference Include=""Npgsql"" Version=""3.1.9"" />
+		<PackageReference Include=""Newtonsoft.Json"" Version=""9.0.1"" />
+		<PackageReference Include=""System.Collections.Specialized"" Version=""4.0.1"" />
+		<PackageReference Include=""System.Diagnostics.TextWriterTraceListener"" Version=""4.0.0"" />
+		<PackageReference Include=""System.IO.FileSystem.Watcher"" Version=""4.0.0"" />
+		<PackageReference Include=""System.Runtime.Serialization.Formatters"" Version=""4.3.0"" />
+		<PackageReference Include=""System.Runtime.Serialization.Json"" Version=""4.0.2"" />
+		<PackageReference Include=""System.Threading.Thread"" Version=""4.0.0"" />
+		<PackageReference Include=""System.Xml.XmlDocument"" Version=""4.0.1"" />
+	</ItemGroup>
+</Project>
+";
+			#endregion
+
+			public static readonly string Infrastructure_csproj =
+			#region 内容太长已被收起
+ @"<Project Sdk=""Microsoft.NET.Sdk"">
+	<PropertyGroup>
+		<TargetFramework>netstandard1.6</TargetFramework>
+		<AssemblyName>Infrastructure</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""1.0.3"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""1.0.2"" />
+	</ItemGroup>
+</Project>
+
+";
+			#endregion
+
+			public static readonly string WebHost_Extensions_StarupExtensions_cs =
+			#region 内容太长已被收起
+ @"using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
+
+public static class StarupExtensions {{
+	public static ConfigurationBuilder LoadInstalledModules(this ConfigurationBuilder build, IList<ModuleInfo> modules, IHostingEnvironment env) {{
+		var moduleRootFolder = new DirectoryInfo(Path.Combine(env.ContentRootPath, ""Module""));
+		var moduleFolders = moduleRootFolder.GetDirectories();
+
+		foreach (var moduleFolder in moduleFolders) {{
+			var binFolder = new DirectoryInfo(Path.Combine(moduleFolder.FullName, ""bin""));
+			if (!binFolder.Exists) continue;
+
+			foreach (var file in binFolder.GetFileSystemInfos(""*.dll"", SearchOption.AllDirectories)) {{
+				Assembly assembly;
+				try {{
+					assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(file.FullName);
+				}} catch (FileLoadException) {{
+					assembly = Assembly.Load(new AssemblyName(Path.GetFileNameWithoutExtension(file.Name)));
+					if (assembly == null) throw;
+				}}
+				if (assembly.FullName.Contains(moduleFolder.Name))
+					modules.Add(new ModuleInfo {{
+						Name = moduleFolder.Name,
+						Assembly = assembly,
+						Path = moduleFolder.FullName
+					}});
+			}}
+		}}
+
+		return build;
+	}}
+
+	public static ConfigurationBuilder AddCustomizedJsonFile(this ConfigurationBuilder build, IList<ModuleInfo> modules, IHostingEnvironment env, string productPath) {{
+		build.SetBasePath(env.ContentRootPath).AddJsonFile(""appsettings.json"", true, true);
+		foreach (var module in modules) {{
+			var jsonpath = $""Module/{{module.Name}}/appsettings.json"";
+			if (File.Exists(Path.Combine(env.ContentRootPath, jsonpath)))
+				build.AddJsonFile(jsonpath, true, true);
+		}}
+		if (env.IsProduction()) {{
+			build.AddJsonFile(Path.Combine(productPath, ""/appsettings.json""), true, true);
+			foreach (var module in modules) {{
+				var jsonpath = Path.Combine(productPath, $""/Module_{{module.Name}}_appsettings.json"");
+				if (File.Exists(Path.Combine(env.ContentRootPath, jsonpath)))
+					build.AddJsonFile(jsonpath, true, true);
+			}}
+		}}
+		return build;
+	}}
+
+	public static IServiceCollection AddCustomizedMvc(this IServiceCollection services, IList<ModuleInfo> modules) {{
+		var mvcBuilder = services.AddMvc()
+			.AddRazorOptions(o => {{
+				foreach (var module in modules) {{
+					var a = MetadataReference.CreateFromFile(module.Assembly.Location);
+					o.AdditionalCompilationReferences.Add(a);
+				}}
+			}})
+			.AddViewLocalization()
+			.AddDataAnnotationsLocalization();
+
+		foreach (var module in modules) {{
+			mvcBuilder.AddApplicationPart(module.Assembly);
+
+			var moduleInitializerType =
+				module.Assembly.GetTypes().FirstOrDefault(x => typeof(IModuleInitializer).IsAssignableFrom(x));
+			if ((moduleInitializerType != null) && (moduleInitializerType != typeof(IModuleInitializer))) {{
+				var moduleInitializer = (IModuleInitializer)Activator.CreateInstance(moduleInitializerType);
+				moduleInitializer.Init(services);
+			}}
+		}}
+
+		return services;
+	}}
+
+	public static IApplicationBuilder UseCustomizedStaticFiles(this IApplicationBuilder app, IList<ModuleInfo> modules) {{
+		app.UseDefaultFiles();
+		app.UseStaticFiles(new StaticFileOptions() {{
+			OnPrepareResponse = (context) => {{
+				var headers = context.Context.Response.GetTypedHeaders();
+				headers.CacheControl = new CacheControlHeaderValue() {{
+					Public = true,
+					MaxAge = TimeSpan.FromDays(60)
+				}};
+			}}
+		}});
+		return app;
+	}}
+}}
+";
+			#endregion
+			public static readonly string WebHost_Extensions_SwaggerExtensions_cs =
+			#region 内容太长已被收起
+ @"using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Linq;
+
+namespace Swashbuckle.AspNetCore.Swagger {{
+	public class FormDataOperationFilter : IOperationFilter {{
+		public void Apply(Operation operation, OperationFilterContext context) {{
+			var actattrs = context.ApiDescription.ActionAttributes();
+			if (actattrs.OfType<HttpPostAttribute>().Any() ||
+				actattrs.OfType<HttpPutAttribute>().Any())
+				operation.Consumes = new[] {{ ""multipart/form-data"" }};
+		}}
+	}}
+
+	public static class SwashbuckleSwaggerExtensions {{
+		public static IServiceCollection AddCustomizedSwaggerGen(this IServiceCollection services) {{
+			services.AddSwaggerGen(options => {{
+				options.SwaggerDoc(""v1"", new Info {{
+					Version = ""v1"",
+					Title = ""WebAPI"",
+					Description = ""项目webapi接口说明"",
+					TermsOfService = ""None"",
+					Contact = new Contact {{ Name = ""duoyi"", Email = """", Url = ""http://duoyi.com"" }},
+					License = new License {{ Name = ""duoyi"", Url = ""http://duoyi.com"" }}
+				}});
+				options.IgnoreObsoleteActions();
+				//options.IgnoreObsoleteControllers(); // 类、方法标记 [Obsolete]，可以阻止【Swagger文档】生成
+				options.DescribeAllEnumsAsStrings();
+				//options.IncludeXmlComments(AppContext.BaseDirectory + @""/Admin.xml""); // 使用前需开启项目注释 xmldoc
+				options.OperationFilter<FormDataOperationFilter>();
+			}});
+			return services;
 		}}
 	}}
 }}
 ";
 			#endregion
-
-			public static readonly string Admin_web_config =
-			#region 内容太长已被收起
- @"<?xml version=""1.0"" encoding=""utf-8""?>
-<configuration>
-
-  <!--
-    Configure your application settings in appsettings.json. Learn more at http://go.microsoft.com/fwlink/?LinkId=786380
-  -->
-
-  <system.webServer>
-    <handlers>
-      <add name=""aspNetCore"" path=""*"" verb=""*"" modules=""AspNetCoreModule"" resourceType=""Unspecified""/>
-    </handlers>
-    <aspNetCore processPath=""%LAUNCHER_PATH%"" arguments=""%LAUNCHER_ARGS%"" stdoutLogEnabled=""false"" stdoutLogFile="".\logs\stdout"" forwardWindowsAuthToken=""false""/>
-  </system.webServer>
-</configuration>
-";
-			#endregion
-			public static readonly string Admin_nlog_config =
+			public static readonly string WebHost_nlog_config =
 			#region 内容太长已被收起
  @"<?xml version=""1.0"" encoding=""utf-8"" ?>
 <nlog xmlns=""http://www.nlog-project.org/schemas/NLog.xsd"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
@@ -1135,7 +1272,7 @@ return rTn;"");
 </nlog>
 ";
 			#endregion
-			public static readonly string Admin_appsettings_json =
+			public static readonly string WebHost_appsettings_json =
 			#region 内容太长已被收起
  @"{{
 	""Logging"": {{
@@ -1163,21 +1300,17 @@ return rTn;"");
 }}
 ";
 			#endregion
-			public static readonly string Admin_Program_cs =
+			public static readonly string WebHost_Program_cs =
 			#region 内容太长已被收起
- @"using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+ @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Builder;
+using System.IO;
 
-namespace {0}.Admin {{
+namespace {0}.WebHost {{
 	public class Program {{
 		public static void Main(string[] args) {{
 			var host = new WebHostBuilder()
-				.UseUrls(""http://*:20000"", ""http://*:20001"")
+				.UseUrls(""http://*:5000"", ""http://*:5001"")
 				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.UseIISIntegration()
@@ -1190,34 +1323,29 @@ namespace {0}.Admin {{
 }}
 ";
 			#endregion
-			public static readonly string Admin_Startup_cs =
+
+			public static readonly string WebHost_Startup_cs =
 			#region 内容太长已被收起
- @"using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+ @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Caching.Redis;
 using NLog.Extensions.Logging;
-using NLog.Web;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace {0}.Admin {{
+namespace {0}.WebHost {{
 	public class Startup {{
 		public Startup(IHostingEnvironment env) {{
 			var builder = new ConfigurationBuilder()
-				.SetBasePath(env.ContentRootPath)
-				.AddJsonFile(""appsettings.json"", true, true);
-
-			if (env.IsProduction())
-				builder.AddJsonFile(""/var/webos/{0}/appsettings.json"", true, true);
+				.LoadInstalledModules(Modules, env)
+				.AddCustomizedJsonFile(Modules, env, ""/var/webos/{0}/"");
 
 			this.Configuration = builder.AddEnvironmentVariables().Build();
 			this.env = env;
@@ -1229,49 +1357,34 @@ namespace {0}.Admin {{
 			}};
 		}}
 
+		public static IList<ModuleInfo> Modules = new List<ModuleInfo>();
 		public IConfigurationRoot Configuration {{ get; }}
 		public IHostingEnvironment env {{ get; }}
 
 		public void ConfigureServices(IServiceCollection services) {{
 			services.AddSingleton<IDistributedCache>(new RedisCache());
+			services.AddSingleton<IConfigurationRoot>(Configuration);
+			services.AddSingleton<IHostingEnvironment>(env);
+
 			services.AddSession(a => {{
 				a.IdleTimeout = TimeSpan.FromMinutes(30);
 				a.CookieName = ""Session_{0}"";
-			}}).AddMvc();
+			}});
+			services.AddCustomizedMvc(Modules);
+			services.Configure<RazorViewEngineOptions>(options => {{ options.ViewLocationExpanders.Add(new ModuleViewLocationExpander()); }});
 
-			#region Swagger UI
 			if (env.IsDevelopment())
-				services.AddSwaggerGen(options => {{
-					options.SwaggerDoc(""v1"", new Info {{
-						Version = ""v1"",
-						Title = ""{0} API"",
-						Description = ""{0} 项目webapi接口说明"",
-						TermsOfService = ""None"",
-						Contact = new Contact {{ Name = ""duoyi"", Email = """", Url = ""http://duoyi.com"" }},
-						License = new License {{ Name = ""duoyi"", Url = ""http://duoyi.com"" }}
-					}});
-					options.IgnoreObsoleteActions();
-					//options.IgnoreObsoleteControllers(); // 类、方法标记 [Obsolete]，可以阻止【Swagger文档】生成
-					options.DescribeAllEnumsAsStrings();
-					//options.IncludeXmlComments(AppContext.BaseDirectory + @""/Admin.xml""); // 使用前需开启项目注释 xmldoc
-					options.OperationFilter<FormDataOperationFilter>();
-				}});
-			#endregion
-			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-			services.AddSingleton<IConfigurationRoot>(Configuration);
-			services.AddSingleton<IHostingEnvironment>(env);
+				services.AddCustomizedSwaggerGen();
 		}}
 
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory) {{
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime lifetime) {{
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			Console.OutputEncoding = Encoding.GetEncoding(""GB2312"");
 			Console.InputEncoding = Encoding.GetEncoding(""GB2312"");
 
-			// 以下写日志会严重影响吞吐量，高并发项目建议改成 redis 订阅发布形式
 			loggerFactory.AddConsole(Configuration.GetSection(""Logging""));
 			loggerFactory.AddNLog().AddDebug();
 			env.ConfigureNLog(""nlog.config"");
-			app.AddNLogWeb();
 
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
@@ -1279,198 +1392,57 @@ namespace {0}.Admin {{
 			{0}.BLL.RedisHelper.InitializeConfiguration(Configuration);
 			{0}.DAL.SqlHelper.Instance.Log = loggerFactory.CreateLogger(""{0}_DAL_sqlhelper"");
 
-			app.UseSession().UseMvc();
-			app.UseDefaultFiles().UseStaticFiles(); //UseDefaultFiles 必须在 UseStaticFiles 之前调用
-
-			if (env.IsDevelopment())
-				app.UseSwagger().UseSwaggerUi(options => {{
-					options.SwaggerEndpoint(""/swagger/v1/swagger.json"", ""V1 Docs"");
-				}});
+			app.UseSession();
+			app.UseMvc();
+			app.UseCustomizedStaticFiles(Modules);
 		}}
 	}}
 }}
 ";
 			#endregion
-
-			public static readonly string Admin_Controllers_BaseAdminController_cs =
+			public static readonly string WebHost_csproj =
 			#region 内容太长已被收起
- @"using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using {0}.BLL;
-using {0}.Model;
-
-namespace {0}.AdminControllers {{
-	public partial class BaseAdminController : Controller {{
-		public ILogger _logger;
-		public ISession Session {{ get {{ return HttpContext.Session; }} }}
-		public HttpRequest Req {{ get {{ return Request; }} }}
-		public HttpResponse Res {{ get {{ return Response; }} }}
-
-		//public SysuserInfo LoginUser {{ get; private set; }}
-		public BaseAdminController(ILogger logger) {{ _logger = logger; }}
-		public override void OnActionExecuting(ActionExecutingContext context) {{
-			#region 参数验证
-			if (context.ModelState.IsValid == false)
-				foreach(var value in context.ModelState.Values)
-					if (value.Errors.Any()) {{
-						context.Result = APIReturn.参数格式不正确.SetMessage($""参数格式不正确：{{value.Errors.First().ErrorMessage}}"");
-						return;
-					}}
-			#endregion
-			#region 初始化当前登陆账号
-			//string username = Session.GetString(""login.username"");
-			//if (!string.IsNullOrEmpty(username)) LoginUser = Sysuser.GetItemByUsername(username);
-
-			//var method = (context.ActionDescriptor as ControllerActionDescriptor).MethodInfo;
-			//if (method.GetCustomAttribute<需要登陆Attribute>() != null && LoginUser == null)
-			//	context.Result = new RedirectResult(""/signin"");
-			//else if (method.GetCustomAttribute<匿名访问Attribute>() == null && LoginUser == null)
-			//	context.Result = new RedirectResult(""/signin"");
-			//ViewBag.user = LoginUser;
-			#endregion
-			base.OnActionExecuting(context);
-		}}
-		public override void OnActionExecuted(ActionExecutedContext context) {{
-			if (context.Exception != null) {{
-				#region 错误拦截，在这里记录日志
-				//this.Json(new APIReturn(-1, context.Exception.Message)).ExecuteResultAsync(context).Wait();
-				//context.Exception = null;
-				#endregion
-			}}
-			base.OnActionExecuted(context);
-		}}
-
-		public override ViewResult View() {{
-			return base.View($""/Views/Admin/{{this.ControllerContext.ActionDescriptor.ControllerName}}/{{this.ControllerContext.ActionDescriptor.MethodInfo.Name}}.cshtml"");
-		}}
-
-		#region 角色权限验证
-		//public bool sysrole_check(string url) {{
-		//	url = url.ToLower();
-		//	//Response.Write(url + ""<br>"");
-		//	if (url == ""/"" || url.IndexOf(""/default.aspx"") == 0) return true;
-		//	foreach(var role in this.LoginUser.Obj_sysroles) {{
-		//		//Response.Write(role.ToString());
-		//		foreach(var dir in role.Obj_sysdirs) {{
-		//			//Response.Write(""-----------------"" + dir.ToString() + ""<br>"");
-		//			string tmp = dir.Url;
-		//			if (tmp.EndsWith(""/"")) tmp += ""default.aspx"";
-		//			if (url.IndexOf(tmp) == 0) return true;
-		//		}}
-		//	}}
-		//	return false;
-		//}}
-		#endregion
-	}}
-}}
-
-#region 需要登陆、匿名访问、IgnoreObsoleteControllers、FormDataOperationFilter
-public partial class 需要登陆Attribute : Attribute {{ }}
-public partial class 匿名访问Attribute : Attribute {{ }}
-public static class Swashbuckle_SwaggerGen_Application_SwaggerGenOptions_ExtensionMethods {{
-	public class IgnoreObsoleteControllersFilter : IDocumentFilter {{
-		public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context) {{
-			foreach (ApiDescription apiDescription in context.ApiDescriptionsGroups.Items.SelectMany(e => e.Items)) {{
-				if (apiDescription.ControllerAttributes().OfType<ObsoleteAttribute>().Any() == false) continue;
-				var key = ""/"" + apiDescription.RelativePath.TrimEnd('/');
-				if (swaggerDoc.Paths.ContainsKey(key))
-					swaggerDoc.Paths.Remove(key);
-			}}
-		}}
-	}}
-	public static void IgnoreObsoleteControllers(this SwaggerGenOptions options) {{
-		options.DocumentFilter<IgnoreObsoleteControllersFilter>();
-	}}
-	public static object Json(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper html, object obj) {{
-		string str = JsonConvert.SerializeObject(obj);
-		if (!string.IsNullOrEmpty(str)) str = Regex.Replace(str, @""<(/?script[\s>])"", ""<\""+\""$1"", RegexOptions.IgnoreCase);
-		if (html == null) return str;
-		return html.Raw(str);
-	}}
-}}
-namespace Swashbuckle.AspNetCore.Swagger {{
-	public class FormDataOperationFilter : IOperationFilter {{
-		public void Apply(Operation operation, OperationFilterContext context) {{
-			var actattrs = context.ApiDescription.ActionAttributes();
-			if (actattrs.OfType<HttpPostAttribute>().Any() ||
-				actattrs.OfType<HttpPutAttribute>().Any())
-				operation.Consumes = new[] {{ ""multipart/form-data"" }};
-		}}
-	}}
-}}
-#endregion
-
-#region APIReturn
-[JsonObject(MemberSerialization.OptIn)]
-public partial class APIReturn : ContentResult {{
-	[JsonProperty(""code"")] public int Code {{ get; protected set; }}
-	[JsonProperty(""message"")] public string Message {{ get; protected set; }}
-	[JsonProperty(""data"")] public Hashtable Data {{ get; protected set; }} = new Hashtable();
-	[JsonProperty(""success"")] public bool Success {{ get {{ return this.Code == 0; }} }}
-
-	public APIReturn() {{ }}
-	public APIReturn(int code) {{ this.SetCode(code); }}
-	public APIReturn(string message) {{ this.SetMessage(message); }}
-	public APIReturn(int code, string message, params object[] data) {{ this.SetCode(code).SetMessage(message).AppendData(data); }}
-
-	public APIReturn SetCode(int value) {{ this.Code = value;  return this; }}
-	public APIReturn SetMessage(string value) {{ this.Message = value;  return this; }}
-	public APIReturn SetData(params object[] value) {{
-		this.Data.Clear();
-		return this.AppendData(value);
-	}}
-	public APIReturn AppendData(params object[] value) {{
-		if (value == null || value.Length < 2 || value[0] == null) return this;
-		for (int a = 0; a < value.Length; a += 2) {{
-			if (value[a] == null) continue;
-			this.Data[value[a]] = a + 1 < value.Length ? value[a + 1] : null;
-		}}
-		return this;
-	}}
-	#region form 表单 target=iframe 提交回调处理
-	private void Jsonp(ActionContext context) {{
-		string __callback = context.HttpContext.Request.HasFormContentType ? context.HttpContext.Request.Form[""__callback""].ToString() : null;
-		if (string.IsNullOrEmpty(__callback)) {{
-			this.ContentType = ""text/json;charset=utf-8;"";
-			this.Content = JsonConvert.SerializeObject(this);
-		}}else {{
-			this.ContentType = ""text/html;charset=utf-8"";
-			this.Content = $""<script>top.{{__callback}}({{Swashbuckle_SwaggerGen_Application_SwaggerGenOptions_ExtensionMethods.Json(null, this)}});</script>"";
-		}}
-	}}
-	public override void ExecuteResult(ActionContext context) {{
-		Jsonp(context);
-		base.ExecuteResult(context);
-	}}
-	public override Task ExecuteResultAsync(ActionContext context) {{
-		Jsonp(context);
-		return base.ExecuteResultAsync(context);
-	}}
-	#endregion
-
-	public static APIReturn 成功 {{ get {{ return new APIReturn(0, ""成功""); }} }}
-	public static APIReturn 失败 {{ get {{ return new APIReturn(99, ""失败""); }} }}
-	public static APIReturn 记录不存在_或者没有权限 {{ get {{ return new APIReturn(98, ""记录不存在，或者没有权限""); }} }}
-	public static APIReturn 参数格式不正确 {{ get {{ return new APIReturn(97, ""参数格式不正确""); }} }}
-}}
-#endregion
+ @"<Project Sdk=""Microsoft.NET.Sdk.Web"">
+	<PropertyGroup>
+		<TargetFramework>netcoreapp1.0</TargetFramework>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+		<AssemblyName>WebHost</AssemblyName>
+		<OutputType>Exe</OutputType>
+		<RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+		<PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;portable-net45+win8</PackageTargetFallback>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Update=""wwwroot\**\*;Views;Module\**\*;nlog.config"">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include=""..\Infrastructure\Infrastructure.csproj"" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""1.0.3"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Server.IISIntegration"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Server.Kestrel"" Version=""1.0.3"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Console"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Debug"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""1.0.2"" />
+		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.0.0-rtm-alpha4"" />
+		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.0.1"" />
+		<PackageReference Include=""Swashbuckle.AspNetCore.SwaggerGen"" Version=""1.0.0-*"" />
+		<PackageReference Include=""Swashbuckle.AspNetCore.SwaggerUi"" Version=""1.0.0-*"" />
+	</ItemGroup>
+	<ItemGroup>
+		<DotNetCliToolReference Include=""Microsoft.DotNet.Watcher.Tools"" Version=""1.0.0"" />
+	</ItemGroup>
+</Project>
 ";
 			#endregion
 
-			public static readonly string Admin_Controllers_SysController =
+			public static readonly string Module_Admin_Controllers_SysController =
 			#region 内容太长已被收起
  @"using System;
 using System.Collections.Generic;
@@ -1482,7 +1454,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using {0}.BLL;
 using {0}.Model;
 
-namespace {0}.AdminControllers {{
+namespace {0}.Module.Admin.Controllers {{
 	[Route(""[controller]"")]
 	[Obsolete]
 	public class SysController : Controller {{
@@ -1536,7 +1508,7 @@ namespace {0}.AdminControllers {{
 ";
 			#endregion
 
-			public static readonly string Admin_Controllers_LoginController =
+			public static readonly string Module_Admin_Controllers_LoginController =
 			#region 内容太长已被收起
  @"using System;
 using System.Collections.Generic;
@@ -1551,10 +1523,10 @@ using Microsoft.Extensions.Logging;
 using {0}.BLL;
 using {0}.Model;
 
-namespace {0}.AdminControllers {{
+namespace {0}.Module.Admin.Controllers {{
 	[Route(""[controller]"")]
 	[Obsolete]
-	public class LoginController : BaseAdminController {{
+	public class LoginController : BaseController {{
 
 		public LoginController(ILogger<LoginController> logger) : base(logger) {{ }}
 
@@ -1583,7 +1555,7 @@ namespace {0}.AdminControllers {{
 }}
 ";
 			#endregion
-			public static readonly string Admin_Views_Admin_Login_Index_cshtml =
+			public static readonly string Module_Admin_Views_Login_Index_cshtml =
 			#region 内容太长已被收起
  @"@{{
 	Layout = """";
@@ -1597,14 +1569,14 @@ namespace {0}.AdminControllers {{
 	<title>{0}后台管理中心 - 登陆</title>
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content=""width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"" name=""viewport"">
-	<link rel=""stylesheet"" href=""./htm/bootstrap/css/bootstrap.min.css"">
-	<link rel=""stylesheet"" href=""./htm/plugins/font-awesome/css/font-awesome.min.css"" />
-	<link rel=""stylesheet"" href=""./htm/css/system.css"">
-	<script type=""text/javascript"" src=""./htm/js/jQuery-2.1.4.min.js""></script>
-	<script type=""text/javascript"" src=""./htm/js/lib.js""></script>
+	<link rel=""stylesheet"" href=""/module/admin/htm/bootstrap/css/bootstrap.min.css"">
+	<link rel=""stylesheet"" href=""/module/admin/htm/plugins/font-awesome/css/font-awesome.min.css"" />
+	<link rel=""stylesheet"" href=""/module/admin/htm/css/system.css"">
+	<script type=""text/javascript"" src=""/module/admin/htm/js/jQuery-2.1.4.min.js""></script>
+	<script type=""text/javascript"" src=""/module/admin/htm/js/lib.js""></script>
 	<!--[if lt IE 9]>
-	<script type='text/javascript' src='./htm/plugins/html5shiv/html5shiv.min.js'></script>
-	<script type='text/javascript' src='./htm/plugins/respond/respond.min.js'></script>
+	<script type='text/javascript' src='/module/admin/htm/plugins/html5shiv/html5shiv.min.js'></script>
+	<script type='text/javascript' src='/module/admin/htm/plugins/respond/respond.min.js'></script>
 	<![endif]-->
 
 <style type=""text/css"">
@@ -1617,7 +1589,7 @@ namespace {0}.AdminControllers {{
 <body class=""hold-transition login-page"">
 	<div class=""login-box"">
 		<div class=""login-logo"">
-			<a href=""./""><b>{0}</b>后台管理中心</a>
+			<a href=""/module/admin/""><b>{0}</b>后台管理中心</a>
 		</div>
 
 		<div id=""error_msg"" style=""display:none;"">
@@ -1661,14 +1633,14 @@ namespace {0}.AdminControllers {{
 	<!-- /.login-box -->
 
 	<!-- jQuery 2.2.0 -->
-	<script src=""./htm/plugins/jQuery/jQuery-2.2.0.min.js""></script>
-	<script src=""./htm/bootstrap/js/bootstrap.min.js""></script>
+	<script src=""/module/admin/htm/plugins/jQuery/jQuery-2.2.0.min.js""></script>
+	<script src=""/module/admin/htm/bootstrap/js/bootstrap.min.js""></script>
 
 <script type=""text/javascript"">
 	(function () {{
 		var msgtpl = $('#error_msg').html();
 		top.login_callback = function (rt) {{
-			if (rt.success) return location.href = './';
+			if (rt.success) return location.href = '/module/admin/';
 			$('#error_msg').html(msgtpl.format(rt.message)).show();
 			$('div.login-box-body').addClass('login-box-body--has-errors');
 			setTimeout(function () {{
@@ -1682,7 +1654,7 @@ namespace {0}.AdminControllers {{
 ";
 			#endregion
 
-			public static readonly string Admin_Controllers =
+			public static readonly string Module_Admin_Controller =
 			#region 内容太长已被收起
 			@"using System;
 using System.Collections.Generic;
@@ -1699,9 +1671,9 @@ using Newtonsoft.Json.Linq;
 using {0}.BLL;
 using {0}.Model;
 
-namespace {0}.AdminControllers {{
+namespace {0}.Module.Admin.Controllers {{
 	[Route(""[controller]"")]
-	public class {1}Controller : BaseAdminController {{
+	public class {1}Controller : BaseController {{
 		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
 
 		[HttpGet]
@@ -1751,7 +1723,7 @@ namespace {0}.AdminControllers {{
 ";
 			#endregion
 
-			public static readonly string Admin_wwwroot_index_html =
+			public static readonly string Module_Admin_wwwroot_index_html =
 			#region 内容太长已被收起
 			@"<!DOCTYPE html>
 <html lang=""zh-cmn-Hans"">
@@ -1985,73 +1957,51 @@ namespace {0}.AdminControllers {{
 </html>";
 			#endregion
 
-			public static readonly string Admin_project_json =
+			public static readonly string Module_Test_Controller =
 			#region 内容太长已被收起
- @"{{
-	""dependencies"": {{
-		""Microsoft.NETCore.App"": {{
-			""version"": ""1.0.0"",
-			""type"": ""platform""
-		}},
-		""Microsoft.AspNetCore.Mvc"": ""1.0.0"",
-		""Microsoft.AspNetCore.Server.IISIntegration"": ""1.0.0"",
-		""Microsoft.AspNetCore.Server.Kestrel"": ""1.0.0"",
-		""Microsoft.AspNetCore.Diagnostics"": ""1.0.0"",
-		""Microsoft.Extensions.Configuration.EnvironmentVariables"": ""1.0.0"",
-		""Microsoft.Extensions.Configuration.FileExtensions"": ""1.0.0"",
-		""Microsoft.Extensions.Configuration.Json"": ""1.0.0"",
-		""Microsoft.Extensions.Logging.Console"": ""1.0.0"",
-		""Microsoft.Extensions.Logging.Debug"": ""1.0.0"",
-		""{0}.db"": ""1.0.0-*"",
-		""Microsoft.AspNetCore.Session"": ""1.0.0"",
-		""NLog.Extensions.Logging"": ""1.0.0-rtm-beta3"",
-		""NLog.Web.AspNetCore"": ""4.3.1"",
-		""System.Text.Encoding.CodePages"": ""4.0.1"",
-		""Swashbuckle.AspNetCore.SwaggerGen"": ""1.0.0-*"",
-		""Swashbuckle.AspNetCore.SwaggerUi"": ""1.0.0-*""
-	}},
+			@"using System;
+using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
+using System.IO;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
+using NpgsqlTypes;
+using {0}.BLL;
+using {0}.Model;
 
-	""tools"": {{
-		//""Microsoft.AspNetCore.Server.IISIntegration.Tools"": ""1.0.0-preview2-final""
-		""Microsoft.DotNet.Watcher.Tools"": ""1.0.0-preview2-final""
-	}},
+namespace {0}.Module.Admin.Controllers {{
+	[Route(""[controller]"")]
+	public class {1}Controller : BaseController {{
+		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
 
-	""frameworks"": {{
-		""netcoreapp1.0"": {{
-			""imports"": [
-				""dotnet5.6"",
-				""portable-net45+win8""
-			]
+		[HttpGet]
+		public ActionResult List([FromServices]IConfigurationRoot cfg) {{
+			return APIReturn.成功;
 		}}
-	}},
-
-	""buildOptions"": {{
-		""emitEntryPoint"": true,
-		""preserveCompilationContext"": true,
-		""xmlDoc"": false
-	}},
-
-	""runtimeOptions"": {{
-		""configProperties"": {{
-			""System.GC.Server"": true
-		}}
-	}},
-
-	""publishOptions"": {{
-		""include"": [
-			""wwwroot"",
-			""Views"",
-			""Areas/**/Views"",
-			""appsettings.json"",
-			""web.config"",
-			""nlog.config""
-		]
-	}},
-
-	""scripts"": {{
-		""postpublish"": [ ""dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"" ]
 	}}
 }}
+";
+			#endregion
+
+			public static readonly string Module_csproj =
+			#region 内容太长已被收起
+ @"<Project Sdk=""Microsoft.NET.Sdk"">
+	<PropertyGroup>
+		<TargetFramework>netstandard1.6</TargetFramework>
+		<AssemblyName>{0}</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include=""..\..\Infrastructure\Infrastructure.csproj"" />
+	</ItemGroup>
+</Project>
 ";
 			#endregion
 		}

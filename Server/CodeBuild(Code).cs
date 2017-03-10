@@ -25,11 +25,6 @@ namespace Server {
 			string connectionStringName = _client.Database + "ConnectionString";
 			string basicName = "Build";
 
-			string srcGuid = Guid.NewGuid().ToString().ToUpper();
-			string slnGuid = Guid.NewGuid().ToString().ToUpper();
-			string commonGuid = Guid.NewGuid().ToString().ToUpper();
-			string dbGuid = Guid.NewGuid().ToString().ToUpper();
-			string adminGuid = Guid.NewGuid().ToString().ToUpper();
 			string wwwroot_sitemap = "";
 
 			Dictionary<string, bool> isMakedHtmlSelect = new Dictionary<string, bool>();
@@ -99,13 +94,18 @@ namespace Server {
 
 			if (isSolution) {
 				#region solution.sln
-				sb1.AppendFormat(CONST.sln, srcGuid, slnGuid, commonGuid, dbGuid, adminGuid, solutionName);
+				sb1.AppendFormat(CONST.sln, solutionName,
+					Guid.NewGuid().ToString().ToUpper(),
+					Guid.NewGuid().ToString().ToUpper(),
+					Guid.NewGuid().ToString().ToUpper(),
+					Guid.NewGuid().ToString().ToUpper(),
+					Guid.NewGuid().ToString().ToUpper(),
+					Guid.NewGuid().ToString().ToUpper(),
+					Guid.NewGuid().ToString().ToUpper(),
+					Guid.NewGuid().ToString().ToUpper(),
+					Guid.NewGuid().ToString().ToUpper(),
+					Guid.NewGuid().ToString().ToUpper());
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\", solutionName, ".sln"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#region global.json
-				sb1.AppendFormat(CONST.global_json);
-				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\", "global.json"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
 
@@ -260,14 +260,42 @@ namespace Server {
 				clearSb();
 				#endregion
 
-				#region Common.xproj
-				sb1.AppendFormat(CONST.xproj, commonGuid, "Common");
-				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\Common.xproj"), Deflate.Compress(sb1.ToString())));
+				#region Common.csproj
+				sb1.Append(CONST.Common_csproj);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\Common.csproj"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
-				#region project.json
-				sb1.AppendFormat(CONST.Common_project_json);
-				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\project.json"), Deflate.Compress(sb1.ToString())));
+				#endregion
+
+				#region Project Infrastructure
+				#region Controllers\BaseController.cs
+				sb1.Append(Server.Properties.Resources.Infrastructure_Controllers_BaseController_cs);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Infrastructure\Controllers\BaseController.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Extensions\GlobalExtensions.cs
+				sb1.Append(Server.Properties.Resources.Infrastructure_Extensions_GlobalExtensions_cs);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Infrastructure\Extensions\GlobalExtensions.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region ModuleBasic\IModuleInitializer.cs
+				sb1.Append(Server.Properties.Resources.Infrastructure_ModuleBasic_IModuleInitializer_cs);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Infrastructure\ModuleBasic\IModuleInitializer.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region ModuleBasic\ModuleInfo.cs
+				sb1.Append(Server.Properties.Resources.Infrastructure_ModuleBasic_ModuleInfo_cs);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Infrastructure\ModuleBasic\ModuleInfo.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region ModuleBasic\ModuleViewLocationExpander.cs
+				sb1.Append(Server.Properties.Resources.Infrastructure_ModuleBasic_ModuleViewLocationExpander_cs);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Infrastructure\ModuleBasic\ModuleViewLocationExpander.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Infrastructure.csproj
+				sb1.AppendFormat(CONST.Infrastructure_csproj, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Infrastructure\Infrastructure.csproj"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
 				#endregion
@@ -1941,13 +1969,13 @@ namespace {0}.BLL {{
 		}}", solutionName, uClass_Name, pkParses);
 					}
 
-					sb1.AppendFormat(CONST.Admin_Controllers, solutionName, uClass_Name, nClass_Name, pkMvcRoute,
+					sb1.AppendFormat(CONST.Module_Admin_Controller, solutionName, uClass_Name, nClass_Name, pkMvcRoute,
 						"[FromQuery] " + pkCsParam.Replace("?", "").Replace(", ", ", [FromQuery] "), pkCsParamNoType, itemSetValuePK, itemSetValueNotPK,
 						sb2.ToString(), sb3.ToString(), itemCsParamInsertForm, itemCsParamUpdateForm, getListParamQuery, itemSetValuePKInsert,
 						str_controller_list_join, "",
 						str_controller_insert_mn, str_controller_update_mn, str_mvcdel);
 
-					loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"\AdminControllers\", uClass_Name, @"Controller.cs"), Deflate.Compress(sb1.ToString())));
+					loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"\Controllers\", uClass_Name, @"Controller.cs"), Deflate.Compress(sb1.ToString())));
 					clearSb();
 					#endregion
 
@@ -2044,7 +2072,7 @@ namespace {0}.BLL {{
 	}})();
 </script>
 ", uClass_Name, pkUrlQuerys, pkHiddens, str_listTh, str_listTd, str_listCms2FilterFK, str_listCms2FilterFK_fkitems);
-						loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Views\Admin\", uClass_Name, @"\List.cshtml"), Deflate.Compress(sb1.ToString())));
+						loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Views\", uClass_Name, @"\List.cshtml"), Deflate.Compress(sb1.ToString())));
 						clearSb();
 						#endregion
 					} else {
@@ -2100,7 +2128,7 @@ namespace {0}.BLL {{
 	}})();
 </script>", uClass_Name, CodeBuild.UFString(table.PrimaryKeys[0].Name), CodeBuild.UFString(ttfk.Columns[0].Name), "",
 	pkUrlQuerys.Replace("a.", ""), pkHiddens.Replace("a.", ""), str_listTh.Replace("a.", ""), str_listTd.Replace("a.", ""), str_listTh1.Replace("a.", ""), str_listTd1.Replace("a.", ""));
-						loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Views\Admin\", uClass_Name, @"\List.cshtml"), Deflate.Compress(sb1.ToString())));
+						loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Views\", uClass_Name, @"\List.cshtml"), Deflate.Compress(sb1.ToString())));
 						clearSb();
 						#endregion
 					}
@@ -2329,7 +2357,7 @@ namespace {0}.BLL {{
 		top.mainViewInit();
 	}})();
 </script>", uClass_Name, sb4.ToString(), sb5.ToString(), str_fk_getlist, str_addjs_mn_initUI, sb14.ToString());
-					loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Views\Admin\", uClass_Name, @"\Edit.cshtml"), Deflate.Compress(sb1.ToString())));
+					loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Views\", uClass_Name, @"\Edit.cshtml"), Deflate.Compress(sb1.ToString())));
 					clearSb();
 					#endregion
 				}
@@ -2351,90 +2379,27 @@ namespace {0}.BLL {{
 			loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\Model\", basicName, @"\ExtensionMethods.cs"), Deflate.Compress(sb1.ToString())));
 			clearSb();
 			#endregion
+			#region DBUtility/SqlHelper.cs
+			sb1.AppendFormat(CONST.DAL_DBUtility_SqlHelper_cs, solutionName, connectionStringName);
+			loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\DAL\DBUtility\SqlHelper.cs"), Deflate.Compress(sb1.ToString())));
+			clearSb();
+			#endregion
 
 			if (isSolution) {
-
-				#region db.xproj
-
-				#region DBUtility/SqlHelper.cs
-				sb1.AppendFormat(CONST.DAL_DBUtility_SqlHelper_cs, solutionName, connectionStringName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\DAL\DBUtility\SqlHelper.cs"), Deflate.Compress(sb1.ToString())));
+				#region db.csproj
+				sb1.AppendFormat(CONST.Db_csproj, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\", solutionName, ".db.csproj"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
 
-				sb1.AppendFormat(CONST.xproj, dbGuid, solutionName + ".db");
-				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\", solutionName, ".db.xproj"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#region project.json
-				sb1.AppendFormat(CONST.Db_project_json);
-				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\", @"project.json"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#endregion
-			}
-
-			if (isMakeAdmin) {
-				#region Project Admin
-				#region web.config
-				sb1.AppendFormat(CONST.Admin_web_config, solutionName, connectionStringName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"web.config"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#region nlog.config
-				sb1.AppendFormat(CONST.Admin_nlog_config, solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"nlog.config"), Deflate.Compress(sb1.ToString())));
+				#region Module/Test
+				#region TestController.cs
+				sb1.AppendFormat(CONST.Module_Test_Controller, solutionName, "Test");
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Module\Test\Controllers\TestController.cs"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
 				#region appsettings.json
-				sb1.AppendFormat(CONST.Admin_appsettings_json, solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"appsettings.json"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#region Program.cs
-				sb1.AppendFormat(CONST.Admin_Program_cs, solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Program.cs"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#region Startup.cs
-				sb1.AppendFormat(CONST.Admin_Startup_cs, solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Startup.cs"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-
-				#region Controllers\BaseAdminController.cs
-				sb1.AppendFormat(CONST.Admin_Controllers_BaseAdminController_cs, solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"AdminControllers\BaseAdminController.cs"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-
-				#region SysController.cs
-				sb1.AppendFormat(CONST.Admin_Controllers_SysController, solutionName, string.Join(string.Empty, admin_controllers_syscontroller_init_sysdir.ToArray()));
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"AdminControllers\SysController.cs"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#region LoginController.cs
-				sb1.AppendFormat(CONST.Admin_Controllers_LoginController, solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"AdminControllers\LoginController.cs"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#region Views\Admin\Login\Index.cshtml
-				sb1.AppendFormat(CONST.Admin_Views_Admin_Login_Index_cshtml, solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Views\Admin\Login\Index.cshtml"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#region Admin.xproj
-				sb1.AppendFormat(CONST.xproj, adminGuid, "Admin");
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Admin.xproj"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#region project.json
-				sb1.AppendFormat(CONST.Admin_project_json, solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"project.json"), Deflate.Compress(sb1.ToString())));
-				clearSb();
-				#endregion
-				#region wwwroot\index.html
-				sb1.AppendFormat(CONST.Admin_wwwroot_index_html, solutionName, wwwroot_sitemap);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"wwwroot\index.html"), Deflate.Compress(sb1.ToString())));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Module\Test\appsettings.json"), Deflate.Compress("{\r\n}")));
 				clearSb();
 				#endregion
 
@@ -2442,7 +2407,7 @@ namespace {0}.BLL {{
 				sb1.AppendFormat(@"@{{
 	Layout = ""_Layout"";
 }}", solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Views\_ViewStart.cshtml"), Deflate.Compress(sb1.ToString())));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Module\Test\Views\_ViewStart.cshtml"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
 				#region Views\_ViewImports.cshtml
@@ -2452,7 +2417,7 @@ namespace {0}.BLL {{
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 ", solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Views\_ViewImports.cshtml"), Deflate.Compress(sb1.ToString())));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Module\Test\Views\_ViewImports.cshtml"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
 				#region Views\Shared\_Layout.cshtml
@@ -2472,7 +2437,163 @@ namespace {0}.BLL {{
 
 </body>
 </html>", solutionName);
-				loc1.Add(new BuildInfo(string.Concat(CONST.adminPath, @"Views\Shared\_Layout.cshtml"), Deflate.Compress(sb1.ToString())));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Module\Test\Views\Shared\_Layout.cshtml"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Test.csproj
+				sb1.AppendFormat(CONST.Module_csproj, "Test");
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Module\Test\Test.csproj"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#endregion
+
+				#region .gitattributes
+				sb1.Append(Server.Properties.Resources._gitattributes);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\.gitattributes"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region .gitignore
+				sb1.Append(Server.Properties.Resources._gitignore);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\.gitignore"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region build.bat
+				sb1.Append(Server.Properties.Resources._build_bat);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\build.bat"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region readme.md
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\readme.md"), Deflate.Compress(string.Format(@"# {0}
+.net core模块化开发架构", solutionName))));
+				clearSb();
+				#endregion
+			}
+
+			if (isMakeAdmin) {
+				#region WebHost
+				#region Extensions/StarupExtensions.cs
+				sb1.AppendFormat(CONST.WebHost_Extensions_StarupExtensions_cs, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"\Extensions\StarupExtensions.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Extensions/SwaggerExtensions.cs
+				sb1.AppendFormat(CONST.WebHost_Extensions_SwaggerExtensions_cs, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"\Extensions\SwaggerExtensions.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region .gitignore
+				sb1.Append(Server.Properties.Resources.WebHost_gitignore);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @".gitignore"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region appsettings.json
+				sb1.AppendFormat(CONST.WebHost_appsettings_json, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"appsettings.json"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region gulpfile.js
+				sb1.Append(Server.Properties.Resources.WebHost_gulpfile_js);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"gulpfile.js"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region nlog.config
+				sb1.AppendFormat(CONST.WebHost_nlog_config, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"nlog.config"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region package.json
+				sb1.Append(Server.Properties.Resources.WebHost_package_json);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"package.json"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Program.cs
+				sb1.AppendFormat(CONST.WebHost_Program_cs, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"Program.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Startup.cs
+				sb1.AppendFormat(CONST.WebHost_Startup_cs, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"Startup.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region web.config
+				sb1.Append(Server.Properties.Resources.WebHost_web_config);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"web.config"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region WebHost.csproj
+				sb1.AppendFormat(CONST.WebHost_csproj, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.webHostPath, @"WebHost.csproj"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#endregion
+
+				#region Module/Admin
+				#region SysController.cs
+				sb1.AppendFormat(CONST.Module_Admin_Controllers_SysController, solutionName, string.Join(string.Empty, admin_controllers_syscontroller_init_sysdir.ToArray()));
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Controllers\SysController.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region LoginController.cs
+				sb1.AppendFormat(CONST.Module_Admin_Controllers_LoginController, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Controllers\LoginController.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Views\Admin\Login\Index.cshtml
+				sb1.AppendFormat(CONST.Module_Admin_Views_Login_Index_cshtml, solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Views\Login\Index.cshtml"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region wwwroot\index.html
+				sb1.AppendFormat(CONST.Module_Admin_wwwroot_index_html, solutionName, wwwroot_sitemap);
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"wwwroot\index.html"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region appsettings.json
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"appsettings.json"), Deflate.Compress("{\r\n}")));
+				clearSb();
+				#endregion
+
+				#region Views\_ViewStart.cshtml
+				sb1.AppendFormat(@"@{{
+	Layout = ""_Layout"";
+}}", solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Views\_ViewStart.cshtml"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Views\_ViewImports.cshtml
+				sb1.AppendFormat(@"@using Newtonsoft.Json;
+@using {0}.BLL;
+@using {0}.Model;
+
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+", solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Views\_ViewImports.cshtml"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Views\Shared\_Layout.cshtml
+				sb1.AppendFormat(@"<!DOCTYPE html>
+<html>
+<head>
+	<meta charset=""utf-8"">
+	<title>@ViewBag.title</title>
+	<link rel=""stylesheet"" href=""//cdn.bootcss.com/semantic-ui/2.1.8/semantic.min.css"">
+	<link rel=""stylesheet"" href=""/css/style.css"">
+	<script src=""//cdn.bootcss.com/jquery/1.11.3/jquery.min.js""></script>
+	<script src=""//cdn.bootcss.com/semantic-ui/2.1.8/semantic.min.js""></script>
+</head>
+<body>
+
+	@RenderBody()
+
+</body>
+</html>", solutionName);
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Views\Shared\_Layout.cshtml"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
+				#region Admin.csproj
+				sb1.AppendFormat(CONST.Module_csproj, "Admin");
+				loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"Admin.csproj"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
 				#endregion
