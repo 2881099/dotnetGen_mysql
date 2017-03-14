@@ -1487,7 +1487,7 @@ namespace {0}.BLL {{
 			if (ids == null || ids.Length == 0) return this;
 			{5}SelectBuild subConditionSelect = {5}.Select.Where(string.Format(""`{6}` = a.`{7}` AND `{8}` IN ({{0}})"", string.Join<{9}>("","", ids)));
 			if (subCondition != null) subCondition(subConditionSelect);
-			return base.Where($""EXISTS({{subConditionSelect.ToString(""`{6}`"")}})"") as {0}SelectBuild;
+			return base.Where($""EXISTS({{subConditionSelect.ToString(""`{6}`"").Replace("" a \r\nWHERE ("", "" WHERE "")}})"") as {0}SelectBuild;
 		}}", uClass_Name, fkcsBy, orgInfo, civ, string.Empty, CodeBuild.UFString(t2.ClassName), _f6, _f7, _f8, _f9);
 				});
 
