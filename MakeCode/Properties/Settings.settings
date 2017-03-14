@@ -29,5 +29,8 @@
     <Setting Name="chkDownloadRes_checked" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="txtPort_text" Type="System.String" Scope="User">
+      <Value Profile="(Default)">3306</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

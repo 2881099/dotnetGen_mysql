@@ -93,7 +93,7 @@ Example：
 						break;
 				}
 			}
-			this._client = new ClientInfo(this.Server, this.Username, this.Password);
+			this._client = new ClientInfo(this.Server, this.Port, this.Username, this.Password);
 			Uri uri = new Uri("tcp://" + Settings.Default.server + "/");
 			this._socket = new ClientSocket();
 			this._socket.Error += Socket_OnError;

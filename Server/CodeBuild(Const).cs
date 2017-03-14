@@ -1286,9 +1286,9 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 	""ConnectionStrings"": {{
 		""MySql"": ""{{connectionString}};Max pool size=32"",
 		""redis"": {{
-			""ip"": ""10.17.65.49"",
+			""ip"": ""172.16.30.56"",
 			""port"": 6379,
-			""pass"": ""duoyi@2016"",
+			""pass"": ""123456"",
 			""database"": 13,
 			""poolsize"": 50,
 			""name"": ""{0}""
@@ -1397,7 +1397,7 @@ namespace {0}.WebHost {{
 			app.UseCustomizedStaticFiles(Modules);
 
 			if (env.IsDevelopment())
-				app.UseSwagger().UseSwaggerUi(options => {{
+				app.UseSwagger().UseSwaggerUI(options => {{
 					options.SwaggerEndpoint(""/swagger/v1/swagger.json"", ""V1 Docs"");
 				}});
 		}}

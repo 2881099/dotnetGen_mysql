@@ -56,6 +56,8 @@ namespace MakeCode {
 			this.labDatabase = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.webBrowser1 = new System.Windows.Forms.WebBrowser();
+			this.txtPort = new System.Windows.Forms.TextBox();
+			this.labPort = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.dgvGridview)).BeginInit();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
@@ -207,7 +209,7 @@ namespace MakeCode {
 			this.txtServer.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::MakeCode.Properties.Settings.Default, "txtServer_text", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
 			this.txtServer.Location = new System.Drawing.Point(81, 320);
 			this.txtServer.Name = "txtServer";
-			this.txtServer.Size = new System.Drawing.Size(215, 21);
+			this.txtServer.Size = new System.Drawing.Size(116, 21);
 			this.txtServer.TabIndex = 17;
 			this.txtServer.Text = global::MakeCode.Properties.Settings.Default.txtServer_text;
 			this.toolTip1.SetToolTip(this.txtServer, "数据库地址\r\n如：101.10.131.100");
@@ -274,12 +276,34 @@ namespace MakeCode {
 			this.webBrowser1.Url = new System.Uri("http://www.penzz.com/nicpetshop.html", System.UriKind.Absolute);
 			this.webBrowser1.WebBrowserShortcutsEnabled = false;
 			// 
+			// txtPort
+			// 
+			this.txtPort.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::MakeCode.Properties.Settings.Default, "txtPort_text", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+			this.txtPort.Location = new System.Drawing.Point(243, 320);
+			this.txtPort.MaxLength = 5;
+			this.txtPort.Name = "txtPort";
+			this.txtPort.Size = new System.Drawing.Size(55, 21);
+			this.txtPort.TabIndex = 41;
+			this.txtPort.Text = "3306";
+			this.toolTip1.SetToolTip(this.txtPort, "\r\n如：127.0.0.1:5432");
+			// 
+			// labPort
+			// 
+			this.labPort.AutoSize = true;
+			this.labPort.Location = new System.Drawing.Point(208, 326);
+			this.labPort.Name = "labPort";
+			this.labPort.Size = new System.Drawing.Size(29, 12);
+			this.labPort.TabIndex = 40;
+			this.labPort.Text = "端口";
+			// 
 			// FrmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.NavajoWhite;
 			this.ClientSize = new System.Drawing.Size(586, 405);
+			this.Controls.Add(this.txtPort);
+			this.Controls.Add(this.labPort);
 			this.Controls.Add(this.chkDownloadRes);
 			this.Controls.Add(this.panel1);
 			this.Controls.Add(this.chkWebAdmin);
@@ -334,5 +358,7 @@ namespace MakeCode {
         private WebBrowser webBrowser1;
 		private CheckBox chkDownloadRes;
 		private CheckBox chkWebAdmin;
+		private TextBox txtPort;
+		private Label labPort;
 	}
 }

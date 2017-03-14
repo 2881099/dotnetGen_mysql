@@ -1465,7 +1465,8 @@ namespace {0}.BLL {{
 		public static {0}SelectBuild SelectBy{1}_{4}(params {3}[] ids) {{
 			return Select.Where{1}_{4}(ids);
 		}}", uClass_Name, fkcsBy, orgInfo,
-		GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", ""), table.PrimaryKeys[0].Name);
+		GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", ""), 
+		table.PrimaryKeys[0].Name);
 
 					string _f6 = fk.Columns[0].Name;
 					string _f7 = fk.ReferencedTable.PrimaryKeys[0].Name;
@@ -1479,14 +1480,15 @@ namespace {0}.BLL {{
 						_f9 = GetCSType(fk2[0].Table.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].Table.ClassName) + fk2[0].Table.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
 					}
 					sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}Info[] items) {{
-			if (items == null) return this;
-			return Where{1}_{7}(items.Where<{2}Info>(a => a != null).Select<{2}Info, {9}>(a => a.{3}).ToArray());
-		}}
-		public {0}SelectBuild Where{1}_{7}(params {9}[] ids) {{
+		public {0}SelectBuild Where{1}(params {2}Info[] items) => Where{1}(items?.ToArray(), null);
+		public {0}SelectBuild Where{1}_{7}(params {9}[] ids) => Where{1}_{7}(ids?.ToArray(), null);
+		public {0}SelectBuild Where{1}({2}Info[] items, Action<{5}SelectBuild> subCondition) => Where{1}_{7}(items?.Where<{2}Info>(a => a != null).Select<{2}Info, {9}>(a => a.{3}).ToArray(), subCondition);
+		public {0}SelectBuild Where{1}_{7}({9}[] ids, Action<{5}SelectBuild> subCondition) {{
 			if (ids == null || ids.Length == 0) return this;
-			return base.Where(string.Format(@""EXISTS( SELECT `{6}` FROM {4}`{5}` WHERE `{6}` = a.`{7}` AND `{8}` IN ({{0}}) )"", string.Join<{9}>("","", ids))) as {0}SelectBuild;
-		}}", uClass_Name, fkcsBy, orgInfo, civ, string.Empty, t2.FullName, _f6, _f7, _f8, _f9);
+			{5}SelectBuild subConditionSelect = {5}.Select.Where(string.Format(""`{6}` = a.`{7}` AND `{8}` IN ({{0}})"", string.Join<{9}>("","", ids)));
+			if (subCondition != null) subCondition(subConditionSelect);
+			return base.Where($""EXISTS({{subConditionSelect.ToString(""id"")}})"") as {0}SelectBuild;
+		}}", uClass_Name, fkcsBy, orgInfo, civ, string.Empty, CodeBuild.UFString(t2.ClassName), _f6, _f7, _f8, _f9);
 				});
 
 				table.Columns.ForEach(delegate (ColumnInfo col) {

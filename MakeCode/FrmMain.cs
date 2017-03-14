@@ -24,8 +24,8 @@ namespace MakeCode {
 
 		public string ConnectionString {
 			get {
-				string connStr = "Data Source={0};User ID={1};Password={2};Initial Catalog={3};Charset=utf8";
-				return string.Format(connStr, this._client.Server, this._client.Username, this._client.Password, this._client.Database);
+				string connStr = "Data Source={0};Port={1};User ID={2};Password={3};Initial Catalog={4};Charset=utf8";
+				return string.Format(connStr, this._client.Server, this._client.Port, this._client.Username, this._client.Password, this._client.Database);
 			}
 		}
 
@@ -146,7 +146,7 @@ namespace MakeCode {
 		private void btnConnect_Click(object sender, EventArgs e) {
 			this.btnConnect.Enabled = false;
 			if (this.btnConnect.Text == "Connect") {
-				this._client = new ClientInfo(this.txtServer.Text, this.txtUsername.Text, this.txtPassword.Text);
+				this._client = new ClientInfo(this.txtServer.Text, int.Parse(this.txtPort.Text), this.txtUsername.Text, this.txtPassword.Text);
 				List<DatabaseInfo> dbs = null;
 				SocketMessager messager = new SocketMessager("GetDatabases", this._client);
 				this._socket.Write(messager, delegate(object sender2, ClientSocketReceiveEventArgs e2) {
