@@ -660,6 +660,7 @@ namespace {0}.Model {{
 					} else if (fk2.Count == 1 && t2name.EndsWith("_" + fk2[0].ReferencedTable.Name)) {
 						addname = t2name;
 					}
+					string addname_schema = addname == t2.Name && t2.Owner != table.Owner ? t2.ClassName : addname;
 
 					string parms1 = "";
 					string parmsNoneType1 = "";
@@ -748,16 +749,15 @@ namespace {0}.Model {{
 					if (add_or_flag == "Flag") {
 						if (parms1 != parms2)
 							sb6.AppendFormat(@"
-		public {0}Info Flag{1}({2}) => Flag{1}({3});", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname), parms1, parmsNoneType1);
+		public {0}Info Flag{1}({2}) => Flag{1}({3});", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms1, parmsNoneType1);
 						sb6.AppendFormat(@"
 		public {0}Info Flag{1}({2}) {{
 			{0}Info item = BLL.{0}.GetItem({5});
 			if (item == null) item = BLL.{0}.Insert(new {0}Info {{{3}}});{6}
 			return item;
 		}}
-", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname), parms2, parmsNoneType2, solutionName, pkNamesNoneType, updateDiySet.Length > 0 ? "\r\n\t\t\telse item.UpdateDiy" + updateDiySet + ".ExecuteNonQuery();" : string.Empty);
+", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms2, parmsNoneType2, solutionName, pkNamesNoneType, updateDiySet.Length > 0 ? "\r\n\t\t\telse item.UpdateDiy" + updateDiySet + ".ExecuteNonQuery();" : string.Empty);
 					} else {
-						string addname_schema = addname == t2.Name && t2.Owner != table.Owner ? t2.ClassName : addname;
 						//sb6.Append(addname + "," + t2.Name);
 						if (parms1 != parms2)
 							sb6.AppendFormat(@"
@@ -783,7 +783,7 @@ namespace {0}.Model {{
 		public int Unflag{1}({2}) => Unflag{1}({3});
 		public int Unflag{1}({4}) => BLL.{0}.Delete{9}({5});
 		public int Unflag{1}ALL() => BLL.{0}.DeleteBy{8}(this.{7});
-", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname), parms3, parmsNoneType3, parms4, parmsNoneType4,
+", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms3, parmsNoneType3, parms4, parmsNoneType4,
 	solutionName, CodeBuild.UFString(table.PrimaryKeys[0].Name), CodeBuild.UFString(fk.Columns[0].Name), deleteByUniqui);
 
 						if (ms > 2) {
@@ -800,14 +800,14 @@ namespace {0}.Model {{
 								f5 = f5.Remove(f5.Length - fk20_ReferencedTable_Name.Length - 1);
 							else if (string.Compare(t2name, fk20_ReferencedTable_Name + "_" + fk_ReferencedTable_Name) != 0 &&
 								string.Compare(t2name, fk_ReferencedTable_Name + "_" + fk20_ReferencedTable_Name) != 0)
-								f5 = t2name;
+								f5 = addname_schema;
 							//}
 							string objs_value = string.Format(@"
 		private List<{0}Info> _obj_{1}s;
 		public List<{0}Info> Obj_{1}s => _obj_{1}s ?? (_obj_{1}s = BLL.{0}.SelectBy{5}_{4}({3}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), solutionName, civ, table.PrimaryKeys[0].Name, CodeBuild.UFString(f5));
 							//如果中间表字段 > 2，那么应该把其中间表也查询出来
 							if (t2.Columns.Count > 2) {
-								string _f6 = fk.Columns[0].Name;
+								string _f6 = main_column;
 								string _f7 = fk.ReferencedTable.PrimaryKeys[0].Name;
 								string _f8 = fk2[0].Columns[0].Name;
 								string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
@@ -825,7 +825,7 @@ namespace {0}.Model {{
 		/// <summary>
 		/// 遍历时，可通过 Obj_{3} 可获取中间表数据
 		/// </summary>
-		public List<{0}Info> Obj_{1}s =>_obj_{1}s ?? (_obj_{1}s = BLL.{0}.Select.InnerJoin<BLL.{2}>(""b"", ""b.`{6}` = a.`{5}`"").Where(""b.`{4}` = {{0}}"", {7}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), CodeBuild.UFString(t2.ClassName), CodeBuild.LFString(t2.ClassName),
+		public List<{0}Info> Obj_{1}s =>_obj_{1}s ?? (_obj_{1}s = BLL.{0}.Select.InnerJoin<BLL.{2}>(""b"", ""b.`{6}` = a.`{5}`"").Where(""b.`{4}` = {{0}}"", {7}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname_schema), CodeBuild.UFString(t2.ClassName), CodeBuild.LFString(t2.ClassName),
 			_f6, _f7, _f8, civ);
 							}
 							string objs_key = string.Format("Obj_{0}s", CodeBuild.LFString(addname));
@@ -1440,9 +1440,9 @@ namespace {0}.BLL {{
 						return false;
 					});
 					if (fk == null) return;
-					if (fk.Table.FullName == table.FullName) return;
+					//if (fk.Table.FullName == table.FullName) return;
 					List<ForeignKeyInfo> fk2 = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk2) {
-						return ffk2 != fk;
+						return ffk2.Columns[0].IsPrimaryKey && ffk2 != fk;
 					});
 					if (fk2.Count != 1) return;
 					if (fk.Columns[0].IsPrimaryKey == false) return; //中间表关系键，必须为主键
@@ -1460,24 +1460,30 @@ namespace {0}.BLL {{
 					} else if (fk2.Count == 1 && t2name.EndsWith("_" + fk2[0].ReferencedTable.Name)) {
 						addname = t2name;
 					}
+					string addname_schema = addname == t2.Name && t2.Owner != table.Owner ? t2.ClassName : addname;
+					//若中间表，两外键指向相同表，则选择 表名_主键名 此字段作为主参考字段
+					string main_column = UFString(table.Name + "_" + table.PrimaryKeys[0].Name);
+					if (t2.Columns.Find(delegate (ColumnInfo tcol) {
+						return string.Compare(main_column, tcol.Name, true) == 0;
+					}) == null) main_column = fk.Columns[0].Name;
 
 					string orgInfo = CodeBuild.UFString(fk2[0].ReferencedTable.ClassName);
-					string fkcsBy = CodeBuild.UFString(addname);
+					string fkcsBy = CodeBuild.UFString(addname_schema);
 					if (byItems.ContainsKey(fkcsBy)) return;
 					byItems.Add(fkcsBy, true);
 
 					string civ = string.Format(GetCSTypeValue(fk2[0].ReferencedTable.PrimaryKeys[0].Type), CodeBuild.UFString(fk2[0].ReferencedTable.PrimaryKeys[0].Name));
 					sb1.AppendFormat(@"
-		public static {0}SelectBuild SelectBy{1}(params {2}Info[] items) {{
-			return Select.Where{1}(items);
+		public static {0}SelectBuild SelectBy{1}(params {2}Info[] {5}s) {{
+			return Select.Where{1}({5}s);
 		}}
-		public static {0}SelectBuild SelectBy{1}_{4}(params {3}[] ids) {{
-			return Select.Where{1}_{4}(ids);
+		public static {0}SelectBuild SelectBy{1}_{4}(params {3}[] {5}_ids) {{
+			return Select.Where{1}_{4}({5}_ids);
 		}}", uClass_Name, fkcsBy, orgInfo,
 		GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", ""), 
-		table.PrimaryKeys[0].Name);
+		table.PrimaryKeys[0].Name, LFString(orgInfo));
 
-					string _f6 = fk.Columns[0].Name;
+					string _f6 = main_column;
 					string _f7 = fk.ReferencedTable.PrimaryKeys[0].Name;
 					string _f8 = fk2[0].Columns[0].Name;
 					string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
@@ -1489,15 +1495,15 @@ namespace {0}.BLL {{
 						_f9 = GetCSType(fk2[0].Table.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].Table.ClassName) + fk2[0].Table.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
 					}
 					sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}Info[] items) => Where{1}(items?.ToArray(), null);
-		public {0}SelectBuild Where{1}_{7}(params {9}[] ids) => Where{1}_{7}(ids?.ToArray(), null);
-		public {0}SelectBuild Where{1}({2}Info[] items, Action<{5}SelectBuild> subCondition) => Where{1}_{7}(items?.Where<{2}Info>(a => a != null).Select<{2}Info, {9}>(a => a.{3}).ToArray(), subCondition);
-		public {0}SelectBuild Where{1}_{7}({9}[] ids, Action<{5}SelectBuild> subCondition) {{
-			if (ids == null || ids.Length == 0) return this;
-			{5}SelectBuild subConditionSelect = {5}.Select.Where(string.Format(""`{6}` = a.`{7}` AND `{8}` IN ({{0}})"", string.Join<{9}>("","", ids)));
+		public {0}SelectBuild Where{1}(params {2}Info[] {10}s) => Where{1}({10}s?.ToArray(), null);
+		public {0}SelectBuild Where{1}_{7}(params {9}[] {10}_ids) => Where{1}_{7}({10}_ids?.ToArray(), null);
+		public {0}SelectBuild Where{1}({2}Info[] {10}s, Action<{5}SelectBuild> subCondition) => Where{1}_{7}({10}s?.Where<{2}Info>(a => a != null).Select<{2}Info, {9}>(a => a.{3}).ToArray(), subCondition);
+		public {0}SelectBuild Where{1}_{7}({9}[] {10}_ids, Action<{5}SelectBuild> subCondition) {{
+			if ({10}_ids == null || {10}_ids.Length == 0) return this;
+			{5}SelectBuild subConditionSelect = {5}.Select.Where(string.Format(""`{6}` = a.`{7}` AND `{8}` IN ({{0}})"", string.Join<{9}>("","", {10}_ids)));
 			if (subCondition != null) subCondition(subConditionSelect);
 			return base.Where($""EXISTS({{subConditionSelect.ToString(""`{6}`"").Replace("" a \r\nWHERE ("", "" WHERE "")}})"") as {0}SelectBuild;
-		}}", uClass_Name, fkcsBy, orgInfo, civ, string.Empty, CodeBuild.UFString(t2.ClassName), _f6, _f7, _f8, _f9);
+		}}", uClass_Name, fkcsBy, orgInfo, civ, string.Empty, CodeBuild.UFString(t2.ClassName), _f6, _f7, _f8, _f9, LFString(orgInfo));
 				});
 
 				table.Columns.ForEach(delegate (ColumnInfo col) {
