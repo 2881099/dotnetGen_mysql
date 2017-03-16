@@ -1286,7 +1286,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 	""ConnectionStrings"": {{
 		""MySql"": ""{{connectionString}};Max pool size=32"",
 		""redis"": {{
-			""ip"": ""172.16.30.56"",
+			""ip"": ""172.16.1.220"",
 			""port"": 6379,
 			""pass"": ""123456"",
 			""database"": 13,

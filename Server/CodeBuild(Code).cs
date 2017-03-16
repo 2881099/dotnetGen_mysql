@@ -638,7 +638,7 @@ namespace {0}.Model {{
 					if (fk == null) return;
 					//if (fk.Table.FullName == table.FullName) return; //注释这行条件为了增加 parent_id 的 obj 对象
 					List<ForeignKeyInfo> fk2 = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk2) {
-						return ffk2 != fk;
+						return ffk2.Columns[0].IsPrimaryKey && ffk2 != fk;
 					});
 					// 1 -> 1
 					ForeignKeyInfo fk1v1 = table.ForeignKeys.Find(delegate (ForeignKeyInfo ffk2) {
@@ -677,9 +677,8 @@ namespace {0}.Model {{
 					int ms = 0;
 					//若中间表，两外键指向相同表，则选择 表名_主键名 此字段作为主参考字段
 					string main_column = UFString(table.Name + "_" + table.PrimaryKeys[0].Name);
-					if (t2.Columns.Find(delegate (ColumnInfo tcol) {
-						return string.Compare(main_column, tcol.Name, true) == 0;
-					}) == null) main_column = fk.Columns[0].Name;
+					if (string.Compare(main_column, fk.Columns[0].Name, true) != 0 &&
+						(fk2.Count == 0 || string.Compare(main_column, fk2[0].Columns[0].Name, true) != 0)) main_column = fk.Columns[0].Name;
 					foreach (ColumnInfo columnInfo in t2.Columns) {
 						if (string.Compare(columnInfo.Name, main_column, true) == 0) {
 							parmsNoneType2 += string.Format("\r\n			{0} = this.{1}, ", CodeBuild.UFString(columnInfo.Name), CodeBuild.UFString(table.PrimaryKeys[0].Name));
@@ -807,12 +806,13 @@ namespace {0}.Model {{
 		public List<{0}Info> Obj_{1}s => _obj_{1}s ?? (_obj_{1}s = BLL.{0}.SelectBy{5}_{4}({3}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), solutionName, civ, table.PrimaryKeys[0].Name, CodeBuild.UFString(f5));
 							//如果中间表字段 > 2，那么应该把其中间表也查询出来
 							if (t2.Columns.Count > 2) {
-								string _f6 = main_column;
+								string _f6 = fk.Columns[0].Name;
 								string _f7 = fk.ReferencedTable.PrimaryKeys[0].Name;
 								string _f8 = fk2[0].Columns[0].Name;
 								string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
 
-								if (fk.ReferencedTable.ClassName == fk2[0].ReferencedTable.ClassName) {
+								if (fk.ReferencedTable.ClassName == fk2[0].ReferencedTable.ClassName &&
+									string.Compare(main_column, fk.Columns[0].Name, true) != 0) {
 									_f6 = fk2[0].Columns[0].Name;
 									_f7 = fk2[0].ReferencedTable.PrimaryKeys[0].Name;
 									_f8 = fk.Columns[0].Name;
@@ -1461,11 +1461,6 @@ namespace {0}.BLL {{
 						addname = t2name;
 					}
 					string addname_schema = addname == t2.Name && t2.Owner != table.Owner ? t2.ClassName : addname;
-					//若中间表，两外键指向相同表，则选择 表名_主键名 此字段作为主参考字段
-					string main_column = UFString(table.Name + "_" + table.PrimaryKeys[0].Name);
-					if (t2.Columns.Find(delegate (ColumnInfo tcol) {
-						return string.Compare(main_column, tcol.Name, true) == 0;
-					}) == null) main_column = fk.Columns[0].Name;
 
 					string orgInfo = CodeBuild.UFString(fk2[0].ReferencedTable.ClassName);
 					string fkcsBy = CodeBuild.UFString(addname_schema);
@@ -1483,12 +1478,15 @@ namespace {0}.BLL {{
 		GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", ""), 
 		table.PrimaryKeys[0].Name, LFString(orgInfo));
 
-					string _f6 = main_column;
+					string _f6 = fk.Columns[0].Name;
 					string _f7 = fk.ReferencedTable.PrimaryKeys[0].Name;
 					string _f8 = fk2[0].Columns[0].Name;
 					string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
 
-					if (fk.ReferencedTable.ClassName == fk2[0].ReferencedTable.ClassName) {
+					//若中间表，两外键指向相同表，则选择 表名_主键名 此字段作为主参考字段
+					string main_column = UFString(table.Name + "_" + table.PrimaryKeys[0].Name);
+					if (fk.ReferencedTable.ClassName == fk2[0].ReferencedTable.ClassName &&
+						string.Compare(main_column, fk.Columns[0].Name, true) == 0) {
 						_f6 = fk2[0].Columns[0].Name;
 						_f7 = fk2[0].ReferencedTable.PrimaryKeys[0].Name;
 						_f8 = fk.Columns[0].Name;
