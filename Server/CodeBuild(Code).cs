@@ -1514,7 +1514,7 @@ namespace {0}.BLL {{
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType, col.Name);
+		}}", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name);
 						return;
 					}
 					if (col.Type == MySqlDbType.Byte || col.Type == MySqlDbType.Int16 || col.Type == MySqlDbType.Int24 || col.Type == MySqlDbType.Int32 || col.Type == MySqlDbType.Int64 ||
