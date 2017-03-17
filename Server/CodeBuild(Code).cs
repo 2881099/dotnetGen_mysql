@@ -627,7 +627,7 @@ namespace {0}.Model {{
 						}
 					}
 					ForeignKeyInfo fk_Common = null;
-					ForeignKeyInfo fk = t2.ForeignKeys.Find(delegate (ForeignKeyInfo ffk) {
+					List<ForeignKeyInfo> fks = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk) {
 						if (ffk.ReferencedTable.FullName == table.FullName/* && 
 							ffk.Table.FullName != table.FullName*/) { //注释这行条件为了增加 parent_id 的 obj 对象
 							fk_Common = ffk;
@@ -635,7 +635,10 @@ namespace {0}.Model {{
 						}
 						return false;
 					});
-					if (fk == null) return;
+					if (fks.Count == 0) return;
+					ForeignKeyInfo fk = fks.Count > 1 ? fks.Find(delegate(ForeignKeyInfo ffk) {
+						return string.Compare(table.Name + "_" + table.PrimaryKeys[0].Name, ffk.Columns[0].Name, true) == 0;
+					}) : fks[0];
 					//if (fk.Table.FullName == table.FullName) return; //注释这行条件为了增加 parent_id 的 obj 对象
 					List<ForeignKeyInfo> fk2 = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk2) {
 						return ffk2.Columns[0].IsPrimaryKey && ffk2 != fk;
@@ -680,9 +683,7 @@ namespace {0}.Model {{
 					string add_or_flag = "Add";
 					int ms = 0;
 					//若中间表，两外键指向相同表，则选择 表名_主键名 此字段作为主参考字段
-					string main_column = UFString(table.Name + "_" + table.PrimaryKeys[0].Name);
-					if (string.Compare(main_column, fk.Columns[0].Name, true) != 0 &&
-						(fk2.Count == 0 || string.Compare(main_column, fk2[0].Columns[0].Name, true) != 0)) main_column = fk.Columns[0].Name;
+					string main_column = fk.Columns[0].Name;
 					foreach (ColumnInfo columnInfo in t2.Columns) {
 						string csType = GetCSType(columnInfo.Type, "");
 						bool is_addignore = columnInfo.IsPrimaryKey && csType == "Guid?" ||
@@ -1472,13 +1473,16 @@ namespace {0}.BLL {{
 				}
 				// m -> n
 				_tables.ForEach(delegate (TableInfo t2) {
-					ForeignKeyInfo fk = t2.ForeignKeys.Find(delegate (ForeignKeyInfo ffk) {
+					List<ForeignKeyInfo> fks = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk) {
 						if (ffk.ReferencedTable.FullName == table.FullName) {
 							return true;
 						}
 						return false;
 					});
-					if (fk == null) return;
+					if (fks.Count == 0) return;
+					ForeignKeyInfo fk = fks.Count > 1 ? fks.Find(delegate(ForeignKeyInfo ffk) {
+						return string.Compare(table.Name + "_" + table.PrimaryKeys[0].Name, ffk.Columns[0].Name, true) == 0;
+					}) : fks[0];
 					//if (fk.Table.FullName == table.FullName) return;
 					List<ForeignKeyInfo> fk2 = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk2) {
 						return ffk2.Columns[0].IsPrimaryKey && ffk2 != fk;
@@ -1523,7 +1527,7 @@ namespace {0}.BLL {{
 					string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
 
 					//若中间表，两外键指向相同表，则选择 表名_主键名 此字段作为主参考字段
-					string main_column = UFString(table.Name + "_" + table.PrimaryKeys[0].Name);
+					string main_column = fk.Columns[0].Name;
 					if (fk.ReferencedTable.ClassName == fk2[0].ReferencedTable.ClassName &&
 						string.Compare(main_column, fk.Columns[0].Name, true) == 0) {
 						_f6 = fk2[0].Columns[0].Name;
