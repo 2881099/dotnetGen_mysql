@@ -1464,7 +1464,10 @@ namespace {0}.BLL {{
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType, fk.Columns[0].Name);
+		}}
+		public {0}SelectBuild Where{1}({4}SelectBuild select) {{
+			return this.Where($""a.`{3}` IN ({{select.ToString(""`{5}`"")}})"");
+		}}", uClass_Name, fkcsBy, csType, fk.Columns[0].Name, UFString(fk.ReferencedTable.ClassName), fk.ReferencedColumns[0].Name);
 					}
 				}
 				// m -> n
