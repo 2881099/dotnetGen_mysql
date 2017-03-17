@@ -664,8 +664,12 @@ namespace {0}.Model {{
 
 					string parms1 = "";
 					string parmsNoneType1 = "";
+					string parms1_add = "";
+					string parmsNoneType1_add = "";
 					string parms2 = "";
 					string parmsNoneType2 = "";
+					string parms2_add = "";
+					string parmsNoneType2_add = "";
 					string parms3 = "";
 					string parmsNoneType3 = "";
 					string parms4 = "";
@@ -680,8 +684,14 @@ namespace {0}.Model {{
 					if (string.Compare(main_column, fk.Columns[0].Name, true) != 0 &&
 						(fk2.Count == 0 || string.Compare(main_column, fk2[0].Columns[0].Name, true) != 0)) main_column = fk.Columns[0].Name;
 					foreach (ColumnInfo columnInfo in t2.Columns) {
+						string csType = GetCSType(columnInfo.Type, "");
+						bool is_addignore = columnInfo.IsPrimaryKey && csType == "Guid?" ||
+							 columnInfo.Name.ToLower() == "update_time" && csType == "DateTime?" ||
+							 columnInfo.Name.ToLower() == "create_time" && csType == "DateTime?";
 						if (string.Compare(columnInfo.Name, main_column, true) == 0) {
 							parmsNoneType2 += string.Format("\r\n			{0} = this.{1}, ", CodeBuild.UFString(columnInfo.Name), CodeBuild.UFString(table.PrimaryKeys[0].Name));
+							//if (!is_addignore) parmsNoneType2_add += string.Format("\r\n			{0} = this.{1}, ", CodeBuild.UFString(columnInfo.Name), CodeBuild.UFString(table.PrimaryKeys[0].Name));
+
 							parmsNoneType4 += string.Format(GetCSTypeValue(columnInfo.Type), "this." + CodeBuild.UFString(table.PrimaryKeys[0].Name)) + ", ";
 							parmsNoneType5 += string.Format("\r\n			item.{0} = this.{1};", CodeBuild.UFString(columnInfo.Name), CodeBuild.UFString(table.PrimaryKeys[0].Name));
 							if (columnInfo.IsPrimaryKey) pkNamesNoneType += string.Format(GetCSTypeValue(table.PrimaryKeys[0].Type), "this." + CodeBuild.UFString(table.PrimaryKeys[0].Name)) + ", ";
@@ -696,6 +706,10 @@ namespace {0}.Model {{
 						}
 						parms2 += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						parmsNoneType2 += string.Format("\r\n				{0} = {0}, ", CodeBuild.UFString(columnInfo.Name));
+						if (!is_addignore) {
+							parms2_add += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+							parmsNoneType2_add += string.Format("\r\n				{0} = {0}, ", CodeBuild.UFString(columnInfo.Name));
+						}
 
 						ForeignKeyInfo fkk3 = t2.ForeignKeys.Find(delegate (ForeignKeyInfo fkk33) {
 							return fkk33.Columns[0].Name == columnInfo.Name;
@@ -703,6 +717,10 @@ namespace {0}.Model {{
 						if (fkk3 == null) {
 							parms1 += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 							parmsNoneType1 += CodeBuild.UFString(columnInfo.Name) + ", ";
+							if (!is_addignore) {
+								parms1_add += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+								parmsNoneType1_add += CodeBuild.UFString(columnInfo.Name) + ", ";
+							}
 						} else {
 							string fkk3_ReferencedTable_ObjName = fkk3.ReferencedTable.Name;
 							string endStr = "_" + fkk3.ReferencedTable.Name + "_" + fkk3.ReferencedColumns[0].Name;
@@ -712,6 +730,10 @@ namespace {0}.Model {{
 							fkk3_ReferencedTable_ObjName = CodeBuild.UFString(fkk3_ReferencedTable_ObjName);
 							parms1 += CodeBuild.UFString(fkk3.ReferencedTable.ClassName) + "Info " + fkk3_ReferencedTable_ObjName + ", ";
 							parmsNoneType1 += fkk3_ReferencedTable_ObjName + "." + CodeBuild.UFString(fkk3.ReferencedColumns[0].Name) + ", ";
+							if (!is_addignore) {
+								parms1_add += CodeBuild.UFString(fkk3.ReferencedTable.ClassName) + "Info " + fkk3_ReferencedTable_ObjName + ", ";
+								parmsNoneType1_add += fkk3_ReferencedTable_ObjName + "." + CodeBuild.UFString(fkk3.ReferencedColumns[0].Name) + ", ";
+							}
 
 							if (columnInfo.IsPrimaryKey) {
 								parms3 += CodeBuild.UFString(fkk3.ReferencedTable.ClassName) + "Info " + fkk3_ReferencedTable_ObjName + ", ";
@@ -737,8 +759,14 @@ namespace {0}.Model {{
 					}
 					if (parms1.Length > 0) parms1 = parms1.Remove(parms1.Length - 2);
 					if (parmsNoneType1.Length > 0) parmsNoneType1 = parmsNoneType1.Remove(parmsNoneType1.Length - 2);
+					if (parms1_add.Length > 0) parms1_add = parms1_add.Remove(parms1_add.Length - 2);
+					if (parmsNoneType1_add.Length > 0) parmsNoneType1_add = parmsNoneType1_add.Remove(parmsNoneType1_add.Length - 2);
+
 					if (parms2.Length > 0) parms2 = parms2.Remove(parms2.Length - 2);
 					if (parmsNoneType2.Length > 0) parmsNoneType2 = parmsNoneType2.Remove(parmsNoneType2.Length - 2);
+					if (parms2_add.Length > 0) parms2_add = parms2_add.Remove(parms2_add.Length - 2);
+					if (parmsNoneType2_add.Length > 0) parmsNoneType2_add = parmsNoneType2_add.Remove(parmsNoneType2_add.Length - 2);
+
 					if (parms3.Length > 0) parms3 = parms3.Remove(parms3.Length - 2);
 					if (parmsNoneType3.Length > 0) parmsNoneType3 = parmsNoneType3.Remove(parmsNoneType3.Length - 2);
 					if (parms4.Length > 0) parms4 = parms4.Remove(parms4.Length - 2);
@@ -758,15 +786,15 @@ namespace {0}.Model {{
 ", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms2, parmsNoneType2, solutionName, pkNamesNoneType, updateDiySet.Length > 0 ? "\r\n\t\t\telse item.UpdateDiy" + updateDiySet + ".ExecuteNonQuery();" : string.Empty);
 					} else {
 						//sb6.Append(addname + "," + t2.Name);
-						if (parms1 != parms2)
+						if (parms1_add != parms2_add)
 							sb6.AppendFormat(@"
-		public {0}Info Add{1}({2}) => Add{1}({3});", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms1, parmsNoneType1);
+		public {0}Info Add{1}({2}) => Add{1}({3});", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms1_add, parmsNoneType1_add);
 						sb6.AppendFormat(@"
-		public {0}Info Add{1}({2}) => BLL.{0}.Insert(new {0}Info {{{3}}});
+		public {0}Info Add{1}({2}) => Add{1}(new {0}Info {{{3}}});
 		public {0}Info Add{1}({0}Info item) {{{5}
 			return item.Save();
 		}}
-", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms2, parmsNoneType2, solutionName, parmsNoneType5);
+", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms2_add, parmsNoneType2_add, solutionName, parmsNoneType5);
 					}
 
 					if (add_or_flag == "Flag") {
@@ -853,7 +881,12 @@ namespace {0}.Model {{
 				sb9.Append(string.Join("", innerjoinObjs_values));
 
 				if (table.PrimaryKeys.Count > 0) {
-					if (table.Columns.Count > table.PrimaryKeys.Count) {
+					string newguid = "";
+					foreach (ColumnInfo guidpk in table.PrimaryKeys)
+						if (GetCSType(guidpk.Type, "") == "Guid?") newguid += string.Format(@"
+			this.{0} = Guid.NewGuid();", UFString(guidpk.Name));
+
+					if (table.Columns.Count > table.PrimaryKeys.Count || !string.IsNullOrEmpty(newguid)) {
 						ColumnInfo colUpdateTime = table.Columns.Find(delegate (ColumnInfo fcc) { return fcc.Name.ToLower() == "update_time" && GetCSType(fcc.Type, "") == "DateTime?"; });
 						ColumnInfo colCreateTime = table.Columns.Find(delegate (ColumnInfo fcc) { return fcc.Name.ToLower() == "create_time" && GetCSType(fcc.Type, "") == "DateTime?"; });
 						sb6.Insert(0, string.Format(@"
@@ -861,11 +894,11 @@ namespace {0}.Model {{
 			if (this.{4} != null) {{
 				BLL.{1}.Update(this);
 				return this;
-			}}{3}
+			}}{5}{3}
 			return BLL.{1}.Insert(this);
 		}}", solutionName, uClass_Name, colUpdateTime != null ? @"
 			this." + UFString(colUpdateTime.Name) + " = DateTime.Now;" : "", colCreateTime != null ? @"
-			this." + UFString(colCreateTime.Name) + " = DateTime.Now;" : "", pkCsParamNoType.Replace(", ", " != null && this.")));
+			this." + UFString(colCreateTime.Name) + " = DateTime.Now;" : "", pkCsParamNoType.Replace(", ", " != null && this."), newguid));
 					}
 					sb6.Insert(0, string.Format(@"
 		public {0}.DAL.{1}.SqlUpdateBuild UpdateDiy => BLL.{1}.UpdateDiy(this, _{2});", solutionName, uClass_Name, pkCsParamNoTypeByval.Replace(", ", ", _")));
