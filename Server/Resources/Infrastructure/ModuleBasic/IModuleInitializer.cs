@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 public interface IModuleInitializer {
-	void Init(IServiceCollection services);
+	void Init(IApplicationBuilder services);
 }

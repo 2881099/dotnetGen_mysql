@@ -1171,20 +1171,22 @@ public static class StarupExtensions {{
 			.AddViewLocalization()
 			.AddDataAnnotationsLocalization();
 
-		foreach (var module in modules) {{
+		foreach (var module in modules)
 			mvcBuilder.AddApplicationPart(module.Assembly);
 
+		return services;
+	}}
+	public static IApplicationBuilder UseCustomizedMvc(this IApplicationBuilder app, IList<ModuleInfo> modules) {{
+		foreach (var module in modules) {{
 			var moduleInitializerType =
 				module.Assembly.GetTypes().FirstOrDefault(x => typeof(IModuleInitializer).IsAssignableFrom(x));
 			if ((moduleInitializerType != null) && (moduleInitializerType != typeof(IModuleInitializer))) {{
 				var moduleInitializer = (IModuleInitializer)Activator.CreateInstance(moduleInitializerType);
-				moduleInitializer.Init(services);
+				moduleInitializer.Init(app);
 			}}
 		}}
-
-		return services;
+		return app.UseMvc();
 	}}
-
 	public static IApplicationBuilder UseCustomizedStaticFiles(this IApplicationBuilder app, IList<ModuleInfo> modules) {{
 		app.UseDefaultFiles();
 		app.UseStaticFiles(new StaticFileOptions() {{
@@ -1394,7 +1396,7 @@ namespace {0}.WebHost {{
 			{0}.DAL.SqlHelper.Instance.Log = loggerFactory.CreateLogger(""{0}_DAL_sqlhelper"");
 
 			app.UseSession();
-			app.UseMvc();
+			app.UseCustomizedMvc(Modules);
 			app.UseCustomizedStaticFiles(Modules);
 
 			if (env.IsDevelopment())

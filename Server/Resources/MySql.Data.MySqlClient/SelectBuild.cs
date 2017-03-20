@@ -141,29 +141,6 @@ namespace MySql.Data.MySqlClient {
 			List<TReturnInfo> ret = this.Limit(1).ToList();
 			return ret.Count > 0 ? ret[0] : default(TReturnInfo);
 		}
-		/// <summary>
-		/// 按元组返回指定字段
-		/// </summary>
-		/// <typeparam name="Tuple">元组，如：(int id, string name)，类型必须与数据库字段一致</typeparam>
-		/// <param name="field">返回的字段，用逗号分隔，如：id,name</param>
-		/// <returns></returns>
-		public List<Tuple> ToList<Tuple>(string field) {
-			List<Tuple> ret = new List<Tuple>();
-			string sql = this.ToString(field);
-			Type type = typeof(Tuple);
-			FieldInfo[] fields = type.GetFields();
-
-			Type[] types = new Type[fields.Length];
-			for (int a = 0; a < fields.Length; a++) types[a] = fields[a].FieldType;
-			ConstructorInfo constructor = type.GetConstructor(types);
-
-			_exec.ExecuteReader(dr => {
-				object[] parms = new object[fields.Length];
-				for (int a = 0; a < fields.Length; a++) parms[a] = dr.GetValue(a);
-				ret.Add((Tuple)constructor.Invoke(parms));
-			}, CommandType.Text, sql);
-			return ret;
-		}
 		public override string ToString() => this.ToString(null);
 		public string ToString(string field) {
 			if (string.IsNullOrEmpty(_sort) && _skip > 0) this.Sort(_dals[0].Sort);
@@ -172,19 +149,48 @@ namespace MySql.Data.MySqlClient {
 			string sql = string.Concat("SELECT ", field ?? _field, _table, _join, where, _sort, limit);
 			return sql;
 		}
-		public object[][] Aggregate(string fields) {
+		/// <summary>
+		/// 查询指定字段，返回元组或单值
+		/// </summary>
+		/// <typeparam name="T">元组或单值，如：.Aggregate&lt;(int id, string name)&gt;("id,title")，或 .Aggregate&lt;int&gt;("id")</typeparam>
+		/// <param name="field">返回的字段，用逗号分隔，如：id,name</param>
+		/// <returns></returns>
+		public List<T> Aggregate<T>(string fields) {
 			string limit = _skip > 0 || _limit > 0 ? string.Format(" \r\nlimit {0},{1}", Math.Max(0, _skip), _limit > 0 ? _limit : -1) : string.Empty;
 			string where = string.IsNullOrEmpty(_where) ? string.Empty : string.Concat(" \r\nWHERE ", _where.Substring(5));
 			string having = string.IsNullOrEmpty(_groupby) ||
 							string.IsNullOrEmpty(_having) ? string.Empty : string.Concat(" \r\nHAVING ", _having.Substring(5));
 			string sql = string.Concat("SELECT ", fields, _table, _join, where, _groupby, having, _sort, limit);
-			return _exec.ExeucteArray(CommandType.Text, sql);
+
+			List<T> ret = new List<T>();
+			Type type = typeof(T);
+			bool isTuple = type.Namespace == "System" && type.Name.StartsWith("ValueTuple`");
+			FieldInfo[] fs = new FieldInfo[0];
+			ConstructorInfo constructor = null;
+
+			if (isTuple) {
+				fs = type.GetFields();
+				Type[] types = new Type[fs.Length];
+				for (int a = 0; a < fs.Length; a++) types[a] = fs[a].FieldType;
+				constructor = type.GetConstructor(types);
+			}
+
+			_exec.ExecuteReader(dr => {
+				if (isTuple) {
+					object[] parms = new object[fs.Length];
+					for (int a = 0; a < fs.Length; a++) parms[a] = dr.GetValue(a);
+					ret.Add((T)constructor.Invoke(parms));
+				} else
+					ret.Add((T)dr.GetValue(0));
+			}, CommandType.Text, sql);
+			return ret;
 		}
-		public T Aggregate<T>(string fields) {
-			return Lib.ConvertTo<T>(this.Aggregate(fields)[0][0]);
+		public T AggregateScalar<T>(string field) {
+			var items = this.Aggregate<Tuple<T>>(field);
+			return items.Count > 0 ? items[0].Item1 : default(T);
 		}
 		public int Count() {
-			return this.Aggregate<int>("count(1)");
+			return this.AggregateScalar<int>("count(1)");
 		}
 		public SelectBuild<TReturnInfo> Count(out int count) {
 			count = this.Count();
