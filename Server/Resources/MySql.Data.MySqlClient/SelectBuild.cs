@@ -141,6 +141,29 @@ namespace MySql.Data.MySqlClient {
 			List<TReturnInfo> ret = this.Limit(1).ToList();
 			return ret.Count > 0 ? ret[0] : default(TReturnInfo);
 		}
+		/// <summary>
+		/// 按元组返回指定字段
+		/// </summary>
+		/// <typeparam name="Tuple">元组，如：(int id, string name)，类型必须与数据库字段一致</typeparam>
+		/// <param name="field">返回的字段，用逗号分隔，如：id,name</param>
+		/// <returns></returns>
+		public List<Tuple> ToList<Tuple>(string field) {
+			List<Tuple> ret = new List<Tuple>();
+			string sql = this.ToString(field);
+			Type type = typeof(Tuple);
+			FieldInfo[] fields = type.GetFields();
+
+			Type[] types = new Type[fields.Length];
+			for (int a = 0; a < fields.Length; a++) types[a] = fields[a].FieldType;
+			ConstructorInfo constructor = type.GetConstructor(types);
+
+			_exec.ExecuteReader(dr => {
+				object[] parms = new object[fields.Length];
+				for (int a = 0; a < fields.Length; a++) parms[a] = dr.GetValue(a);
+				ret.Add((Tuple)constructor.Invoke(parms));
+			}, CommandType.Text, sql);
+			return ret;
+		}
 		public override string ToString() => this.ToString(null);
 		public string ToString(string field) {
 			if (string.IsNullOrEmpty(_sort) && _skip > 0) this.Sort(_dals[0].Sort);

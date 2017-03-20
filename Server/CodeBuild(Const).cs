@@ -1067,6 +1067,7 @@ return rTn;"");
 		<PackageReference Include=""System.Runtime.Serialization.Formatters"" Version=""4.3.0"" />
 		<PackageReference Include=""System.Runtime.Serialization.Json"" Version=""4.0.2"" />
 		<PackageReference Include=""System.Threading.Thread"" Version=""4.0.0"" />
+		<PackageReference Include=""System.ValueTuple"" Version=""4.3.0"" />
 		<PackageReference Include=""System.Xml.XmlDocument"" Version=""4.0.1"" />
 	</ItemGroup>
 </Project>
