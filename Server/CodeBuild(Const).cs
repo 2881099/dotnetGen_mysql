@@ -2004,6 +2004,7 @@ namespace {0}.Module.Admin.Controllers {{
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
 		<TargetFramework>netstandard1.6</TargetFramework>
+		<PostBuildEvent>cd $(SolutionDir)\src\WebHost\ &amp;&amp; gulp copy-module</PostBuildEvent>
 		<AssemblyName>{0}</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
