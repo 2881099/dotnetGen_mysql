@@ -1079,7 +1079,7 @@ return rTn;"");
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
 		<TargetFramework>netstandard1.6</TargetFramework>
-		<AssemblyName>Infrastructure</AssemblyName>
+		<WarningLevel>3</WarningLevel>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
@@ -2005,7 +2005,7 @@ namespace {0}.Module.Admin.Controllers {{
 	<PropertyGroup>
 		<TargetFramework>netstandard1.6</TargetFramework>
 		<PostBuildEvent>cd $(SolutionDir)\src\WebHost\ &amp;&amp; gulp copy-module</PostBuildEvent>
-		<AssemblyName>{0}</AssemblyName>
+		<WarningLevel>3</WarningLevel>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include=""..\..\Infrastructure\Infrastructure.csproj"" />
