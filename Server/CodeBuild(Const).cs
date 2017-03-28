@@ -1413,11 +1413,10 @@ namespace {0}.WebHost {{
  @"<Project Sdk=""Microsoft.NET.Sdk.Web"">
 	<PropertyGroup>
 		<TargetFramework>netcoreapp1.0</TargetFramework>
-		<PreserveCompilationContext>true</PreserveCompilationContext>
-		<AssemblyName>WebHost</AssemblyName>
 		<OutputType>Exe</OutputType>
-		<RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
-		<PackageTargetFallback>$(PackageTargetFallback);dotnet5.6;portable-net45+win8</PackageTargetFallback>
+		<DebugType>Portable</DebugType>
+		<RuntimeIdentifiers>win;debian.8-x64</RuntimeIdentifiers>
+		<WarningLevel>3</WarningLevel>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Update=""wwwroot\**\*;Views;Module\**\*;nlog.config"">
@@ -1439,6 +1438,7 @@ namespace {0}.WebHost {{
 		<PackageReference Include=""Microsoft.Extensions.Logging.Debug"" Version=""1.0.2"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""1.0.2"" />
 		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.0.0-rtm-alpha4"" />
+		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.3.1"" />
 		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.0.1"" />
 		<PackageReference Include=""Swashbuckle.AspNetCore.SwaggerGen"" Version=""1.0.0-*"" />
 		<PackageReference Include=""Swashbuckle.AspNetCore.SwaggerUi"" Version=""1.0.0-*"" />
