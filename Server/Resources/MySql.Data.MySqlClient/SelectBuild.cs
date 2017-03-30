@@ -68,6 +68,12 @@ namespace MySql.Data.MySqlClient {
 		public new TLinket Limit(int limit) {
 			return base.Limit(limit) as TLinket;
 		}
+		public new TLinket Take(int limit) {
+			return this.Limit(limit) as TLinket;
+		}
+		public new TLinket Page(int pageIndex, int pageSize) {
+			return this.Page(pageIndex, pageSize) as TLinket;
+		}
 		public SelectBuild(IDAL dal, Executer exec) : base(dal, exec) { }
 	}
 	public class SelectBuild<TReturnInfo> {
@@ -186,8 +192,8 @@ namespace MySql.Data.MySqlClient {
 			return ret;
 		}
 		public T AggregateScalar<T>(string field) {
-			var items = this.Aggregate<T>(field);
-			return items.Count > 0 ? items[0] : default(T);
+			var items = this.Aggregate<Tuple<T>>(field);
+			return items.Count > 0 ? items[0].Item1 : default(T);
 		}
 		public int Count() {
 			return this.AggregateScalar<int>("count(1)");
@@ -285,6 +291,12 @@ namespace MySql.Data.MySqlClient {
 		public SelectBuild<TReturnInfo> Limit(int limit) {
 			_limit = limit;
 			return this;
+		}
+		public SelectBuild<TReturnInfo> Take(int limit) {
+			return this.Limit(limit);
+		}
+		public SelectBuild<TReturnInfo> Page(int pageIndex, int pageSize) {
+			return this.Skip(Math.Max(0, pageIndex - 1) * pageSize).Limit(pageSize);
 		}
 	}
 }
