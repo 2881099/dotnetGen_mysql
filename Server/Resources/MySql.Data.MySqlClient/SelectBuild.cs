@@ -192,8 +192,8 @@ namespace MySql.Data.MySqlClient {
 			return ret;
 		}
 		public T AggregateScalar<T>(string field) {
-			var items = this.Aggregate<Tuple<T>>(field);
-			return items.Count > 0 ? items[0].Item1 : default(T);
+			var items = this.Aggregate<T>(field);
+			return items.Count > 0 ? items[0] : default(T);
 		}
 		public int Count() {
 			return this.AggregateScalar<int>("count(1)");
