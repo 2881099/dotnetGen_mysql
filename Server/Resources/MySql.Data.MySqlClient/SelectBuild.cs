@@ -69,10 +69,10 @@ namespace MySql.Data.MySqlClient {
 			return base.Limit(limit) as TLinket;
 		}
 		public new TLinket Take(int limit) {
-			return this.Limit(limit) as TLinket;
+			return base.Limit(limit) as TLinket;
 		}
 		public new TLinket Page(int pageIndex, int pageSize) {
-			return this.Page(pageIndex, pageSize) as TLinket;
+			return base.Page(pageIndex, pageSize) as TLinket;
 		}
 		public SelectBuild(IDAL dal, Executer exec) : base(dal, exec) { }
 	}
