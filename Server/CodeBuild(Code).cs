@@ -1541,7 +1541,7 @@ namespace {0}.BLL {{
 		public {0}SelectBuild Where{1}({2}Info[] {10}s, Action<{5}SelectBuild> subCondition) => Where{1}_{7}({10}s?.Where<{2}Info>(a => a != null).Select<{2}Info, {9}>(a => a.{3}).ToArray(), subCondition);
 		public {0}SelectBuild Where{1}_{7}({9}[] {10}_ids, Action<{5}SelectBuild> subCondition) {{
 			if ({10}_ids == null || {10}_ids.Length == 0) return this;
-			{5}SelectBuild subConditionSelect = {5}.Select.Where(string.Format(""`{6}` = a.`{7}` AND `{8}` IN ({{0}})"", string.Join<{9}>("","", {10}_ids)));
+			{5}SelectBuild subConditionSelect = {5}.Select.Where(string.Format(""`{6}` = a.`{7}` AND `{8}` IN ('{{0}}')"", string.Join(""','"", {10}_ids.Select(a => string.Concat(a).Replace(""'"", ""''"")))));
 			if (subCondition != null) subCondition(subConditionSelect);
 			return base.Where($""EXISTS({{subConditionSelect.ToString(""`{6}`"").Replace("" a \r\nWHERE ("", "" WHERE "")}})"") as {0}SelectBuild;
 		}}", uClass_Name, fkcsBy, orgInfo, civ, string.Empty, CodeBuild.UFString(t2.ClassName), _f6, _f7, _f8, _f9, LFString(orgInfo));
