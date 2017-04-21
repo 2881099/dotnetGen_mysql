@@ -1687,7 +1687,7 @@ namespace {0}.Module.Admin.Controllers {{
 		[HttpGet]
 		public ActionResult List([FromServices]IConfigurationRoot cfg, {12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
 			var select = {1}.Select{8};{9}
-			int count;
+			long count;
 			var items = select.Count(out count){14}.Skip((page - 1) * limit).Limit(limit).ToList();
 			ViewBag.items = items;
 			ViewBag.count = count;

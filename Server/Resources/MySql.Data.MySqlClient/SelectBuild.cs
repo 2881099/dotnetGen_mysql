@@ -23,7 +23,7 @@ namespace MySql.Data.MySqlClient {
 			values.CopyTo(parms, 0);
 			return base.Where(filter.Substring(4), parms);
 		}
-		public new TLinket Count(out int count) {
+		public new TLinket Count(out long count) {
 			return base.Count(out count) as TLinket;
 		}
 		public new TLinket Where(string filter, params object[] parms) {
@@ -195,10 +195,10 @@ namespace MySql.Data.MySqlClient {
 			var items = this.Aggregate<T>(field);
 			return items.Count > 0 ? items[0] : default(T);
 		}
-		public int Count() {
-			return this.AggregateScalar<int>("count(1)");
+		public long Count() {
+			return this.AggregateScalar<long>("count(1)");
 		}
-		public SelectBuild<TReturnInfo> Count(out int count) {
+		public SelectBuild<TReturnInfo> Count(out long count) {
 			count = this.Count();
 			return this;
 		}
