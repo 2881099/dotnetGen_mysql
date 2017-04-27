@@ -133,7 +133,7 @@ namespace MySql.Data.MySqlClient {
 					prop.SetValue(info, obj, null);
 					if (isCache) cacheList.Add(obj.GetType().GetMethod("Stringify").Invoke(obj, null));
 				}
-			}, CommandType.Text, this.ToString());
+			}, CommandType.Text, sql);
 			if (isCache) {
 				string json = JsonConvert.SerializeObject(cacheList);
 				cache_set(cacheKey, json, (int)expire.TotalSeconds);
