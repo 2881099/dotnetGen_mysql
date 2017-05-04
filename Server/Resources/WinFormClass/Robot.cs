@@ -78,10 +78,10 @@ public class Robot : IDisposable {
 	}
 	public List<RobotDef> LoadDef(string defDoc) {
 		Dictionary<string, RobotDef> dic = new Dictionary<string, RobotDef>();
-		string[] defs = defDoc.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+		string[] defs = defDoc.Split(new string[] { "\n" }, StringSplitOptions.None);
 		int row = 1;
 		foreach (string def in defs) {
-			string loc1 = def.Trim();
+			string loc1 = def.Trim().Trim('\r');
 			if (string.IsNullOrEmpty(loc1) || loc1[0] == 65279 || loc1[0] == ';' || loc1[0] == '#') continue;
 			string pattern = @"([^\s]+)\s+(NONE|SEC|MIN|HOUR|DAY|RunOnDay|RunOnWeek|RunOnMonth)\s+([^\s]+)\s+([^\s]+)";
 			Match m = Regex.Match(loc1, pattern, RegexOptions.IgnoreCase);
