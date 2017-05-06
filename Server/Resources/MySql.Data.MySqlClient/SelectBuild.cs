@@ -184,7 +184,7 @@ namespace MySql.Data.MySqlClient {
 			_exec.ExecuteReader(dr => {
 				if (isTuple) {
 					object[] parms = new object[fs.Length];
-					for (int a = 0; a < fs.Length; a++) parms[a] = dr.GetValue(a);
+					for (int a = 0; a < fs.Length; a++) parms[a] = dr.IsDBNull(a) ? null : dr.GetValue(a);
 					ret.Add((T)constructor.Invoke(parms));
 				} else
 					ret.Add((T)dr.GetValue(0));
