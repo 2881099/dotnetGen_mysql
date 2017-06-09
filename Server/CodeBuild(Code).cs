@@ -1193,7 +1193,7 @@ namespace {0}.DAL {{
 								sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}Increment({2} value) {{
 				if (_item != null) {4}
-				return this.Set(""`{1}`"", $""`{1}` + ?{1}_{{_parameters.Count}}"", 
+				return this.Set(""`{1}`"", $""ifnull(`{1}`, 0) + ?{1}_{{_parameters.Count}}"", 
 					{3}value));
 			}}", CodeBuild.UFString(col.Name), col.Name, fptype, fparam, fpset_);
 							}
