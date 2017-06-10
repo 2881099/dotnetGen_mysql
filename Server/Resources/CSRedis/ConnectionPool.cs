@@ -55,6 +55,12 @@ namespace CSRedis {
 			conn.ThreadId = Thread.CurrentThread.ManagedThreadId;
 			conn.LastActive = DateTime.Now;
 			Interlocked.Increment(ref conn.UseSum);
+			try {
+				conn.Client.Ping();
+			} catch {
+				conn.Client = new RedisClient(new IPEndPoint(IPAddress.Parse(_ip), _port));
+				conn.Client.Connected += Connected;
+			}
 			return conn;
 		}
 
