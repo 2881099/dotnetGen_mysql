@@ -323,7 +323,7 @@ using MySql.Data.MySqlClient;
 namespace {0}.BLL {{
 
 	public partial class RedisHelper : CSRedis.QuickHelperBase {{
-		internal static IConfigurationRoot Configuration;
+		public static IConfigurationRoot Configuration {{ get; internal set; }};
 		public static void InitializeConfiguration(IConfigurationRoot cfg) {{
 			Configuration = cfg;
 			int port, poolsize, database;
