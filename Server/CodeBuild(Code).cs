@@ -1592,6 +1592,11 @@ namespace {0}.BLL {{
 						return;
 					}
 					if (col.Type == MySqlDbType.Date || col.Type == MySqlDbType.Time || col.Type == MySqlDbType.Timestamp || col.Type == MySqlDbType.Datetime) {
+						if (col.IsPrimaryKey)
+							sb6.AppendFormat(@"
+		public {0}SelectBuild Where{1}({2} {1}) {{
+			return base.Where(""a.`{3}` = {{0}}"", {1}) as {0}SelectBuild;
+		}}", uClass_Name, fkcsBy, csType, col.Name);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}Range({2} begin) {{
 			return base.Where(""a.`{3}` >= {{0}}"", begin) as {0}SelectBuild;
