@@ -170,30 +170,32 @@ namespace MySql.Data.MySqlClient {
 
 			List<T> ret = new List<T>();
 			Type type = typeof(T);
-			bool isTuple = type.Namespace == "System" && type.Name.StartsWith("ValueTuple`");
-			FieldInfo[] fs = new FieldInfo[0];
-			ConstructorInfo constructor = null;
-
-			if (isTuple) {
-				fs = type.GetFields();
-				Type[] types = new Type[fs.Length];
-				for (int a = 0; a < fs.Length; a++) types[a] = fs[a].FieldType;
-				constructor = type.GetConstructor(types);
-			}
 
 			_exec.ExecuteReader(dr => {
-				if (isTuple) {
-					object[] parms = new object[fs.Length];
-					for (int a = 0; a < fs.Length; a++) parms[a] = dr.IsDBNull(a) ? null : dr.GetValue(a);
-					ret.Add((T)constructor.Invoke(parms));
-				} else
-					ret.Add((T)dr.GetValue(0));
+				int dataIndex = -1;
+				ret.Add((T)this.AggregateReadTuple(type, dr, ref dataIndex));
 			}, CommandType.Text, sql);
 			return ret;
 		}
 		public T AggregateScalar<T>(string field) {
 			var items = this.Aggregate<T>(field);
 			return items.Count > 0 ? items[0] : default(T);
+		}
+		protected object AggregateReadTuple(Type type, IDataReader dr, ref int dataIndex) {
+			bool isTuple = type.Namespace == "System" && type.Name.StartsWith("ValueTuple`");
+			if (isTuple) {
+				FieldInfo[] fs = type.GetFields();
+				Type[] types = new Type[fs.Length];
+				object[] parms = new object[fs.Length];
+				for (int a = 0; a < fs.Length; a++) {
+					types[a] = fs[a].FieldType;
+					parms[a] = this.AggregateReadTuple(types[a], dr, ref dataIndex);
+				}
+				ConstructorInfo constructor = type.GetConstructor(types);
+				return constructor.Invoke(parms);
+			}
+			++dataIndex;
+			return dr.IsDBNull(dataIndex) ? null : dr.GetValue(dataIndex);
 		}
 		public long Count() {
 			return this.AggregateScalar<long>("count(1)");
