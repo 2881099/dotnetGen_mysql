@@ -66,7 +66,7 @@ namespace MySql.Data.MySqlClient {
 			MySqlCommand cmd = new MySqlCommand();
 			var pc = PrepareCommand(cmd, cmdType, cmdText, cmdParms);
 			Exception ex = Lib.Trys(delegate () {
-				if (cmd.Connection.Ping() == false) cmd.Connection.Open();
+				if (cmd.Connection.State == ConnectionState.Closed || cmd.Connection.Ping() == false) cmd.Connection.Open();
 				try {
 					using (MySqlDataReader dr = cmd.ExecuteReader()) {
 						while (dr.Read())
@@ -94,7 +94,7 @@ namespace MySql.Data.MySqlClient {
 			var pc = PrepareCommand(cmd, cmdType, cmdText, cmdParms);
 			int val = 0;
 			Exception ex = Lib.Trys(delegate () {
-				if (cmd.Connection.Ping() == false) cmd.Connection.Open();
+				if (cmd.Connection.State == ConnectionState.Closed || cmd.Connection.Ping() == false) cmd.Connection.Open();
 				try {
 					val = cmd.ExecuteNonQuery();
 				} catch {
@@ -112,7 +112,7 @@ namespace MySql.Data.MySqlClient {
 			var pc = PrepareCommand(cmd, cmdType, cmdText, cmdParms);
 			object val = null;
 			Exception ex = Lib.Trys(delegate () {
-				if (cmd.Connection.Ping() == false) cmd.Connection.Open();
+				if (cmd.Connection.State == ConnectionState.Closed || cmd.Connection.Ping() == false) cmd.Connection.Open();
 				try {
 					val = cmd.ExecuteScalar();
 				} catch {
