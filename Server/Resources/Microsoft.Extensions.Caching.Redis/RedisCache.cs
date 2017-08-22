@@ -3,14 +3,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using System.Text;
+using System.Threading;
 
 namespace Microsoft.Extensions.Caching.Redis {
 	public class RedisCache : IDistributedCache {
 
 		public byte[] Get(string key) {
-			return this.GetAsync(key).Result;
+			return this.GetAsync(key, CancellationToken.None).Result;
 		}
-		public Task<byte[]> GetAsync(string key) {
+		public Task<byte[]> GetAsync(string key, CancellationToken token) {
 			if (key == null) throw new ArgumentNullException(nameof(key));
 
 			var ret = CSRedis.QuickHelperBase.HashGet(key, "data");
@@ -18,9 +19,9 @@ namespace Microsoft.Extensions.Caching.Redis {
 		}
 
 		public void Set(string key, byte[] value, DistributedCacheEntryOptions options) {
-			this.SetAsync(key, value, options).Wait();
+			this.SetAsync(key, value, options, CancellationToken.None).Wait();
 		}
-		public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options) {
+		public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options, CancellationToken token) {
 			if (key == null) throw new ArgumentNullException(nameof(key));
 			if (value == null) throw new ArgumentNullException(nameof(value));
 			if (options == null) throw new ArgumentNullException(nameof(options));
@@ -31,21 +32,20 @@ namespace Microsoft.Extensions.Caching.Redis {
 		}
 
 		public void Refresh(string key) {
-			this.RefreshAsync(key).Wait();
+			this.RefreshAsync(key, CancellationToken.None).Wait();
 		}
 
-		public Task RefreshAsync(string key) {
+		public Task RefreshAsync(string key, CancellationToken token) {
 			if (key == null) throw new ArgumentNullException(nameof(key));
 
-			long expire;
-			if (long.TryParse(CSRedis.QuickHelperBase.HashGet(key, "expire"), out expire) && expire > 0) CSRedis.QuickHelperBase.Expire(key, TimeSpan.FromTicks(expire));
+			if (long.TryParse(CSRedis.QuickHelperBase.HashGet(key, "expire"), out long expire) && expire > 0) CSRedis.QuickHelperBase.Expire(key, TimeSpan.FromTicks(expire));
 			return Task.Run(() => { });
 		}
 		public void Remove(string key) {
-			this.RemoveAsync(key).Wait();
+			this.RemoveAsync(key, CancellationToken.None).Wait();
 		}
 
-		public Task RemoveAsync(string key) {
+		public Task RemoveAsync(string key, CancellationToken token) {
 			if (key == null) throw new ArgumentNullException(nameof(key));
 
 			CSRedis.QuickHelperBase.Remove(key);

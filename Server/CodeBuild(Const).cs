@@ -399,7 +399,7 @@ namespace {0}.Model {{
 			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
-		<TargetFramework>netstandard1.6</TargetFramework>
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
@@ -1049,55 +1049,55 @@ return rTn;"");
 			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
-		<TargetFramework>netstandard1.6</TargetFramework>
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<AssemblyName>Common</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""Google.Protobuf"" Version=""3.1.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Caching.Abstractions"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging.Abstractions"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""1.0.2"" />
-		<PackageReference Include=""MySql.Data"" Version=""7.0.5-IR21"" />
-		<PackageReference Include=""Npgsql"" Version=""3.1.9"" />
-		<PackageReference Include=""Newtonsoft.Json"" Version=""9.0.1"" />
-		<PackageReference Include=""System.Collections.Specialized"" Version=""4.0.1"" />
-		<PackageReference Include=""System.Diagnostics.TextWriterTraceListener"" Version=""4.0.0"" />
-		<PackageReference Include=""System.IO.FileSystem.Watcher"" Version=""4.0.0"" />
+		<PackageReference Include=""Google.Protobuf"" Version=""3.3.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Caching.Abstractions"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Abstractions"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""2.0.0"" />
+		<PackageReference Include=""MySql.Data"" Version=""8.0.8-dmr"" />
+		<PackageReference Include=""Npgsql"" Version=""3.2.5"" />
+		<PackageReference Include=""Newtonsoft.Json"" Version=""10.0.3"" />
+		<PackageReference Include=""System.Collections.Specialized"" Version=""4.3.0"" />
+		<PackageReference Include=""System.Diagnostics.TextWriterTraceListener"" Version=""4.3.0"" />
+		<PackageReference Include=""System.IO.FileSystem.Watcher"" Version=""4.3.0"" />
 		<PackageReference Include=""System.Runtime.Serialization.Formatters"" Version=""4.3.0"" />
-		<PackageReference Include=""System.Runtime.Serialization.Json"" Version=""4.0.2"" />
-		<PackageReference Include=""System.Threading.Thread"" Version=""4.0.0"" />
-		<PackageReference Include=""System.ValueTuple"" Version=""4.3.0"" />
-		<PackageReference Include=""System.Xml.XmlDocument"" Version=""4.0.1"" />
+		<PackageReference Include=""System.Runtime.Serialization.Json"" Version=""4.3.0"" />
+		<PackageReference Include=""System.Threading.Thread"" Version=""4.3.0"" />
+		<PackageReference Include=""System.ValueTuple"" Version=""4.4.0"" />
+		<PackageReference Include=""System.Xml.XmlDocument"" Version=""4.3.0"" />
 	</ItemGroup>
 </Project>
 ";
-			#endregion
+            #endregion
 
-			public static readonly string Infrastructure_csproj =
-			#region 内容太长已被收起
+            public static readonly string Infrastructure_csproj =
+            #region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
-		<TargetFramework>netstandard1.6</TargetFramework>
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<WarningLevel>3</WarningLevel>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""1.0.3"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.0.0"" />
 	</ItemGroup>
 </Project>
 
 ";
-			#endregion
+            #endregion
 
-			public static readonly string WebHost_Extensions_StarupExtensions_cs =
+            public static readonly string WebHost_Extensions_StarupExtensions_cs =
 			#region 内容太长已被收起
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -1293,7 +1293,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 	""ConnectionStrings"": {{
 		""MySql"": ""{{connectionString}};Max pool size=32"",
 		""redis"": {{
-			""ip"": ""172.16.1.220"",
+			""ip"": ""192.168.1.2"",
 			""port"": 6379,
 			""pass"": ""123456"",
 			""database"": 13,
@@ -1375,7 +1375,7 @@ namespace {0}.WebHost {{
 
 			services.AddSession(a => {{
 				a.IdleTimeout = TimeSpan.FromMinutes(30);
-				a.CookieName = ""Session_{0}"";
+				a.Cookie.Name = ""Session_{0}"";
 			}});
 			services.AddCustomizedMvc(Modules);
 			services.Configure<RazorViewEngineOptions>(options => {{ options.ViewLocationExpanders.Add(new ModuleViewLocationExpander()); }});
@@ -1390,8 +1390,7 @@ namespace {0}.WebHost {{
 			Console.InputEncoding = Encoding.GetEncoding(""GB2312"");
 
 			loggerFactory.AddConsole(Configuration.GetSection(""Logging""));
-			loggerFactory.AddNLog().AddDebug();
-			env.ConfigureNLog(""nlog.config"");
+			loggerFactory.AddNLog().AddDebug().ConfigureNLog(""nlog.config"");
 
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
@@ -1416,14 +1415,15 @@ namespace {0}.WebHost {{
 			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk.Web"">
 	<PropertyGroup>
-		<TargetFramework>netcoreapp1.0</TargetFramework>
+		<TargetFramework>netcoreapp2.0</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<DebugType>Portable</DebugType>
 		<RuntimeIdentifiers>win;debian.8-x64</RuntimeIdentifiers>
 		<WarningLevel>3</WarningLevel>
+		<PostBuildEvent>gulp --gulpfile ../../../gulpfile.js copy-module</PostBuildEvent>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Update=""wwwroot\**\*;Views;Module\**\*;nlog.config"">
+		<None Update=""Views;Module\**\*;nlog.config"">
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</None>
 	</ItemGroup>
@@ -1431,24 +1431,18 @@ namespace {0}.WebHost {{
 		<ProjectReference Include=""..\Infrastructure\Infrastructure.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""1.0.3"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Server.IISIntegration"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Server.Kestrel"" Version=""1.0.3"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging.Console"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging.Debug"" Version=""1.0.2"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""1.0.2"" />
-		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.0.0-rtm-alpha4"" />
-		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.3.1"" />
-		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.0.1"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Server.IISIntegration"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Server.Kestrel"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Console"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Debug"" Version=""2.0.0"" />
+		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.0.0-rtm-beta5"" />
+		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.4.1"" />
+		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.4.0"" />
 		<PackageReference Include=""Swashbuckle.AspNetCore.SwaggerGen"" Version=""1.0.0-*"" />
 		<PackageReference Include=""Swashbuckle.AspNetCore.SwaggerUi"" Version=""1.0.0-*"" />
 	</ItemGroup>
 	<ItemGroup>
-		<DotNetCliToolReference Include=""Microsoft.DotNet.Watcher.Tools"" Version=""1.0.0"" />
+		<DotNetCliToolReference Include=""Microsoft.DotNet.Watcher.Tools"" Version=""2.0.0"" />
 	</ItemGroup>
 </Project>
 ";
@@ -2007,8 +2001,7 @@ namespace {0}.Module.Admin.Controllers {{
 			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
-		<TargetFramework>netstandard1.6</TargetFramework>
-		<PostBuildEvent>cd $(SolutionDir)\src\WebHost\ &amp;&amp; gulp copy-module</PostBuildEvent>
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<WarningLevel>3</WarningLevel>
 	</PropertyGroup>
 	<ItemGroup>

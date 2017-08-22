@@ -22,7 +22,7 @@ gulp.task('copy-module', ['clean-module'], function () {
 		console.log(paths.devModule + module.fullName + '/Views/**/*.*');
         gulp.src([paths.devModule + module.fullName + '/Views/**/*.*'], { base: module.fullName })
             .pipe(gulp.dest(paths.hostModule + module.fullName));
-        gulp.src(paths.devModule + module.fullName + '/bin/Debug/netstandard1.6/**/*.*')
+        gulp.src(paths.devModule + module.fullName + '/bin/Debug/netstandard2.0/**/*.*')
             .pipe(gulp.dest(paths.hostModule + module.fullName + '/bin'));
         gulp.src(paths.devModule + module.fullName + '/appsettings.json')
             .pipe(gulp.dest(paths.hostModule + module.fullName));
