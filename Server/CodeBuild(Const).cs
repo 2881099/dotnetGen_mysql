@@ -1059,7 +1059,6 @@ return rTn;"");
 		<PackageReference Include=""Microsoft.Extensions.Logging.Abstractions"" Version=""2.0.0"" />
 		<PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""2.0.0"" />
 		<PackageReference Include=""MySql.Data"" Version=""8.0.8-dmr"" />
-		<PackageReference Include=""Npgsql"" Version=""3.2.5"" />
 		<PackageReference Include=""Newtonsoft.Json"" Version=""10.0.3"" />
 		<PackageReference Include=""System.Collections.Specialized"" Version=""4.3.0"" />
 		<PackageReference Include=""System.Diagnostics.TextWriterTraceListener"" Version=""4.3.0"" />
@@ -1075,7 +1074,7 @@ return rTn;"");
             #endregion
 
             public static readonly string Infrastructure_csproj =
-            #region 内容太长已被收起
+			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -1086,11 +1085,11 @@ return rTn;"");
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.0.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.0.0"" />
 		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""2.0.0"" />
 		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""2.0.0"" />
 		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.0.0"" />
 	</ItemGroup>
 </Project>
 
@@ -1291,7 +1290,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 		}}
 	}},
 	""ConnectionStrings"": {{
-		""MySql"": ""{{connectionString}};Max pool size=32"",
+		""MySql"": ""{{connectionString}};Encrypt=False;Max pool size=32"",
 		""redis"": {{
 			""ip"": ""192.168.1.2"",
 			""port"": 6379,
@@ -1369,7 +1368,7 @@ namespace {0}.WebHost {{
 		public IHostingEnvironment env {{ get; }}
 
 		public void ConfigureServices(IServiceCollection services) {{
-			services.AddSingleton<IDistributedCache>(new RedisCache());
+			services.AddSingleton<IDistributedCache>(new RedisSuperCache());
 			services.AddSingleton<IConfigurationRoot>(Configuration);
 			services.AddSingleton<IHostingEnvironment>(env);
 
@@ -1423,23 +1422,21 @@ namespace {0}.WebHost {{
 		<PostBuildEvent>gulp --gulpfile ../../../gulpfile.js copy-module</PostBuildEvent>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Update=""Views;Module\**\*;nlog.config"">
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-		</None>
+		<Content Update=""nlog.config"">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include=""..\Infrastructure\Infrastructure.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Microsoft.AspNetCore.Server.IISIntegration"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Server.Kestrel"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.AspNetCore.All"" Version=""2.0.0"" />
 		<PackageReference Include=""Microsoft.Extensions.Logging.Console"" Version=""2.0.0"" />
 		<PackageReference Include=""Microsoft.Extensions.Logging.Debug"" Version=""2.0.0"" />
 		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.0.0-rtm-beta5"" />
 		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.4.1"" />
 		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.4.0"" />
-		<PackageReference Include=""Swashbuckle.AspNetCore.SwaggerGen"" Version=""1.0.0-*"" />
-		<PackageReference Include=""Swashbuckle.AspNetCore.SwaggerUi"" Version=""1.0.0-*"" />
+		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""1.0.0"" />
 	</ItemGroup>
 	<ItemGroup>
 		<DotNetCliToolReference Include=""Microsoft.DotNet.Watcher.Tools"" Version=""2.0.0"" />
@@ -1979,7 +1976,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-using NpgsqlTypes;
 using {0}.BLL;
 using {0}.Model;
 

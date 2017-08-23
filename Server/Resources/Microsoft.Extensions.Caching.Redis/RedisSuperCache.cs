@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 
 namespace Microsoft.Extensions.Caching.Redis {
-	public class RedisCache : IDistributedCache {
+	public class RedisSuperCache : IDistributedCache {
 
 		public byte[] Get(string key) {
 			return this.GetAsync(key, CancellationToken.None).Result;

@@ -19,7 +19,7 @@ namespace Server.Properties {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -179,7 +179,7 @@ namespace Server.Properties {
         ///        /// &lt;/summary&gt;
         ///        public RedisSubscriptionMessage Message { get; private set; }
         ///
-        ///        internal RedisSubscriptionReceivedEventArgs(Re [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        internal RedisSubscriptionRec [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Events_cs {
             get {
@@ -207,7 +207,7 @@ namespace Server.Properties {
         ///    }
         ///
         ///    /// &lt;summary&gt;
-        ///    /// The exception that is thrown when an unexpec [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///    /// The exception that is thr [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Exceptions_cs {
             get {
@@ -234,7 +234,7 @@ namespace Server.Properties {
         ///
         ///        public override object[] Parse(RedisReader reader)
         ///        {
-        ///            if (_parsers.C [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///         [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisArray_cs {
             get {
@@ -313,7 +313,7 @@ namespace Server.Properties {
         ///            return FromTimestamp(reader.ReadInt());
         ///        }
         ///
-        ///        public class Micro [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisDate_cs {
             get {
@@ -341,7 +341,7 @@ namespace Server.Properties {
         ///
         ///        static double FromString(string input)
         ///        {
-        ///            return Double.Parse(input, NumberStyles. [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            return Double.Parse(i [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisFloat_cs {
             get {
@@ -368,7 +368,7 @@ namespace Server.Properties {
         ///
         ///        public override Dictionary&lt;string, string&gt; Parse(RedisReader reader)
         ///        {
-        ///            return ToDict(r [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///          [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisHash_cs {
             get {
@@ -395,8 +395,7 @@ namespace Server.Properties {
         ///        public class Nullable : RedisCommand&lt;long?&gt;
         ///        {
         ///            public Nullable(string command, params object[] args)
-        ///                : base(command, args)
-        ///             [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///                : base(command,  [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisInt_cs {
             get {
@@ -422,7 +421,7 @@ namespace Server.Properties {
         ///        public override RedisMasterState Parse(RedisReader reader)
         ///        {
         ///            reader.ExpectType(RedisMessage.MultiBulk);
-        ///            reade [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisIsMasterDownByAddrCommand_cs {
             get {
@@ -449,8 +448,7 @@ namespace Server.Properties {
         ///        public class Strings : RedisCommand&lt;object&gt;
         ///        {
         ///            public Strings(string command, params object[] args)
-        ///                : base(command, args)
-        ///       [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///                : base(com [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisObject_cs {
             get {
@@ -477,7 +475,7 @@ namespace Server.Properties {
         ///
         ///        public override RedisRole Parse(RedisReader reader)
         ///        {
-        ///            reader.ExpectType(RedisMessage.M [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            reader.ExpectT [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisRoleCommand_cs {
             get {
@@ -505,9 +503,7 @@ namespace Server.Properties {
         ///            _command = command;
         ///        }
         ///
-        ///        public override RedisScan&lt;T&gt; Parse(RedisReader reader)
-        ///        {
-        ///   [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        public override RedisScan&lt;T&gt; Parse(RedisReader r [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisScanCommand_cs {
             get {
@@ -533,8 +529,7 @@ namespace Server.Properties {
         ///        public override RedisSlowLogEntry Parse(RedisReader reader)
         ///        {
         ///            reader.ExpectType(RedisMessage.MultiBulk);
-        ///            reader.ExpectSize(4);
-        ///           [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            reader.ExpectSi [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisSlowLogCommand_cs {
             get {
@@ -562,9 +557,7 @@ namespace Server.Properties {
         ///        public override string Parse(RedisReader reader)
         ///        {
         ///            return reader.ReadStatus();
-        ///        }
-        ///
-        ///        p [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///  [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisStatus_cs {
             get {
@@ -592,7 +585,7 @@ namespace Server.Properties {
         ///
         ///        public class Nullable : RedisString
         ///        {
-        ///            public Nullable(string command, params object[] args [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            public Nullable(string command, p [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisString_cs {
             get {
@@ -616,7 +609,7 @@ namespace Server.Properties {
         ///        {
         ///            reader.ExpectType(RedisMessage.MultiBulk);
         ///            long count = reader.ReadInt(false);
-        ///            string type = reader.ReadBulkStrin [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            string type = reade [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisSubscription_cs {
             get {
@@ -642,7 +635,7 @@ namespace Server.Properties {
         ///        {
         ///            reader.ExpectType(RedisMessage.MultiBulk);
         ///            reader.ExpectSize(2);
-        ///            return Tuple.Create(reader. [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            return Tup [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Commands_RedisTuple_cs {
             get {
@@ -673,7 +666,7 @@ namespace Server.Properties {
         ///
         ///        public int SendTimeout { get; set; }
         ///
-        ///        public FakeRedisSocket(para [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        publi [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Fakes_FakeRedisSocket_cs {
             get {
@@ -703,8 +696,7 @@ namespace Server.Properties {
         ///
         ///        public void AddResponse(byte[] response)
         ///        {
-        ///            _responses.Enqueue(response);
-        ///     [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            _responses.En [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Fakes_FakeStream_cs {
             get {
@@ -729,7 +721,7 @@ namespace Server.Properties {
         ///        readonly SocketAsyncEventArgs _asyncConnectArgs;
         ///        readonly SocketAsyncPool _asyncTransferPool;
         ///        readonly ConcurrentQueue&lt;IRedisAsyncCommandToken&gt; _asyncReadQueue;
-        ///        readonly ConcurrentQueue&lt;IRedisAsyncCommandT [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        readonly ConcurrentQueue&lt;IRe [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_AsyncConnector_cs {
             get {
@@ -756,8 +748,7 @@ namespace Server.Properties {
         ///        void Connect(EndPoint endpoint);
         ///        bool ConnectAsync(SocketAsyncEventArgs args);
         ///        bool SendAsync(SocketAsyncEventArgs args);
-        ///        Stream GetStream();
-        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        St [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_IRedisSocket_cs {
             get {
@@ -786,7 +777,7 @@ namespace Server.Properties {
         ///    class RedisAsyncCommandToken&lt;T&gt; : IRedisAsyncCommandToken
         ///    {
         ///        readonly TaskCompletionSource&lt;T&gt; _tcs;
-        ///        readonly Redi [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///  [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_RedisAsyncCommandToken_cs {
             get {
@@ -813,7 +804,7 @@ namespace Server.Properties {
         ///        public RedisWriter Writer { get { return _writer; } }
         ///        public RedisReader Reader { get { return GetOrThrow(_reader); } }
         ///        public Encoding Encoding { get; set; }
-        ///        public RedisPi [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///     [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_RedisIO_cs {
             get {
@@ -842,7 +833,7 @@ namespace Server.Properties {
         ///        public int ReceiveTimeout
         ///        {
         ///            get { return _socket.ReceiveTimeout; }
-        ///            set { _socket.Receive [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            s [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_RedisPooledSocket_cs {
             get {
@@ -872,8 +863,7 @@ namespace Server.Properties {
         ///        {
         ///            RedisMessage type = (RedisMessage)_stream.ReadByte();
         ///            if (type == RedisMessage.Error)
-        ///                throw new RedisException(ReadStatus(false));
-        ///   [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///                throw new RedisException(R [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_RedisReader_cs {
             get {
@@ -903,7 +893,7 @@ namespace Server.Properties {
         ///
         ///        public int ReceiveTimeout
         ///        {
-        ///            get { return _socket.ReceiveTime [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            get { retur [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_RedisSocket_cs {
             get {
@@ -934,7 +924,7 @@ namespace Server.Properties {
         ///            _io = io;
         ///        }
         ///
-        ///        public int Write(RedisCommand command, Stream strea [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        public int Write(RedisCommand [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_RedisWriter_cs {
             get {
@@ -961,8 +951,7 @@ namespace Server.Properties {
         ///
         ///        public event EventHandler&lt;SocketAsyncEventArgs&gt; Completed;
         ///
-        ///        public SocketAsyncPool(int concurrency, int bufferSize)
-        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        public SocketAsyncPool(int concurrency [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_SocketAsyncPool_cs {
             get {
@@ -991,7 +980,7 @@ namespace Server.Properties {
         ///        {
         ///            _max = max;
         ///            _endPoint = endPoint;
-        ///            _pool = new ConcurrentSt [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            _poo [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_IO_SocketPool_cs {
             get {
@@ -1019,8 +1008,7 @@ namespace Server.Properties {
         ///        {
         ///            string status = Call(RedisCommands.Monitor());
         ///            Listen(x =&gt; x.Read());
-        ///            return status;
-        ///    [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_MonitorListener_cs {
             get {
@@ -1048,8 +1036,7 @@ namespace Server.Properties {
         ///            return new RedisStatus(&quot;AUTH&quot;, password);
         ///        }
         ///        public static RedisString Echo(string message)
-        ///        {
-        ///            return [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        { [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_RedisCommand_cs {
             get {
@@ -1077,8 +1064,7 @@ namespace Server.Properties {
         ///        readonly int _concurrency;
         ///        readonly int _bufferSize;
         ///        readonly Lazy&lt;AsyncConnector&gt; _asyncConnector;
-        ///        readonly IRedisSocket _redisSocket;
-        ///        readonly E [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        readonly IRedisSocket _redisSocket; [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_RedisConnector_cs {
             get {
@@ -1106,7 +1092,7 @@ namespace Server.Properties {
         ///
         ///        public RedisListner(RedisConnector connection)
         ///        {
-        ///            _connection = connection; [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            _conne [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_RedisListener_cs {
             get {
@@ -1135,8 +1121,7 @@ namespace Server.Properties {
         ///        public bool Active { get; private set; }
         ///
         ///        internal RedisPipeline(RedisIO io)
-        ///        {
-        ///           [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_RedisPipeline_cs {
             get {
@@ -1162,8 +1147,7 @@ namespace Server.Properties {
         ///
         ///        public event EventHandler&lt;RedisTransactionQueuedEventArgs&gt; TransactionQueued;
         ///
-        ///        bool _active;
-        ///     [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        b [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_RedisTransaction_cs {
             get {
@@ -1188,8 +1172,7 @@ namespace Server.Properties {
         ///        public event EventHandler&lt;RedisSubscriptionChangedEventArgs&gt; Changed;
         ///
         ///        public SubscriptionListener(RedisConnector connection)
-        ///            : base(connection)
-        ///   [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            : bas [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_SubscriptionListener_cs {
             get {
@@ -1215,7 +1198,7 @@ namespace Server.Properties {
         ///        {
         ///            int count = 0;
         ///            foreach (var ar in arrays)
-        ///                count += [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Utilities_RedisArgs_cs {
             get {
@@ -1240,8 +1223,7 @@ namespace Server.Properties {
         ///        static readonly Lazy&lt;Func&lt;T, Dictionary&lt;string, string&gt;&gt;&gt;
         ///            _propertySerializer;
         ///        static readonly Lazy&lt;Func&lt;Dictionary&lt;string, string&gt;, T&gt;&gt;
-        ///            _propertyDeserializer;
-        ///        static [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            _propertyDeserializer [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Internal_Utilities_Serializer_cs {
             get {
@@ -1268,7 +1250,7 @@ namespace Server.Properties {
         ///        event EventHandler&lt;RedisSubscriptionReceivedEventArgs&gt; SubscriptionReceived;
         ///
         ///        /// &lt;summary&gt;
-        ///        /// Occurs when a subscription channel is added or [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        /// Occurs when a subscription c [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_IRedisClient_cs {
             get {
@@ -1300,7 +1282,7 @@ namespace Server.Properties {
         ///
         ///
         ///        /// &lt;summary&gt;
-        ///        /// Call arbitrary  [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///     [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_IRedisClientAsync_cs {
             get {
@@ -1326,10 +1308,7 @@ namespace Server.Properties {
         ///        /// &lt;/summary&gt;
         ///        /// &lt;param name=&quot;timeout&quot;&gt;Connection timeout in milliseconds&lt;/param&gt;
         ///        /// &lt;returns&gt;True if connected&lt;/returns&gt;
-        ///        bool Connect(int timeout);
-        ///
-        ///
-        ///        / [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        bool Connect(int time [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_IRedisClientSync_cs {
             get {
@@ -1379,7 +1358,7 @@ namespace Server.Properties {
         ///        /// &lt;summary&gt;
         ///        /// Call arbitrary redis command
         ///        /// &lt;/summary&gt;
-        ///        /// &lt;param name=&quot;command&quot;&gt;&lt;/para [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        /// &lt;param n [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_RedisClient_Async_cs {
             get {
@@ -1407,7 +1386,7 @@ namespace Server.Properties {
         ///    {
         ///        const int DefaultPort = 6379;
         ///        const bool DefaultSSL = false;
-        ///        const int DefaultConc [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        co [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_RedisClient_cs {
             get {
@@ -1434,8 +1413,7 @@ namespace Server.Properties {
         ///            return _connector.Connect(); // TODO timeout
         ///        }
         ///
-        ///        /// &lt;summary&gt;
-        ///        /// Call [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        /// &lt;summary [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_RedisClient_Sync_cs {
             get {
@@ -1464,9 +1442,7 @@ namespace Server.Properties {
         ///        readonly EndPoint _endPoint;
         ///        readonly SocketPool _pool;
         ///		//readonly string pass;
-        ///		//readonly int database;
-        ///
-        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		//read [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_RedisConnectionPool_cs {
             get {
@@ -1496,7 +1472,7 @@ namespace Server.Properties {
         ///        }
         ///
         ///        /// &lt;summary&gt;
-        ///        /// Call arbitrary S [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_RedisSentinelClient_Async_cs {
             get {
@@ -1523,7 +1499,7 @@ namespace Server.Properties {
         ///    {
         ///        const int DefaultPort = 26379;
         ///        const bool DefaultSSL = false;
-        ///        const int DefaultConcurrency = [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        const int De [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_RedisSentinelClient_cs {
             get {
@@ -1549,8 +1525,7 @@ namespace Server.Properties {
         ///        /// &lt;returns&gt;True if connected&lt;/returns&gt;
         ///        public bool Connect(int timeout)
         ///        {
-        ///            return _connector.Connect(); // TODO: timeout
-        ///   [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///            return _connector.Connect(); // [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_RedisSentinelClient_Sync_cs {
             get {
@@ -1576,8 +1551,7 @@ namespace Server.Properties {
         ///        const int DefaultPort = 26379;
         ///        readonly LinkedList&lt;Tuple&lt;string, int&gt;&gt; _sentinels;
         ///        string _masterName;
-        ///        int _connectTimeout;
-        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        int  [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_RedisSentinelManager_cs {
             get {
@@ -1604,7 +1578,7 @@ namespace Server.Properties {
         ///        /// &lt;summary&gt;
         ///        /// Return the number of seconds since the object stored at the specified key is idle
         ///        /// &lt;/summary&gt;
-        ///        IdleTime, [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Types_cs {
             get {
@@ -1634,9 +1608,7 @@ namespace Server.Properties {
         ///		/// &lt;summary&gt;
         ///		/// The value that is stored
         ///		/// &lt;/summary&gt;
-        ///		public object Value { get; set; }
-        ///
-        ///		/// &lt;summar [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		public object Value { get; set; } [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_Cell_cs {
             get {
@@ -1664,8 +1636,7 @@ namespace Server.Properties {
         ///			this.Add(worksheet, null, null);
         ///		}
         ///
-        ///		public void Add(Worksheet worksheet, int insertAfterSheetNumber) {
-        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		public void Add(Worksheet worksheet, int insertAfterShe [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_FastExcel_Add_cs {
             get {
@@ -1690,7 +1661,7 @@ namespace Server.Properties {
         ///
         ///		internal SharedStrings SharedStrings { get; set; }
         ///		internal ZipArchive Archive { get; set; }
-        ///		private bool UpdateExisting {  [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		private bool UpdateExi [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_FastExcel_cs {
             get {
@@ -1718,8 +1689,7 @@ namespace Server.Properties {
         ///			this.Delete(sheetNumber, null);
         ///		}
         ///
-        ///		/// &lt;summary&gt;
-        ///		/// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		/// &lt;s [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_FastExcel_Delete_cs {
             get {
@@ -1744,7 +1714,7 @@ namespace Server.Properties {
         ///			return Read(null, sheetName, existingHeadingRows);
         ///		}
         ///
-        ///		private Worksheet Read(int? sheetNumber = null, string sheetName = [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		private Worksheet Read(int? sheetNumber = null, string sheet [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_FastExcel_Read_cs {
             get {
@@ -1771,9 +1741,7 @@ namespace Server.Properties {
         ///		/// &lt;param name=&quot;sheetNumber&quot;&gt;eg 1,2,4&lt;/param&gt;
         ///		public void Update(Worksheet data, int sheetNumber) {
         ///			this.Update(data, sheetNumber, null);
-        ///		}
-        ///
-        ///		///  [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_FastExcel_Update_cs {
             get {
@@ -1802,8 +1770,7 @@ namespace Server.Properties {
         ///				if (_worksheets != null) {
         ///					return _worksheets;
         ///				} else {
-        ///					_worksheets = GetWorksheetProperties();
-        ///		 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///					_worksheets = GetWorksheetProper [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_FastExcel_Worksheets_cs {
             get {
@@ -1833,8 +1800,7 @@ namespace Server.Properties {
         ///
         ///		/// &lt;summary&gt;
         ///		/// Write data to a sheet
-        ///		/// &lt;/summary&gt;
-        ///		/// &lt;p [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		/// &lt;/su [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_FastExcel_Write_cs {
             get {
@@ -1864,8 +1830,7 @@ namespace Server.Properties {
         ///
         ///        /// &lt;summary&gt;
         ///        /// The collection of cells for this row
-        ///        /// &lt;/summary&gt;
-        ///        public  [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        /// &lt;/sum [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_Row_cs {
             get {
@@ -1892,7 +1857,7 @@ namespace Server.Properties {
         ///    {
         ///        //A dictionary is a lot faster than a list
         ///        private Dictionary&lt;string, int&gt; StringDictionary { get; set; }
-        ///        private Dictionary&lt;int, string&gt; StringArray { get; [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        private Dictionary&lt;int, string&gt;  [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_SharedStrings_cs {
             get {
@@ -1921,9 +1886,7 @@ namespace Server.Properties {
         ///        /// &lt;/summary&gt;
         ///        public IEnumerable&lt;Row&gt; Rows { get; set; }
         ///
-        ///        public IEnumerable&lt;string&gt; Headings { get; set; }
-        ///
-        ///        publ [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        public IEnumerable&lt;string&gt; Headings { get;  [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_Worksheet_cs {
             get {
@@ -2006,20 +1969,21 @@ namespace Server.Properties {
         /// </summary>
         internal static string Infrastructure_Extensions_GlobalExtensions_cs {
             get {
-                return ResourceManager.GetString("Infrastructure_Extensions_GlobalExtensions.cs", resourceCulture);
+                return ResourceManager.GetString("Infrastructure_Extensions_GlobalExtensions_cs", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   查找类似 using Microsoft.Extensions.DependencyInjection;
+        ///   查找类似 using Microsoft.AspNetCore.Builder;
+        ///using Microsoft.Extensions.DependencyInjection;
         ///
         ///public interface IModuleInitializer {
-        ///	void Init(IServiceCollection serviceCollection);
+        ///	void Init(IApplicationBuilder services);
         ///} 的本地化字符串。
         /// </summary>
         internal static string Infrastructure_ModuleBasic_IModuleInitializer_cs {
             get {
-                return ResourceManager.GetString("Infrastructure_ModuleBasic_IModuleInitializer.cs", resourceCulture);
+                return ResourceManager.GetString("Infrastructure_ModuleBasic_IModuleInitializer_cs", resourceCulture);
             }
         }
         
@@ -2043,7 +2007,7 @@ namespace Server.Properties {
         /// </summary>
         internal static string Infrastructure_ModuleBasic_ModuleInfo_cs {
             get {
-                return ResourceManager.GetString("Infrastructure_ModuleBasic_ModuleInfo.cs", resourceCulture);
+                return ResourceManager.GetString("Infrastructure_ModuleBasic_ModuleInfo_cs", resourceCulture);
             }
         }
         
@@ -2059,11 +2023,11 @@ namespace Server.Properties {
         ///		if (context.Values.ContainsKey(_moduleKey)) {
         ///			var module = context.Values[_moduleKey];
         ///			if (!string.IsNullOrWhiteSpace(module)) {
-        ///				var moduleViewLocations = new string [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///				var moduleViewLocations = new stri [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Infrastructure_ModuleBasic_ModuleViewLocationExpander_cs {
             get {
-                return ResourceManager.GetString("Infrastructure_ModuleBasic_ModuleViewLocationExpander.cs", resourceCulture);
+                return ResourceManager.GetString("Infrastructure_ModuleBasic_ModuleViewLocationExpander_cs", resourceCulture);
             }
         }
         
@@ -2155,22 +2119,20 @@ namespace Server.Properties {
         ///using Microsoft.Extensions.Caching.Distributed;
         ///using Microsoft.Extensions.Options;
         ///using System.Text;
+        ///using System.Threading;
         ///
         ///namespace Microsoft.Extensions.Caching.Redis {
-        ///	public class RedisCache : IDistributedCache {
+        ///	public class RedisSuperCache : IDistributedCache {
         ///
         ///		public byte[] Get(string key) {
-        ///			return this.GetAsync(key).Result;
+        ///			return this.GetAsync(key, CancellationToken.None).Result;
         ///		}
-        ///		public Task&lt;byte[]&gt; GetAsync(string key) {
-        ///			if (key == null) throw new ArgumentNullException(nameof(key));
-        ///
-        ///			var ret = CSRedis.QuickHelperBase.HashGet(key, &quot;data&quot;);
-        ///			retu [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		public Task&lt;byte[]&gt; GetAsync(string key, CancellationToken token) {
+        ///			if (key == null) throw new ArgumentNullException(nameo [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static string Microsoft_Extensions_Caching_Redis_RedisCache_cs {
+        internal static string Microsoft_Extensions_Caching_Redis_RedisSuperCache_cs {
             get {
-                return ResourceManager.GetString("Microsoft_Extensions_Caching_Redis_RedisCache_cs", resourceCulture);
+                return ResourceManager.GetString("Microsoft_Extensions_Caching_Redis_RedisSuperCache_cs", resourceCulture);
             }
         }
         

@@ -250,9 +250,6 @@
   <data name="WinFormClass_WorkQueue_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\WinFormClass\WorkQueue.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="Microsoft_Extensions_Caching_Redis_RedisCache_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Microsoft.Extensions.Caching.Redis\RedisCache.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="CSRedis_Events_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CSRedis\Events.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
@@ -412,42 +409,43 @@
   <data name="CSRedis_ConnectionPool_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CSRedis\ConnectionPool.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-	<data name="_build_bat" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\build.bat;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-	<data name="_gitattributes" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\.gitattributes;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-	<data name="_gitignore" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\.gitignore;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-
-	<data name="WebHost_gitignore" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\WebHost\.gitignore;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-	<data name="WebHost_gulpfile_js" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\WebHost\gulpfile.js;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-	<data name="WebHost_package_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\WebHost\package.json;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-	<data name="WebHost_web_config" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\WebHost\web.config;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-
-	<data name="Infrastructure_Controllers_BaseController_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\Infrastructure\Controllers\BaseController.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-	<data name="Infrastructure_Extensions_GlobalExtensions.cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\Infrastructure\Extensions\GlobalExtensions.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-	<data name="Infrastructure_ModuleBasic_IModuleInitializer.cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\Infrastructure\ModuleBasic\IModuleInitializer.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-	<data name="Infrastructure_ModuleBasic_ModuleInfo.cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\Infrastructure\ModuleBasic\ModuleInfo.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
-	<data name="Infrastructure_ModuleBasic_ModuleViewLocationExpander.cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
-		<value>..\Resources\Infrastructure\ModuleBasic\ModuleViewLocationExpander.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-	</data>
+  <data name="_build_bat" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\build.bat;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_gitattributes" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\.gitattributes;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="_gitignore" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\.gitignore;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WebHost_gitignore" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WebHost\.gitignore;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WebHost_gulpfile_js" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WebHost\gulpfile.js;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WebHost_package_json" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WebHost\package.json;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="WebHost_web_config" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WebHost\web.config;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Infrastructure_Controllers_BaseController_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Infrastructure\Controllers\BaseController.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Infrastructure_Extensions_GlobalExtensions_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Infrastructure\Extensions\GlobalExtensions.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Infrastructure_ModuleBasic_IModuleInitializer_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Infrastructure\ModuleBasic\IModuleInitializer.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Infrastructure_ModuleBasic_ModuleInfo_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Infrastructure\ModuleBasic\ModuleInfo.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Infrastructure_ModuleBasic_ModuleViewLocationExpander_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Infrastructure\ModuleBasic\ModuleViewLocationExpander.cs;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="Microsoft_Extensions_Caching_Redis_RedisSuperCache_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Microsoft.Extensions.Caching.Redis\RedisSuperCache.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>
