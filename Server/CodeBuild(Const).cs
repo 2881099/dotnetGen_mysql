@@ -1371,6 +1371,7 @@ namespace {0}.WebHost {{
 			services.AddSingleton<IDistributedCache>(new RedisSuperCache());
 			services.AddSingleton<IConfigurationRoot>(Configuration);
 			services.AddSingleton<IHostingEnvironment>(env);
+			services.AddScoped<CustomExceptionFilter>();
 
 			services.AddSession(a => {{
 				a.IdleTimeout = TimeSpan.FromMinutes(30);
