@@ -51,6 +51,8 @@
 
 ### 测试数据库
 
+![](20170825201740.png)
+
 ```sql
 SET FOREIGN_KEY_CHECKS=0;
 
