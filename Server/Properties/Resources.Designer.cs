@@ -1577,8 +1577,7 @@ namespace Server.Properties {
         ///
         ///        /// &lt;summary&gt;
         ///        /// Return the number of seconds since the object stored at the specified key is idle
-        ///        /// &lt;/summary&gt;
-        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///        /// &lt;/summary&gt;        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_Types_cs {
             get {
@@ -1740,8 +1739,7 @@ namespace Server.Properties {
         ///		/// &lt;param name=&quot;data&quot;&gt;The worksheet&lt;/param&gt;
         ///		/// &lt;param name=&quot;sheetNumber&quot;&gt;eg 1,2,4&lt;/param&gt;
         ///		public void Update(Worksheet data, int sheetNumber) {
-        ///			this.Update(data, sheetNumber, null);
-        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///			this.Update(data, sheetNumber, null);        /// [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string FastExcel_FastExcel_Update_cs {
             get {
@@ -1950,6 +1948,30 @@ namespace Server.Properties {
         internal static string Infrastructure_Controllers_BaseController_cs {
             get {
                 return ResourceManager.GetString("Infrastructure_Controllers_BaseController_cs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 using Microsoft.AspNetCore.Hosting;
+        ///using Microsoft.AspNetCore.Http;
+        ///using Microsoft.AspNetCore.Mvc;
+        ///using Microsoft.AspNetCore.Mvc.Filters;
+        ///using Microsoft.Extensions.Configuration;
+        ///using Microsoft.Extensions.Logging;
+        ///using System;
+        ///using System.Collections.Generic;
+        ///using System.Security.Cryptography;
+        ///using System.Text;
+        ///using System.Threading.Tasks;
+        ///
+        ///public class CustomExceptionFilter : Attribute, IExceptionFilter {
+        ///	private ILogger _logger = null;
+        ///	private IConfigurationRoot _cfg = null;
+        ///	pr [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string Infrastructure_Controllers_CustomExceptionFilter_cs {
+            get {
+                return ResourceManager.GetString("Infrastructure_Controllers_CustomExceptionFilter_cs", resourceCulture);
             }
         }
         

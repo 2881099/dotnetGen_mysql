@@ -273,6 +273,11 @@ namespace Server {
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Infrastructure\Controllers\BaseController.cs"), Deflate.Compress(sb1.ToString())));
 				clearSb();
 				#endregion
+				#region Controllers\CustomExceptionFilter.cs
+				sb1.Append(Server.Properties.Resources.Infrastructure_Controllers_CustomExceptionFilter_cs);
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Infrastructure\Controllers\CustomExceptionFilter.cs"), Deflate.Compress(sb1.ToString())));
+				clearSb();
+				#endregion
 				#region Extensions\GlobalExtensions.cs
 				sb1.Append(Server.Properties.Resources.Infrastructure_Extensions_GlobalExtensions_cs);
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Infrastructure\Extensions\GlobalExtensions.cs"), Deflate.Compress(sb1.ToString())));

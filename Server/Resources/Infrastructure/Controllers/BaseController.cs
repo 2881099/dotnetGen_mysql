@@ -8,6 +8,7 @@ using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 
+[ServiceFilter(typeof(CustomExceptionFilter))]
 public partial class BaseController : Controller {
 	public ILogger _logger;
 	public ISession Session { get { return HttpContext.Session; } }
@@ -39,12 +40,6 @@ public partial class BaseController : Controller {
 		base.OnActionExecuting(context);
 	}
 	public override void OnActionExecuted(ActionExecutedContext context) {
-		if (context.Exception != null) {
-			#region 错误拦截，在这里记录日志
-			//this.Json(new APIReturn(-1, context.Exception.Message)).ExecuteResultAsync(context).Wait();
-			//context.Exception = null;
-			#endregion
-		}
 		base.OnActionExecuted(context);
 	}
 
