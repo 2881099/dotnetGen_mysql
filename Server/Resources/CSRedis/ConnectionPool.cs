@@ -40,7 +40,9 @@ namespace CSRedis {
 					}
 				if (conn != null) {
 					conn.Pool = this;
-					conn.Client = new RedisClient(new IPEndPoint(IPAddress.Parse(_ip), _port));
+					var ips = Dns.GetHostAddresses(_ip);
+					if (ips.Length == 0) throw new Exception($"无法解析“{_ip}”");
+					conn.Client = new RedisClient(new IPEndPoint(ips[0], _port));
 					conn.Client.Connected += Connected;
 				}
 			}
@@ -58,7 +60,9 @@ namespace CSRedis {
 			try {
 				conn.Client.Ping();
 			} catch {
-				conn.Client = new RedisClient(new IPEndPoint(IPAddress.Parse(_ip), _port));
+				var ips = Dns.GetHostAddresses(_ip);
+				if (ips.Length == 0) throw new Exception($"无法解析“{_ip}”");
+				conn.Client = new RedisClient(new IPEndPoint(ips[0], _port));
 				conn.Client.Connected += Connected;
 			}
 			return conn;
