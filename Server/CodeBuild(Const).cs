@@ -1149,9 +1149,9 @@ public static class StarupExtensions {{
 				build.AddJsonFile(jsonpath, true, true);
 		}}
 		if (env.IsProduction()) {{
-			build.AddJsonFile(Path.Combine(productPath, ""/appsettings.json""), true, true);
+			build.AddJsonFile(Path.Combine(productPath, ""appsettings.json""), true, true);
 			foreach (var module in modules) {{
-				var jsonpath = Path.Combine(productPath, $""/Module_{{module.Name}}_appsettings.json"");
+				var jsonpath = Path.Combine(productPath, $""Module_{{module.Name}}_appsettings.json"");
 				if (File.Exists(Path.Combine(env.ContentRootPath, jsonpath)))
 					build.AddJsonFile(jsonpath, true, true);
 			}}
