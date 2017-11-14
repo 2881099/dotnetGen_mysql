@@ -1251,6 +1251,10 @@ namespace {0}.DAL {{
 			public SqlUpdateBuild WhereExists<T>(SelectBuild<T> select) {{
 				return this.Where($""EXISTS({{select.ToString(""1"")}})"");
 			}}
+			public SqlUpdateBuild WhereNotExists<T>(SelectBuild<T> select) {{
+				return this.Where($""NOT EXISTS({{select.ToString(""1"")}})"");
+			}}
+
 			public SqlUpdateBuild Set(string field, string value, params MySqlParameter[] parms) {{
 				if (value.IndexOf('\'') != -1) throw new Exception(""{9}.DAL.{0}.SqlUpdateBuild 可能存在注入漏洞，不允许传递 ' 给参数 value，若使用正常字符串，请使用参数化传递。"");
 				_fields = string.Concat(_fields, "", "", field, "" = "", value);
