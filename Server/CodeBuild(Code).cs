@@ -204,6 +204,10 @@ namespace Server {
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\Internal\Utilities\RedisArgs.cs"), Deflate.Compress(Properties.Resources.CSRedis_Internal_Utilities_RedisArgs_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\Internal\Utilities\Serializer.cs"), Deflate.Compress(Properties.Resources.CSRedis_Internal_Utilities_Serializer_cs)));
 				#endregion
+				#region StackExchange.Redis
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\StackExchange.Redis\ConnectionMultiplexerPool.cs"), Deflate.Compress(Properties.Resources.StackExchange_Redis_ConnectionMultiplexerPool_cs)));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\StackExchange.Redis\QuickHelperBase.cs"), Deflate.Compress(Properties.Resources.StackExchange_Redis_QuickHelperBase_cs)));
+				#endregion
 				#region Microsoft.Extensions.Caching.Redis
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\Microsoft.Extensions.Caching.Redis\RedisCache.cs"), Deflate.Compress(Properties.Resources.Microsoft_Extensions_Caching_Redis_RedisSuperCache_cs)));
 				clearSb();

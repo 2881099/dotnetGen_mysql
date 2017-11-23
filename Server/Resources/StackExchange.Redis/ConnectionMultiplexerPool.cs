@@ -10,38 +10,29 @@ namespace StackExchange.Redis {
 	/// </summary>
 	public partial class ConnectionMultiplexerPool {
 
-		public int MaxPoolSize = 32;
-		public List<ConnectionMultiplexer2> AllConnections = new List<ConnectionMultiplexer2>();
-		public Queue<ConnectionMultiplexer2> FreeConnections = new Queue<ConnectionMultiplexer2>();
+		public List<RedisConnectionMultiplexer2> AllConnections = new List<RedisConnectionMultiplexer2>();
+		public Queue<RedisConnectionMultiplexer2> FreeConnections = new Queue<RedisConnectionMultiplexer2>();
 		public Queue<ManualResetEvent> GetConnectionQueue = new Queue<ManualResetEvent>();
 		private static object _lock = new object();
 		private static object _lock_GetConnectionQueue = new object();
 		private string _connectionString;
-		public string ConnectionString {
-			get { return _connectionString; }
-			set {
-				_connectionString = value;
-				Match m = Regex.Match(_connectionString, @"Max\s*pool\s*size=(\d+)", RegexOptions.IgnoreCase);
-				if (m.Success) int.TryParse(m.Groups[1].Value, out MaxPoolSize);
-				else MaxPoolSize = 32;
-				if (MaxPoolSize <= 0) MaxPoolSize = 32;
-			}
+		private int _poolsize;
+
+		public ConnectionMultiplexerPool(string connectionString, int poolsize = 50) {
+			_connectionString = connectionString;
+			_poolsize = poolsize;
 		}
 
-		public ConnectionMultiplexerPool(string connectionString) {
-			ConnectionString = connectionString;
-		}
-
-		public ConnectionMultiplexer2 GetConnection() {
-			ConnectionMultiplexer2 conn = null;
+		public RedisConnectionMultiplexer2 GetConnection() {
+			RedisConnectionMultiplexer2 conn = null;
 			if (FreeConnections.Count > 0)
 				lock (_lock)
 					if (FreeConnections.Count > 0)
 						conn = FreeConnections.Dequeue();
-			if (conn == null && AllConnections.Count < MaxPoolSize) {
+			if (conn == null && AllConnections.Count < _poolsize) {
 				lock (_lock)
-					if (AllConnections.Count < MaxPoolSize) {
-						conn = new ConnectionMultiplexer2();
+					if (AllConnections.Count < _poolsize) {
+						conn = new RedisConnectionMultiplexer2();
 						AllConnections.Add(conn);
 					}
 				if (conn != null) {
@@ -55,23 +46,23 @@ namespace StackExchange.Redis {
 					GetConnectionQueue.Enqueue(wait);
 				if (wait.WaitOne(TimeSpan.FromSeconds(10)))
 					return GetConnection();
-				throw new Exception("GetConnection 连接池获取超时10秒");
+				throw new Exception("StackExchange.Redis.ConnectionMultiplexerPool.GetConnection 连接池获取超时（10秒）");
 			}
 			conn.ThreadId = Thread.CurrentThread.ManagedThreadId;
 			conn.LastActive = DateTime.Now;
 			Interlocked.Increment(ref conn.UseSum);
 			try {
 				if (conn.Database == null || !conn.Database.IsConnected("test")) {
-					conn.Connection = ConnectionMultiplexer.Connect(ConnectionString);
+					conn.Connection = ConnectionMultiplexer.Connect(_connectionString);
 					conn.Database = conn.Connection.GetDatabase();
 				}
-			} catch(Exception ex) {
+			} catch (Exception ex) {
 				throw new Exception("GetConnection/GetDatabase 出错", ex);
 			}
 			return conn;
 		}
 
-		public void ReleaseConnection(ConnectionMultiplexer2 conn) {
+		public void ReleaseConnectionMultiplexer(RedisConnectionMultiplexer2 conn) {
 			lock (_lock)
 				FreeConnections.Enqueue(conn);
 
@@ -85,7 +76,7 @@ namespace StackExchange.Redis {
 		}
 	}
 
-	public class ConnectionMultiplexer2 : IDisposable {
+	public class RedisConnectionMultiplexer2 : IDisposable {
 		public ConnectionMultiplexer Connection;
 		public IDatabase Database;
 		public DateTime LastActive;
@@ -94,7 +85,7 @@ namespace StackExchange.Redis {
 		internal ConnectionMultiplexerPool Pool;
 
 		public void Dispose() {
-			Pool.ReleaseConnection(this);
+			if (Pool != null) Pool.ReleaseConnectionMultiplexer(this);
 		}
 	}
 }

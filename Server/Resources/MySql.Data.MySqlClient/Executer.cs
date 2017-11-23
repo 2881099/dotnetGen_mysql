@@ -22,7 +22,7 @@ namespace MySql.Data.MySqlClient {
 			if (e == null) return;
 			string log = $"数据库出错（执行SQL）〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓\r\n{cmd.CommandText}\r\n";
 			foreach (MySqlParameter parm in cmd.Parameters) {
-				log += Lib.PadRight(parm.ParameterName, 20) + " = " + Lib.PadRight(parm.Value ?? "NULL", 20) + "\r\n";
+				log += Lib.PadRight(parm.ParameterName, 20) + " = " + Lib.PadRight(parm.Value == null ? "NULL" : parm.Value, 20) + "\r\n";
 			}
 			log += e.Message;
 			Log.LogError(log);
@@ -39,13 +39,14 @@ namespace MySql.Data.MySqlClient {
 			for (int a = 0; a < parms.Length; a++) {
 				if (parms[a] == null) nparms[a] = "NULL";
 				else {
+					decimal trydec;
 					if (parms[a] is bool || parms[a] is bool?)
 						nparms[a] = (bool)parms[a] ? 1 : 0;
 					else if (parms[a] is string)
 						nparms[a] = string.Concat("'", parms[a].ToString().Replace("'", "''"), "'");
 					else if (parms[a] is Enum)
 						nparms[a] = ((Enum)parms[a]).ToInt64();
-					else if (decimal.TryParse(string.Concat(parms[a]), out decimal trydec))
+					else if (decimal.TryParse(string.Concat(parms[a]), out trydec))
 						nparms[a] = parms[a];
 					else if (parms[a] is DateTime) {
 						DateTime dt = (DateTime)parms[a];

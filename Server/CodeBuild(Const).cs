@@ -343,6 +343,23 @@ namespace {0}.BLL {{
 		}}
 	}}
 
+	//截至 1.2.6 版本仍然有 Timeout bug
+	//public partial class RedisHelper : StackExchange.Redis.QuickHelperBase {{
+	//	public static IConfigurationRoot Configuration {{ get; internal set; }}
+	//	public static void InitializeConfiguration(IConfigurationRoot cfg) {{
+	//		Configuration = cfg;
+	//		int port, poolsize, database;
+	//		string ip, pass;
+	//		if (!int.TryParse(cfg[""ConnectionStrings:redis:port""], out port)) port = 6379;
+	//		if (!int.TryParse(cfg[""ConnectionStrings:redis:poolsize""], out poolsize)) poolsize = 50;
+	//		if (!int.TryParse(cfg[""ConnectionStrings:redis:database""], out database)) database = 0;
+	//		ip = cfg[""ConnectionStrings:redis:ip""];
+	//		pass = cfg[""ConnectionStrings:redis:pass""];
+	//		Name = cfg[""ConnectionStrings:redis:name""];
+	//		Instance = new StackExchange.Redis.ConnectionMultiplexerPool($""{{ip}}:{{port}},password={{pass}},name={{Name}},defaultdatabase={{database}}"", poolsize);
+	//	}}
+	//}}
+
 	public static partial class BLLExtensionMethods {{
 		public static List<TReturnInfo> ToList<TReturnInfo>(this SelectBuild<TReturnInfo> select, int expireSeconds, string cacheKey = null) {{ return select.ToList(RedisHelper.Get, RedisHelper.Set, TimeSpan.FromSeconds(expireSeconds), cacheKey); }}
 	}}
@@ -1068,6 +1085,7 @@ return rTn;"");
 		<PackageReference Include=""System.Threading.Thread"" Version=""4.3.0"" />
 		<PackageReference Include=""System.ValueTuple"" Version=""4.4.0"" />
 		<PackageReference Include=""System.Xml.XmlDocument"" Version=""4.3.0"" />
+		<PackageReference Include=""StackExchange.Redis"" Version=""1.2.6"" />
 	</ItemGroup>
 </Project>
 ";
@@ -1484,7 +1502,6 @@ namespace {0}.Module.Admin.Controllers {{
 			List<Hashtable> ret = new List<Hashtable>();
 			foreach (var conn in RedisHelper.Instance.AllConnections) {{
 				ret.Add(new Hashtable() {{
-						{{ ""数据库"", conn.Client.ClientGetName() }},
 						{{ ""最后活动"", conn.LastActive }},
 						{{ ""获取次数"", conn.UseSum }}
 					}});
