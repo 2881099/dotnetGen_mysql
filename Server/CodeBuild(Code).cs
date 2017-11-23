@@ -204,6 +204,10 @@ namespace Server {
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\Internal\Utilities\RedisArgs.cs"), Deflate.Compress(Properties.Resources.CSRedis_Internal_Utilities_RedisArgs_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\Internal\Utilities\Serializer.cs"), Deflate.Compress(Properties.Resources.CSRedis_Internal_Utilities_Serializer_cs)));
 				#endregion
+				#region StackExchange.Redis
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\StackExchange.Redis\ConnectionMultiplexerPool.cs"), Deflate.Compress(Properties.Resources.StackExchange_Redis_ConnectionMultiplexerPool_cs)));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\StackExchange.Redis\QuickHelperBase.cs"), Deflate.Compress(Properties.Resources.StackExchange_Redis_QuickHelperBase_cs)));
+				#endregion
 				#region Microsoft.Extensions.Caching.Redis
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\Microsoft.Extensions.Caching.Redis\RedisCache.cs"), Deflate.Compress(Properties.Resources.Microsoft_Extensions_Caching_Redis_RedisSuperCache_cs)));
 				clearSb();
@@ -1251,6 +1255,10 @@ namespace {0}.DAL {{
 			public SqlUpdateBuild WhereExists<T>(SelectBuild<T> select) {{
 				return this.Where($""EXISTS({{select.ToString(""1"")}})"");
 			}}
+			public SqlUpdateBuild WhereNotExists<T>(SelectBuild<T> select) {{
+				return this.Where($""NOT EXISTS({{select.ToString(""1"")}})"");
+			}}
+
 			public SqlUpdateBuild Set(string field, string value, params MySqlParameter[] parms) {{
 				if (value.IndexOf('\'') != -1) throw new Exception(""{9}.DAL.{0}.SqlUpdateBuild 可能存在注入漏洞，不允许传递 ' 给参数 value，若使用正常字符串，请使用参数化传递。"");
 				_fields = string.Concat(_fields, "", "", field, "" = "", value);

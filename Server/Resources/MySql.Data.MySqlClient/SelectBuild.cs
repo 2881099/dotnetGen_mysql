@@ -81,7 +81,7 @@ namespace MySql.Data.MySqlClient {
 		protected string _sort, _field, _table, _join, _where, _groupby, _having;
 		protected List<IDAL> _dals = new List<IDAL>();
 		protected Executer _exec;
-		public List<TReturnInfo> ToList(Func<string, string> cache_get, Func<string, string, int, string> cache_set, TimeSpan expire, string cacheKey = null) {
+		public List<TReturnInfo> ToList(Func<string, string> cache_get, Func<string, string, int, bool> cache_set, TimeSpan expire, string cacheKey = null) {
 			bool isCache = expire > TimeSpan.Zero && cache_get != null && cache_set != null;
 			List<TReturnInfo> ret = new List<TReturnInfo>();
 			string sql = this.ToString();
