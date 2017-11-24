@@ -26,7 +26,7 @@ namespace CSRedis {
 			_poolsize = poolsize;
 		}
 
-		public RedisConnection2 GetConnection() {
+		public RedisConnection2 GetConnection () {
 			RedisConnection2 conn = null;
 			if (FreeConnections.Count > 0)
 				lock (_lock)

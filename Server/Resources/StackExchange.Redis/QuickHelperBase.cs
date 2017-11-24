@@ -60,7 +60,7 @@ namespace StackExchange.Redis {
 		}
 		#region Hash 操作
 		public static void HashSet(string key, params object[] keyValues) {
-			HashSet(key, TimeSpan.Zero, keyValues);
+			HashSetExpire(key, TimeSpan.Zero, keyValues);
 		}
 		public static void HashSetExpire(string key, TimeSpan expire, params object[] keyValues) {
 			key = string.Concat(Name, key);

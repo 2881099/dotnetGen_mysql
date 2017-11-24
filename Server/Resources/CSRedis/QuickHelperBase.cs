@@ -60,7 +60,7 @@ namespace CSRedis {
 		}
 		#region Hash 操作
 		public static string HashSet(string key, params object[] keyValues) {
-			return HashSet(key, TimeSpan.Zero, keyValues);
+			return HashSetExpire(key, TimeSpan.Zero, keyValues);
 		}
 		public static string HashSetExpire(string key, TimeSpan expire, params object[] keyValues) {
 			key = string.Concat(Name, key);
