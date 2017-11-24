@@ -48,11 +48,6 @@ namespace CSRedis {
 				return conn.Client.Expire(key, expire);
 			}
 		}
-		public static string[] Keys(string pattern) {
-			using (var conn = Instance.GetConnection()) {
-				return conn.Client.Keys(pattern);
-			}
-		}
 		public static long Publish(string channel, string data) {
 			using (var conn = Instance.GetConnection()) {
 				return conn.Client.Publish(channel, data);

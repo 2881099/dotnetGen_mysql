@@ -48,11 +48,6 @@ namespace StackExchange.Redis {
 				return conn.Database.KeyExpire(key, expire);
 			}
 		}
-		public static string[] Keys(string pattern) {
-			using (var conn = Instance.GetConnection()) {
-				return conn.Connection.GetServer(conn.Connection.Configuration).Keys(conn.Database.Database, pattern).Select(a => string.Concat(a)).ToArray();
-			}
-		}
 		public static long Publish(string channel, string data) {
 			using (var conn = Instance.GetConnection()) {
 				return conn.Database.Publish(channel, data);
