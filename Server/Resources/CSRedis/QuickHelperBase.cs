@@ -15,10 +15,25 @@ namespace CSRedis {
 					return conn.Client.Set(key, value) == "OK";
 			}
 		}
+		public static bool SetBytes(string key, byte[] value, int expireSeconds = -1) {
+			key = string.Concat(Name, key);
+			using (var conn = Instance.GetConnection()) {
+				if (expireSeconds > 0)
+					return conn.Client.Set(key, value, TimeSpan.FromSeconds(expireSeconds)) == "OK";
+				else
+					return conn.Client.Set(key, value) == "OK";
+			}
+		}
 		public static string Get(string key) {
 			key = string.Concat(Name, key);
 			using (var conn = Instance.GetConnection()) {
 				return conn.Client.Get(key);
+			}
+		}
+		public static byte[] GetBytes(string key) {
+			key = string.Concat(Name, key);
+			using (var conn = Instance.GetConnection()) {
+				return conn.Client.GetBytes(key);
 			}
 		}
 		public static long Remove(params string[] key) {
