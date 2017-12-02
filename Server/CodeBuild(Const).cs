@@ -1112,9 +1112,9 @@ return rTn;"");
 </Project>
 
 ";
-            #endregion
+			#endregion
 
-            public static readonly string WebHost_Extensions_StarupExtensions_cs =
+			public static readonly string WebHost_Extensions_StarupExtensions_cs =
 			#region 内容太长已被收起
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -1122,6 +1122,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
@@ -1129,6 +1130,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 public static class StarupExtensions {{
 	public static ConfigurationBuilder LoadInstalledModules(this ConfigurationBuilder build, IList<ModuleInfo> modules, IHostingEnvironment env) {{
@@ -1136,24 +1139,18 @@ public static class StarupExtensions {{
 		var moduleFolders = moduleRootFolder.GetDirectories();
 
 		foreach (var moduleFolder in moduleFolders) {{
-			var binFolder = new DirectoryInfo(Path.Combine(moduleFolder.FullName, ""bin""));
-			if (!binFolder.Exists) continue;
-
-			foreach (var file in binFolder.GetFileSystemInfos(""*.dll"", SearchOption.AllDirectories)) {{
-				Assembly assembly;
-				try {{
-					assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(file.FullName);
-				}} catch (FileLoadException) {{
-					assembly = Assembly.Load(new AssemblyName(Path.GetFileNameWithoutExtension(file.Name)));
-					if (assembly == null) throw;
-				}}
-				if (assembly.FullName.Contains(moduleFolder.Name))
-					modules.Add(new ModuleInfo {{
-						Name = moduleFolder.Name,
-						Assembly = assembly,
-						Path = moduleFolder.FullName
-					}});
+			Assembly assembly;
+			try {{
+				assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(moduleFolder.FullName, moduleFolder.Name + "".dll""));
+			}} catch (FileLoadException) {{
+				throw;
 			}}
+			if (assembly.FullName.Contains(moduleFolder.Name))
+				modules.Add(new ModuleInfo {{
+					Name = moduleFolder.Name,
+					Assembly = assembly,
+					Path = moduleFolder.FullName
+				}});
 		}}
 
 		return build;
@@ -1178,7 +1175,11 @@ public static class StarupExtensions {{
 	}}
 
 	public static IServiceCollection AddCustomizedMvc(this IServiceCollection services, IList<ModuleInfo> modules) {{
-		var mvcBuilder = services.AddMvc()
+		var mvcBuilder = services.AddMvc().AddJsonOptions(a => {{
+				a.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+				a.SerializerSettings.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat;
+				a.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+			}})
 			.AddRazorOptions(o => {{
 				foreach (var module in modules) {{
 					var a = MetadataReference.CreateFromFile(module.Assembly.Location);
@@ -1193,6 +1194,7 @@ public static class StarupExtensions {{
 
 		return services;
 	}}
+
 	public static IApplicationBuilder UseCustomizedMvc(this IApplicationBuilder app, IList<ModuleInfo> modules) {{
 		foreach (var module in modules) {{
 			var moduleInitializerType =
@@ -1222,9 +1224,12 @@ public static class StarupExtensions {{
 			#endregion
 			public static readonly string WebHost_Extensions_SwaggerExtensions_cs =
 			#region 内容太长已被收起
- @"using Microsoft.AspNetCore.Mvc;
+ @"using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.IO;
 using System.Linq;
 
 namespace Swashbuckle.AspNetCore.Swagger {{
@@ -1240,21 +1245,39 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 	public static class SwashbuckleSwaggerExtensions {{
 		public static IServiceCollection AddCustomizedSwaggerGen(this IServiceCollection services) {{
 			services.AddSwaggerGen(options => {{
-				options.SwaggerDoc(""v1"", new Info {{
-					Version = ""v1"",
-					Title = ""WebAPI"",
-					Description = ""项目webapi接口说明"",
-					TermsOfService = ""None"",
-					Contact = new Contact {{ Name = ""duoyi"", Email = """", Url = ""http://duoyi.com"" }},
-					License = new License {{ Name = ""duoyi"", Url = ""http://duoyi.com"" }}
+				foreach (var doc in _docs) options.SwaggerDoc(doc, new Info {{ Version = doc }});
+				options.DocInclusionPredicate((docName, apiDesc) => {{
+					var versions = apiDesc.ControllerAttributes()
+						.OfType<ApiExplorerSettingsAttribute>()
+						.Select(attr => attr.GroupName);
+					if (docName == ""未分类"" && versions.Count() == 0) return true;
+					return versions.Any(v => v == docName);
 				}});
 				options.IgnoreObsoleteActions();
 				//options.IgnoreObsoleteControllers(); // 类、方法标记 [Obsolete]，可以阻止【Swagger文档】生成
 				options.DescribeAllEnumsAsStrings();
-				//options.IncludeXmlComments(AppContext.BaseDirectory + @""/Admin.xml""); // 使用前需开启项目注释 xmldoc
-				options.OperationFilter<FormDataOperationFilter>();
+				options.CustomSchemaIds(a => a.FullName);
+				//options.OperationFilter<FormDataOperationFilter>();
+
+				string root = Path.Combine(Directory.GetCurrentDirectory(), ""Module"");
+				string xmlFile = string.Empty;
+				string[] dirs = Directory.GetDirectories(root);
+				foreach (var d in dirs) {{
+					xmlFile = Path.Combine(d, $""{{new DirectoryInfo(d).Name}}.xml"");
+					if (File.Exists(xmlFile))
+						options.IncludeXmlComments(xmlFile); // 使用前需开启项目注释 xmldoc
+				}}
+				var InfrastructureXml = Directory.GetFiles(Directory.GetCurrentDirectory(), ""Infrastructure.xml"", SearchOption.AllDirectories);
+				if (InfrastructureXml.Any())
+					options.IncludeXmlComments(InfrastructureXml[0]);
 			}});
 			return services;
+		}}
+		static string[] _docs = new[] {{ ""未分类"", ""代理后台"", ""超级管理员后台"", ""APP后台"", ""餐饮"", ""APP后台_餐饮"", ""砍价"", ""APP后台_砍价"" }};
+		public static IApplicationBuilder UseCustomizedSwagger(this IApplicationBuilder app, IHostingEnvironment env) {{
+			return app.UseSwagger().UseSwaggerUI(options => {{
+				foreach (var doc in _docs) options.SwaggerEndpoint($""/swagger/{{doc}}/swagger.json"", doc);
+			}});
 		}}
 	}}
 }}
@@ -1421,9 +1444,7 @@ namespace {0}.WebHost {{
 			app.UseCustomizedStaticFiles(Modules);
 
 			if (env.IsDevelopment())
-				app.UseSwagger().UseSwaggerUI(options => {{
-					options.SwaggerEndpoint(""/swagger/v1/swagger.json"", ""V1 Docs"");
-				}});
+				app.UseCustomizedSwagger(env);
 		}}
 	}}
 }}
