@@ -433,10 +433,10 @@ namespace CSRedis {
 		/// <param name="key">不含prefix前辍RedisHelper.Name</param>
 		/// <param name="memberScores">一个或多个成员分数</param>
 		/// <returns></returns>
-		public static long ZAdd(string key, params Tuple<double, string>[] memberScores) {
+		public static long ZAdd(string key, params (double, string)[] memberScores) {
 			key = string.Concat(Name, key);
 			using (var conn = Instance.GetConnection()) {
-				return conn.Client.ZAdd<double, string>(key, memberScores);
+				return conn.Client.ZAdd<double, string>(key, memberScores.Select(a => new Tuple<double, string>(a.Item1, a.Item2)).ToArray());
 			}
 		}
 		/// <summary>
