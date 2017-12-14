@@ -1077,6 +1077,8 @@ namespace {0}.DAL {{
 					else
 						sb1.AppendFormat(@"
 				if (!dr.IsDBNull(++index)) item.{0} = {1}dr.{2}(index);", CodeBuild.UFString(columnInfo.Name), CodeBuild.GetDbToCsConvert(columnInfo.Type), CodeBuild.GetDataReaderMethod(columnInfo.Type));
+					if (columnInfo.IsPrimaryKey)
+						sb1.AppendFormat(@" if (item.{0} == null) return null;", CodeBuild.UFString(columnInfo.Name));
 				}
 				sb1.AppendFormat(@"
 			return item;
