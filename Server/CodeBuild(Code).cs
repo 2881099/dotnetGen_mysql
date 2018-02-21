@@ -1733,7 +1733,7 @@ namespace {0}.BLL {{
 						return;
 					}
 					if (csType == "string") {
-						if (col.Length >= 0 && col.Length < 301)
+						if (col.Length < 301)
 							sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
