@@ -350,7 +350,7 @@ namespace Server {
 				int pkSqlParamFormat_idx = -1;
 				if (table.PrimaryKeys.Count > 0) {
 					foreach (ColumnInfo columnInfo in table.PrimaryKeys) {
-						pkCsParam += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper()).Replace("?", "") + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+						pkCsParam += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType).Replace("?", "") + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						pkCsParamNoType += CodeBuild.UFString(columnInfo.Name) + ", ";
 						pkCsParamNoTypeByval += string.Format(GetCSTypeValue(columnInfo.Type), CodeBuild.UFString(columnInfo.Name)) + ", ";
 						pkSqlParamFormat += "`" + columnInfo.Name + "` = {" + ++pkSqlParamFormat_idx + "} AND ";
@@ -368,12 +368,12 @@ namespace Server {
 					pkEvalsQuerystring = pkEvalsQuerystring.Substring(0, pkEvalsQuerystring.Length - 1);
 				}
 				foreach (ColumnInfo columnInfo in table.Columns) {
-					CsParam1 += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+					CsParam1 += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 					CsParamNoType1 += CodeBuild.UFString(columnInfo.Name) + ", ";
 					if (columnInfo.IsIdentity) {
 						//CsParamNoType2 += "0, ";
 					} else {
-						CsParam2 += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+						CsParam2 += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						CsParamNoType2 += string.Format("\r\n				{0} = {0}, ", CodeBuild.UFString(columnInfo.Name));
 					}
 				}
@@ -403,7 +403,7 @@ namespace {0}.Model {{
 				int column_idx = -1;
 				foreach (ColumnInfo column in table.Columns) {
 					column_idx++;
-					string csType = CodeBuild.GetCSType(column.Type, uClass_Name + column.Name.ToUpper());
+					string csType = CodeBuild.GetCSType(column.Type, uClass_Name + column.Name.ToUpper(), column.SqlType);
 					string nColumn_Name = column.Name;
 					string uColumn_Name = CodeBuild.UFString(column.Name);
 					string comment = _column_coments[table.FullName][column.Name];
@@ -581,6 +581,11 @@ namespace {0}.Model {{
 			set {{ _{1} = value; }}
 		}}
 ", csType, uColumn_Name, prototype_comment);
+						if (column.Type == MySqlDbType.Geometry) {
+							sb2.AppendFormat(
+@"		public {3} {1}ToGeometry() => string.IsNullOrEmpty(_{1}) ? null : new NetTopologySuite.IO.WKTReader().Read(_{1}) as {3};
+", csType, uColumn_Name, prototype_comment, GetCSTypeGeometry(column.SqlType));
+						}
 					}
 					sb3.AppendFormat("{0} {1}, ", csType, uColumn_Name);
 					sb4.AppendFormat(
@@ -610,7 +615,7 @@ namespace {0}.Model {{
 					else
 						sb8.AppendFormat(@"
 			if (string.Compare(""null"", ret[{2}]) != 0) item.{0} = {1};",
-							uColumn_Name, string.Format(CodeBuild.GetStringifyParse(column.Type), "ret[" + column_idx + "]"), column_idx);
+							uColumn_Name, string.Format(CodeBuild.GetStringifyParse(column.Type, column.SqlType), "ret[" + column_idx + "]"), column_idx);
 				}
 
 				if (sb2.Length != 0) {
@@ -694,7 +699,7 @@ namespace {0}.Model {{
 					//若中间表，两外键指向相同表，则选择 表名_主键名 此字段作为主参考字段
 					string main_column = fk.Columns[0].Name;
 					foreach (ColumnInfo columnInfo in t2.Columns) {
-						string csType = GetCSType(columnInfo.Type, "");
+						string csType = GetCSType(columnInfo.Type, "", columnInfo.SqlType);
 						bool is_addignore = columnInfo.IsPrimaryKey && csType == "Guid?" ||
 							 columnInfo.Name.ToLower() == "update_time" && csType == "DateTime?" ||
 							 columnInfo.Name.ToLower() == "create_time" && csType == "DateTime?";
@@ -715,10 +720,10 @@ namespace {0}.Model {{
 							//parmsNoneType2 += "0, ";
 							continue;
 						}
-						parms2 += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+						parms2 += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						parmsNoneType2 += string.Format("\r\n				{0} = {0}, ", CodeBuild.UFString(columnInfo.Name));
 						if (!is_addignore) {
-							parms2_add += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+							parms2_add += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 							parmsNoneType2_add += string.Format("\r\n				{0} = {0}, ", CodeBuild.UFString(columnInfo.Name));
 						}
 
@@ -726,10 +731,10 @@ namespace {0}.Model {{
 							return fkk33.Columns[0].Name == columnInfo.Name;
 						});
 						if (fkk3 == null) {
-							parms1 += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+							parms1 += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 							parmsNoneType1 += CodeBuild.UFString(columnInfo.Name) + ", ";
 							if (!is_addignore) {
-								parms1_add += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+								parms1_add += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 								parmsNoneType1_add += CodeBuild.UFString(columnInfo.Name) + ", ";
 							}
 						} else {
@@ -750,7 +755,7 @@ namespace {0}.Model {{
 								parms3 += CodeBuild.UFString(fkk3.ReferencedTable.ClassName) + "Info " + fkk3_ReferencedTable_ObjName + ", ";
 								parmsNoneType3 += fkk3_ReferencedTable_ObjName + "." + CodeBuild.UFString(fkk3.ReferencedColumns[0].Name) + ", ";
 
-								parms4 += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+								parms4 += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 								parmsNoneType4 += string.Format(GetCSTypeValue(columnInfo.Type), CodeBuild.UFString(columnInfo.Name)) + ", ";
 							}
 							if (add_or_flag != "Flag" && fk.Columns[0].IsPrimaryKey) //中间表关系键，必须为主键
@@ -848,14 +853,14 @@ namespace {0}.Model {{
 								string _f6 = fk.Columns[0].Name;
 								string _f7 = fk.ReferencedTable.PrimaryKeys[0].Name;
 								string _f8 = fk2[0].Columns[0].Name;
-								string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
+								string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper(), fk2[0].ReferencedTable.PrimaryKeys[0].SqlType).Replace("?", "");
 
 								if (fk.ReferencedTable.ClassName == fk2[0].ReferencedTable.ClassName &&
 									string.Compare(main_column, fk.Columns[0].Name, true) != 0) {
 									_f6 = fk2[0].Columns[0].Name;
 									_f7 = fk2[0].ReferencedTable.PrimaryKeys[0].Name;
 									_f8 = fk.Columns[0].Name;
-									_f9 = GetCSType(fk2[0].Table.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].Table.ClassName) + fk2[0].Table.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
+									_f9 = GetCSType(fk2[0].Table.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].Table.ClassName) + fk2[0].Table.PrimaryKeys[0].Name.ToUpper(), fk2[0].Table.PrimaryKeys[0].SqlType).Replace("?", "");
 								}
 
 								objs_value = string.Format(@"
@@ -894,12 +899,12 @@ namespace {0}.Model {{
 				if (table.PrimaryKeys.Count > 0) {
 					string newguid = "";
 					foreach (ColumnInfo guidpk in table.PrimaryKeys)
-						if (GetCSType(guidpk.Type, "") == "Guid?") newguid += string.Format(@"
+						if (GetCSType(guidpk.Type, "", guidpk.SqlType) == "Guid?") newguid += string.Format(@"
 			this.{0} = Guid.NewGuid();", UFString(guidpk.Name));
 
 					if (table.Columns.Count > table.PrimaryKeys.Count || !string.IsNullOrEmpty(newguid)) {
-						ColumnInfo colUpdateTime = table.Columns.Find(delegate (ColumnInfo fcc) { return fcc.Name.ToLower() == "update_time" && GetCSType(fcc.Type, "") == "DateTime?"; });
-						ColumnInfo colCreateTime = table.Columns.Find(delegate (ColumnInfo fcc) { return fcc.Name.ToLower() == "create_time" && GetCSType(fcc.Type, "") == "DateTime?"; });
+						ColumnInfo colUpdateTime = table.Columns.Find(delegate (ColumnInfo fcc) { return fcc.Name.ToLower() == "update_time" && GetCSType(fcc.Type, "", fcc.SqlType) == "DateTime?"; });
+						ColumnInfo colCreateTime = table.Columns.Find(delegate (ColumnInfo fcc) { return fcc.Name.ToLower() == "create_time" && GetCSType(fcc.Type, "", fcc.SqlType) == "DateTime?"; });
 						sb6.Insert(0, string.Format(@"
 		public {1}Info Save() {{{2}
 			if (this.{4} != null) {{
@@ -999,11 +1004,14 @@ namespace {0}.Model {{
 				ColumnInfo identityColumn = null;
 				foreach (ColumnInfo columnInfo in table.Columns) {
 					if (columnInfo.IsIdentity == false) {
-						temp1 += string.Format("`{0}` = ?{0}, ", columnInfo.Name);
+						if (columnInfo.Type == MySqlDbType.Geometry) temp1 += string.Format("`{0}` = ST_GeomFromText(?{0},4326), ", columnInfo.Name);
+						else temp1 += string.Format("`{0}` = ?{0}, ", columnInfo.Name);
 						temp2 += string.Format("`{0}`, ", columnInfo.Name);
-						temp3 += string.Format("?{0}, ", columnInfo.Name);
+						if (columnInfo.Type == MySqlDbType.Geometry) temp3 += string.Format("ST_GeomFromText(?{0},4326), ", columnInfo.Name);
+						else temp3 += string.Format("?{0}, ", columnInfo.Name);
 					} else identityColumn = columnInfo;
-					temp4 += string.Format("a.`{0}`{1}, ", columnInfo.Name, columnInfo.Type == MySqlDbType.Enum || columnInfo.Type == MySqlDbType.Set ? "+0" : "");
+					if (columnInfo.Type == MySqlDbType.Geometry) temp4 += string.Format("AsText(a.`{0}`), ", columnInfo.Name);
+					else temp4 += string.Format("a.`{0}`{1}, ", columnInfo.Name, columnInfo.Type == MySqlDbType.Enum || columnInfo.Type == MySqlDbType.Set ? "+0" : "");
 				}
 				if (temp1.Length > 0) {
 					temp1 = temp1.Substring(0, temp1.Length - 2);
@@ -1047,7 +1055,8 @@ namespace {0}.DAL {{
 
 		#region common call
 		protected static MySqlParameter GetParameter(string name, MySqlDbType type, int size, object value) {{
-			MySqlParameter parm = new MySqlParameter(name, type, size);
+			MySqlParameter parm = new MySqlParameter(name, type);
+			if (size > 0) parm.Size = size;
 			parm.Value = value;
 			return parm;
 		}}
@@ -1065,18 +1074,21 @@ namespace {0}.DAL {{
 			{0}Info item = new {0}Info();", uClass_Name);
 
 				foreach (ColumnInfo columnInfo in table.Columns) {
-					if (CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper()) == "byte[]")
+					if (CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType) == "byte[]")
 						sb1.AppendFormat(@"
-				if (!dr.IsDBNull(++index)) item.{0} = dr.GetValue(index) as byte[];", CodeBuild.UFString(columnInfo.Name));
+			if (!dr.IsDBNull(++index)) item.{0} = dr.GetValue(index) as byte[];", CodeBuild.UFString(columnInfo.Name));
+					else if (columnInfo.Type == MySqlDbType.Geometry)
+						sb1.AppendFormat(@"
+			if (!dr.IsDBNull(++index)) item.{0} = dr.GetString(index);", CodeBuild.UFString(columnInfo.Name), GetCSTypeGeometry(columnInfo.SqlType));
 					else if (columnInfo.Type == MySqlDbType.Enum)
 						sb1.AppendFormat(@"
-				if (!dr.IsDBNull(++index)) item.{0} = ({1}?)dr.GetInt64(index);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
+			if (!dr.IsDBNull(++index)) item.{0} = ({1}?)dr.GetInt64(index);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
 					else if (columnInfo.Type == MySqlDbType.Set)
 						sb1.AppendFormat(@"
-				if (!dr.IsDBNull(++index)) item.{0} = ({1}?)dr.GetInt64(index);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
+			if (!dr.IsDBNull(++index)) item.{0} = ({1}?)dr.GetInt64(index);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
 					else
 						sb1.AppendFormat(@"
-				if (!dr.IsDBNull(++index)) item.{0} = {1}dr.{2}(index);", CodeBuild.UFString(columnInfo.Name), CodeBuild.GetDbToCsConvert(columnInfo.Type), CodeBuild.GetDataReaderMethod(columnInfo.Type));
+			if (!dr.IsDBNull(++index)) item.{0} = {1}dr.{2}(index);", CodeBuild.UFString(columnInfo.Name), CodeBuild.GetDbToCsConvert(columnInfo.Type), CodeBuild.GetDataReaderMethod(columnInfo.Type));
 					if (columnInfo.IsPrimaryKey)
 						sb1.AppendFormat(@" if (item.{0} == null) return null;", CodeBuild.UFString(columnInfo.Name));
 				}
@@ -1095,7 +1107,7 @@ namespace {0}.DAL {{
 					string sqlParmsANoneType = string.Empty;
 					int sqlParmsAIndex = 0;
 					foreach (ColumnInfo columnInfo in cs) {
-						parms += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper()).Replace("?", "") + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+						parms += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType).Replace("?", "") + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						parmsBy += CodeBuild.UFString(columnInfo.Name) + "And";
 						sqlParms += "`" + columnInfo.Name + "` = ?" + columnInfo.Name + " AND ";
 						sqlParmsA += "a.`" + columnInfo.Name + "` = {" + sqlParmsAIndex++ + "} AND ";
@@ -1119,7 +1131,7 @@ namespace {0}.DAL {{
 					string parmsBy = "By";
 					string sqlParms = string.Empty;
 					foreach (ColumnInfo columnInfo in fkk.Columns) {
-						parms += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper()) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+						parms += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						parmsBy += CodeBuild.UFString(columnInfo.Name) + "And";
 						sqlParms += "`" + columnInfo.Name + "` = ?" + columnInfo.Name + " AND ";
 					}
@@ -1143,14 +1155,23 @@ namespace {0}.DAL {{
 							col.IsPrimaryKey ||
 							table.PrimaryKeys.FindIndex(delegate (ColumnInfo pkf) { return pkf.Name == col.Name; }) != -1) continue;
 						string lname = CodeBuild.LFString(col.Name);
-						string valueParm = CodeBuild.AppendParameters(col, "");
+						string valueParm = CodeBuild.AppendParameters(col, "", "");
 						valueParm = valueParm.Remove(valueParm.LastIndexOf(", ") + 2);
-						sb5.AppendFormat(@"
+						if (col.Type == MySqlDbType.Geometry)
+							sb5.AppendFormat(@"
+			public SqlUpdateBuild Set{0}({2} value) {{
+				if (_item != null) _item.{0} = value;
+				return this.Set(""`{1}`"", $""ST_GeomFromText(?{1}_{{_parameters.Count}},4326)"", 
+					{3});
+			}}", CodeBuild.UFString(col.Name), col.Name, CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType),
+							CodeBuild.AppendParameters(col, "_item.", "").Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{_parameters.Count}\""));
+						else
+							sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}({2} value) {{
 				if (_item != null) _item.{0} = value;
 				return this.Set(""`{1}`"", $""?{1}_{{_parameters.Count}}"", 
 					{3}value{4}));
-			}}", CodeBuild.UFString(col.Name), col.Name, CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper()),
+			}}", CodeBuild.UFString(col.Name), col.Name, CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType),
 							valueParm.Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{_parameters.Count}\""),
 							col.Type == MySqlDbType.Enum || col.Type == MySqlDbType.Set ? "?.ToInt64()" : "");
 						if (table.ForeignKeys.FindIndex(delegate (ForeignKeyInfo fkf) { return fkf.Columns.FindIndex(delegate (ColumnInfo fkfpkf) { return fkfpkf.Name == col.Name; }) != -1; }) == -1) {
@@ -1173,7 +1194,7 @@ namespace {0}.DAL {{
 								fparam = fparam.Replace("MySqlDbType.UInt64", "MySqlDbType.Int64");
 								if (col.Type == MySqlDbType.UInt64) fpset_ = string.Format("_item.{0} = (ulong?)((long?)_item.{0} + value);", CodeBuild.UFString(col.Name));
 							} else if (col.Type == MySqlDbType.Double || col.Type == MySqlDbType.Float || col.Type == MySqlDbType.Decimal) {
-								fptype = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper()).Replace("?", "");
+								fptype = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType).Replace("?", "");
 							}
 							if ((col.Type == MySqlDbType.UInt32 || col.Type == MySqlDbType.UInt64) && (lname == "status" || lname.StartsWith("status_") || lname.EndsWith("_status"))) {
 								fptype = "";
@@ -1186,7 +1207,7 @@ namespace {0}.DAL {{
 			}}
 			public SqlUpdateBuild Set{0}UnFlag(int _0_16) {{
 				return this.Set{0}Flag(_0_16, true);
-			}}", CodeBuild.UFString(col.Name), col.Name, GetCSType(col.Type, uClass_Name + col.Name.ToUpper()).Replace("?", ""), valueParm.Replace("\"?" + col.Name + "\"", "string.Concat(\"?" + col.Name + "_\", _parameters.Count)"));
+			}}", CodeBuild.UFString(col.Name), col.Name, GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType).Replace("?", ""), valueParm.Replace("\"?" + col.Name + "\"", "string.Concat(\"?" + col.Name + "_\", _parameters.Count)"));
 							}
 							if (col.Type == MySqlDbType.Set) {
 								fptype = "";
@@ -1198,7 +1219,7 @@ namespace {0}.DAL {{
 			}}
 			public SqlUpdateBuild Set{0}UnFlag({4} value) {{
 				return this.Set{0}Flag(value, true);
-			}}", CodeBuild.UFString(col.Name), col.Name, GetCSType(col.Type, uClass_Name + col.Name.ToUpper()).Replace("?", ""), valueParm.Replace("\"?" + col.Name + "\"", "string.Concat(\"?" + col.Name + "_\", _parameters.Count)"), uClass_Name + col.Name.ToUpper());
+			}}", CodeBuild.UFString(col.Name), col.Name, GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType).Replace("?", ""), valueParm.Replace("\"?" + col.Name + "\"", "string.Concat(\"?" + col.Name + "_\", _parameters.Count)"), uClass_Name + col.Name.ToUpper());
 							}
 							if (!string.IsNullOrEmpty(fptype)) {
 								sb5.AppendFormat(@"
@@ -1220,7 +1241,7 @@ namespace {0}.DAL {{
 						dal_insert_code = string.Format(@"
 			{1} loc1;
 			if ({1}.TryParse(string.Concat(SqlHelper.ExecuteScalar(TSQL.Insert, GetParameters(item))), out loc1)) item.{0} = loc1;
-			return item;", CodeBuild.UFString(identityColumn.Name), CodeBuild.GetCSType(identityColumn.Type, uClass_Name + identityColumn.Name.ToUpper()).Replace("?", ""));
+			return item;", CodeBuild.UFString(identityColumn.Name), CodeBuild.GetCSType(identityColumn.Type, uClass_Name + identityColumn.Name.ToUpper(), identityColumn.SqlType).Replace("?", ""));
 					}
 					sb1.AppendFormat(@"
 {1}
@@ -1312,7 +1333,7 @@ namespace {0}.BLL {{
 				foreach (List<ColumnInfo> cs in table.Uniques) {
 					string parms = string.Empty;
 					foreach (ColumnInfo columnInfo in cs) {
-						string getcstype = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper());
+						string getcstype = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType);
 						parms += getcstype.Replace("?", "") + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 					}
 					parms = parms.Substring(0, parms.Length - 2);
@@ -1331,7 +1352,7 @@ namespace {0}.BLL {{
 					string cacheRemoveCode = string.Empty;
 					string whereCondi = string.Empty;
 					foreach (ColumnInfo columnInfo in cs) {
-						string getcstype = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper());
+						string getcstype = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType);
 						parms += getcstype.Replace("?", "") + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						parmsNewItem += CodeBuild.UFString(columnInfo.Name) + " = " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						parmsBy += CodeBuild.UFString(columnInfo.Name) + "And";
@@ -1484,7 +1505,7 @@ namespace {0}.BLL {{
 					foreach (ColumnInfo c1 in fk.Columns) {
 						fkcsBy += CodeBuild.UFString(c1.Name) + "And";
 						fkcsParms += CodeBuild.UFString(c1.Name) + ", ";
-						fkcsTypeParms += CodeBuild.GetCSType(c1.Type, uClass_Name + c1.Name.ToUpper()) + " " + CodeBuild.UFString(c1.Name) + ", ";
+						fkcsTypeParms += CodeBuild.GetCSType(c1.Type, uClass_Name + c1.Name.ToUpper(), c1.SqlType) + " " + CodeBuild.UFString(c1.Name) + ", ";
 						fkcsFilter += "a.`" + c1.Name + "` = {" + fkcsFilterIdx++ + "} and ";
 					}
 					fkcsBy = fkcsBy.Remove(fkcsBy.Length - 3);
@@ -1518,7 +1539,7 @@ namespace {0}.BLL {{
 			return base.Where(""{4}"", {3}) as {0}SelectBuild;
 		}}", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms, fkcsFilter, solutionName);
 					} else if (fk.Columns.Count == 1/* && fk.Columns[0].IsPrimaryKey == false*/) {
-						string csType = CodeBuild.GetCSType(fk.Columns[0].Type, CodeBuild.UFString(fk.Table.ClassName) + fk.Columns[0].Name.ToUpper());
+						string csType = CodeBuild.GetCSType(fk.Columns[0].Type, CodeBuild.UFString(fk.Table.ClassName) + fk.Columns[0].Name.ToUpper(), fk.Columns[0].SqlType);
 						sb1.AppendFormat(
 		@"
 		public static List<{0}Info> GetItemsBy{1}(params {2}[] {1}) {{
@@ -1586,13 +1607,13 @@ namespace {0}.BLL {{
 		public static {0}SelectBuild SelectBy{1}_{4}(params {3}[] {5}_ids) {{
 			return Select.Where{1}_{4}({5}_ids);
 		}}", uClass_Name, fkcsBy, orgInfo,
-		GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", ""), 
+		GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper(), fk2[0].ReferencedTable.PrimaryKeys[0].SqlType).Replace("?", ""), 
 		table.PrimaryKeys[0].Name, LFString(orgInfo));
 
 					string _f6 = fk.Columns[0].Name;
 					string _f7 = fk.ReferencedTable.PrimaryKeys[0].Name;
 					string _f8 = fk2[0].Columns[0].Name;
-					string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
+					string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper(), fk2[0].ReferencedTable.PrimaryKeys[0].SqlType).Replace("?", "");
 
 					//若中间表，两外键指向相同表，则选择 表名_主键名 此字段作为主参考字段
 					string main_column = fk.Columns[0].Name;
@@ -1601,7 +1622,7 @@ namespace {0}.BLL {{
 						_f6 = fk2[0].Columns[0].Name;
 						_f7 = fk2[0].ReferencedTable.PrimaryKeys[0].Name;
 						_f8 = fk.Columns[0].Name;
-						_f9 = GetCSType(fk2[0].Table.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].Table.ClassName) + fk2[0].Table.PrimaryKeys[0].Name.ToUpper()).Replace("?", "");
+						_f9 = GetCSType(fk2[0].Table.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].Table.ClassName) + fk2[0].Table.PrimaryKeys[0].Name.ToUpper(), fk2[0].Table.PrimaryKeys[0].SqlType).Replace("?", "");
 					}
 					sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}Info[] {10}s) => Where{1}({10}s?.ToArray(), null);
@@ -1618,7 +1639,7 @@ namespace {0}.BLL {{
 				});
 
 				table.Columns.ForEach(delegate (ColumnInfo col) {
-					string csType = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper());
+					string csType = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType);
 					string lname = col.Name.ToLower();
 					//if (col.IsPrimaryKey) return;
 					//if (lname == "create_time" ||
@@ -1828,7 +1849,7 @@ namespace {0}.BLL {{
 							return fk2.Columns.Count == 1 && fk2.Columns[0].Name == col.Name;
 						});
 
-						string csType = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper());
+						string csType = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType);
 						string csUName = CodeBuild.UFString(col.Name);
 						string comment = _column_coments[table.FullName][col.Name];
 						if (csType == "string") {
@@ -1861,7 +1882,7 @@ namespace {0}.BLL {{
 									return col88.Name.ToLower().IndexOf("name") != -1 || col88.Name.ToLower().IndexOf("title") != -1;
 								});
 								if (strNameCol == null) strNameCol = fk.ReferencedTable.Columns.Find(delegate (ColumnInfo col88) {
-									return GetCSType(col88.Type, CodeBuild.UFString(fk.ReferencedTable.ClassName) + col88.Name.ToUpper()) == "string" && col88.Length > 0 && col88.Length < 300;
+									return GetCSType(col88.Type, CodeBuild.UFString(fk.ReferencedTable.ClassName) + col88.Name.ToUpper(), col88.SqlType) == "string" && col88.Length > 0 && col88.Length < 300;
 								});
 							}
 							strName = strNameCol != null ? "." + CodeBuild.UFString(strNameCol.Name) : string.Empty;
@@ -1929,7 +1950,7 @@ namespace {0}.BLL {{
 					table.Columns.ForEach(delegate (ColumnInfo col88) {
 						string csLName = CodeBuild.LFString(col88.Name);
 						string csUName = CodeBuild.UFString(col88.Name);
-						string csType = CodeBuild.GetCSType(col88.Type, uClass_Name + col88.Name.ToUpper());
+						string csType = CodeBuild.GetCSType(col88.Type, uClass_Name + col88.Name.ToUpper(), col88.SqlType);
 
 						if (col88.IsPrimaryKey) {
 			//				itemSetValuePK += string.Format(@"
@@ -2022,12 +2043,12 @@ namespace {0}.BLL {{
 							return col88.Name.ToLower().IndexOf("name") != -1 || col88.Name.ToLower().IndexOf("title") != -1;
 						});
 						if (strNameCol == null) strNameCol = fk2[0].ReferencedTable.Columns.Find(delegate (ColumnInfo col88) {
-							return GetCSType(col88.Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + col88.Name.ToUpper()) == "string" && col88.Length > 0 && col88.Length < 300;
+							return GetCSType(col88.Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + col88.Name.ToUpper(), col88.SqlType) == "string" && col88.Length > 0 && col88.Length < 300;
 						});
 						if (strNameCol == null) strNameCol = fk2[0].ReferencedTable.PrimaryKeys[0];
 						string strName = CodeBuild.UFString(strNameCol.Name);
 
-						getListParamQuery += string.Format(@"[FromQuery] {0}[] {1}_{2}, ", GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper()).Replace("?", ""), CodeBuild.UFString(addname), table.PrimaryKeys[0].Name);
+						getListParamQuery += string.Format(@"[FromQuery] {0}[] {1}_{2}, ", GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper(), fk2[0].ReferencedTable.PrimaryKeys[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname), table.PrimaryKeys[0].Name);
 						sb3.AppendFormat(@"
 			if ({0}_{1}.Length > 0) select.Where{0}_{1}({0}_{1});", CodeBuild.UFString(addname), table.PrimaryKeys[0].Name);
 						if (str_listCms2FilterFK_fkitems.Contains("	var fk_" + CodeBuild.LFString(fk2[0].ReferencedTable.ClassName) + "s = ") == false)
@@ -2038,12 +2059,12 @@ namespace {0}.BLL {{
 			CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName),
 			string.IsNullOrEmpty(strName) ? "ToString()" : strName.TrimStart('.'), CodeBuild.UFString(fk2[0].ReferencedColumns[0].Name), CodeBuild.UFString(fk2[0].Columns[0].Name));
 						//add.html 标签关联
-						itemCsParamInsertForm += string.Format(", [FromForm] {0}[] mn_{1}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper()).Replace("?", ""), CodeBuild.UFString(addname));
-						itemCsParamUpdateForm += string.Format(", [FromForm] {0}[] mn_{1}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper()).Replace("?", ""), CodeBuild.UFString(addname));
+						itemCsParamInsertForm += string.Format(", [FromForm] {0}[] mn_{1}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper(), fk2[0].ReferencedColumns[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname));
+						itemCsParamUpdateForm += string.Format(", [FromForm] {0}[] mn_{1}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper(), fk2[0].ReferencedColumns[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname));
 						str_controller_insert_mn += string.Format(@"
 			//关联 {1}
 			foreach ({0} mn_{1}_in in mn_{1})
-				item.Flag{1}(mn_{1}_in);", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper()).Replace("?", ""), CodeBuild.UFString(addname));
+				item.Flag{1}(mn_{1}_in);", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper(), fk2[0].ReferencedColumns[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname));
 						str_controller_update_mn += string.Format(@"
 			//关联 {1}
 			if (mn_{1}.Length == 0) {{
@@ -2056,7 +2077,7 @@ namespace {0}.BLL {{
 					else mn_{1}_list.RemoveAt(idx);
 				}}
 				mn_{1}_list.ForEach(a => item.Flag{1}(a));
-			}}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper()).Replace("?", ""), CodeBuild.UFString(addname), addname);
+			}}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper(), fk2[0].ReferencedColumns[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname), addname);
 						str_addhtml_mn += string.Format(@"
 						<tr>
 							<td>{1}</td>
@@ -2082,12 +2103,12 @@ namespace {0}.BLL {{
 				affrows += {1}.Delete(id);
 			if (affrows > 0) return APIReturn.成功.SetMessage($""删除成功，影响行数：{{affrows}}"");
 			return APIReturn.失败;
-		}}", solutionName, uClass_Name, CodeBuild.GetCSType(table.PrimaryKeys[0].Type, CodeBuild.UFString(table.ClassName) + table.PrimaryKeys[0].Name.ToUpper()).Replace("?", ""));
+		}}", solutionName, uClass_Name, CodeBuild.GetCSType(table.PrimaryKeys[0].Type, CodeBuild.UFString(table.ClassName) + table.PrimaryKeys[0].Name.ToUpper(), table.PrimaryKeys[0].SqlType).Replace("?", ""));
 					if (table.PrimaryKeys.Count > 1) {
 						string pkParses = "";
 						int pk_idx = 0;
 						foreach (ColumnInfo pk in table.PrimaryKeys) {
-							pkParses += ", " + string.Format(GetStringifyParse(pk.Type).Replace(".Replace(StringifySplit, \"|\")", ""), "vs[" + pk_idx++ + "]");
+							pkParses += ", " + string.Format(GetStringifyParse(pk.Type, pk.SqlType).Replace(".Replace(StringifySplit, \"|\")", ""), "vs[" + pk_idx++ + "]");
 						}
 						pkParses = pkParses.Substring(2);
 						str_mvcdel = string.Format(@"
@@ -2268,7 +2289,7 @@ namespace {0}.BLL {{
 
 					#region wwwroot/xxx/add.html
 					foreach (ColumnInfo col in table.Columns) {
-						string csType = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper());
+						string csType = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType);
 						string csUName = CodeBuild.UFString(col.Name);
 						string lname = col.Name.ToLower();
 						string comment = _column_coments[table.FullName][col.Name];
@@ -2324,7 +2345,7 @@ namespace {0}.BLL {{
 								return col99.Name.ToLower().IndexOf("name") != -1 || col99.Name.ToLower().IndexOf("title") != -1;
 							});
 							if (strCol == null) strCol = fkcb.ReferencedTable.Columns.Find(delegate (ColumnInfo col99) {
-								return GetCSType(col99.Type, CodeBuild.UFString(fkcb.ReferencedTable.ClassName) + col99.Name.ToUpper()) == "string" && col99.Length > 0 && col99.Length < 300;
+								return GetCSType(col99.Type, CodeBuild.UFString(fkcb.ReferencedTable.ClassName) + col99.Name.ToUpper(), col99.SqlType) == "string" && col99.Length > 0 && col99.Length < 300;
 							});
 							string FK_Column_Text = fkcb.ReferencedTable != null && strCol != null ? CodeBuild.UFString(strCol.Name)
 								 : FK_Column;
@@ -2427,7 +2448,7 @@ namespace {0}.BLL {{
 									@foreach (object eo in Enum.GetValues(typeof({2}))) {{ <option value=""@eo"">@eo</option> }}
 								</select>
 							</td>
-						</tr>", csUName, comment, GetCSType(col.Type, CodeBuild.UFString(table.ClassName) + col.Name.ToUpper()).Replace("?", ""), col.Type == MySqlDbType.Set ? string.Format(@" data-placeholder=""Select a {0}"" class=""form-control select2"" multiple>", comment) : @"><option value="""">------ 请选择 ------</option>");
+						</tr>", csUName, comment, GetCSType(col.Type, CodeBuild.UFString(table.ClassName) + col.Name.ToUpper(), col.SqlType).Replace("?", ""), col.Type == MySqlDbType.Set ? string.Format(@" data-placeholder=""Select a {0}"" class=""form-control select2"" multiple>", comment) : @"><option value="""">------ 请选择 ------</option>");
 						} else {
 							sb4.AppendFormat(@"
 						<tr>

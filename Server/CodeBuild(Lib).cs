@@ -48,6 +48,15 @@ namespace Server {
 
 				case "set": return MySqlDbType.Set;
 				case "enum": return MySqlDbType.Enum;
+
+				case "point": return MySqlDbType.Geometry;
+				case "linestring": return MySqlDbType.Geometry;
+				case "polygon": return MySqlDbType.Geometry;
+				case "geometry": return MySqlDbType.Geometry;
+				case "multipoint": return MySqlDbType.Geometry;
+				case "multilinestring": return MySqlDbType.Geometry;
+				case "multipolygon": return MySqlDbType.Geometry;
+				case "geometrycollection": return MySqlDbType.Geometry;
 				default: return MySqlDbType.String;
 			}
 		}
@@ -97,6 +106,8 @@ namespace Server {
 
 				case MySqlDbType.Set:
 				case MySqlDbType.Enum: return "(long?)";
+
+				case MySqlDbType.Geometry: return "(GeoAPI.Geometries.IGeometry)";
 				default: return "";
 			}
 		}
@@ -146,10 +157,12 @@ namespace Server {
 
 				case MySqlDbType.Set:
 				case MySqlDbType.Enum: return "{0}";
+
+				case MySqlDbType.Geometry: return "{0}";
 				default: return "";
 			}
 		}
-		protected static string GetCSType(MySqlDbType type, string enumType) {
+		protected static string GetCSType(MySqlDbType type, string enumType, string sqlType) {
 			switch (type) {
 				case MySqlDbType.Bit: return "bool?";
 
@@ -194,8 +207,24 @@ namespace Server {
 
 				case MySqlDbType.Set: return enumType + "?";
 				case MySqlDbType.Enum: return enumType + "?";
+
+				case MySqlDbType.Geometry: return "string";
 				default: return "object";
 			}
+		}
+
+		protected static string GetCSTypeGeometry(string sqlType) {
+			switch (sqlType) {
+				case "point": return "GeoAPI.Geometries.IPoint";
+				case "linestring": return "GeoAPI.Geometries.ILineString";
+				case "polygon": return "GeoAPI.Geometries.IPolygon";
+				case "geometry": return "GeoAPI.Geometries.IGeometry";
+				case "multipoint": return "GeoAPI.Geometries.IMultiPoint";
+				case "multilinestring": return "GeoAPI.Geometries.IMultiLineString";
+				case "multipolygon": return "GeoAPI.Geometries.IMultiPolygon";
+				case "geometrycollection": return "GeoAPI.Geometries.IGeometryCollection";
+			}
+			return "object";
 		}
 
 		protected static string GetDataReaderMethod(MySqlDbType type) {
@@ -243,6 +272,8 @@ namespace Server {
 
 				case MySqlDbType.Set:
 				case MySqlDbType.Enum: return "GetString";
+
+				case MySqlDbType.Geometry: return "GetString";
 				default: return "GetValue";
 			}
 		}
@@ -272,7 +303,7 @@ namespace Server {
 				case MySqlDbType.Date:
 				case MySqlDbType.Timestamp:
 				case MySqlDbType.Datetime: return string.Format("{0} == null ? \"null\" : {0}.Value.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds.ToString()", CodeBuild.UFString(columnInfo.Name));
-				
+
 				case MySqlDbType.TinyBlob:
 				case MySqlDbType.Blob:
 				case MySqlDbType.MediumBlob:
@@ -292,7 +323,9 @@ namespace Server {
 
 				case MySqlDbType.Set: return string.Format("{0} == null ? \"null\" : string.Format(\"[ '{{0}}' ]\", string.Join(\"', '\", {0}.ToInt64().ToSet<{1}>().Select<{1}, string>(a => a.ToDescriptionOrString().Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\"))))", CodeBuild.UFString(columnInfo.Name), csType);
 				case MySqlDbType.Enum: return string.Format("{0} == null ? \"null\" : string.Format(\"'{{0}}'\", {0}.ToDescriptionOrString().Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\"))", CodeBuild.UFString(columnInfo.Name));
-				default: return string.Format("{0} == null ? \"null\" : {0}.ToString()", CodeBuild.UFString(columnInfo.Name)); 
+
+				case MySqlDbType.Geometry: return string.Format("{0} == null ? \"null\" : string.Format(\"'{{0}}'\", {0}.Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\"))", CodeBuild.UFString(columnInfo.Name));
+				default: return string.Format("{0} == null ? \"null\" : {0}.ToString()", CodeBuild.UFString(columnInfo.Name));
 			}
 		}
 
@@ -343,12 +376,13 @@ namespace Server {
 
 				case MySqlDbType.Set:
 				case MySqlDbType.Enum: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".ToInt64().ToString()";
+
+				case MySqlDbType.Geometry: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".Replace(\"|\", StringifySplit)";
 				default: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".ToString().Replace(\"|\", StringifySplit)";
             }
         }
-        protected static string GetStringifyParse(MySqlDbType type)
+        protected static string GetStringifyParse(MySqlDbType type, string sqlType)
         {
-
 			switch (type)
             {
 				case MySqlDbType.Bit: return "{0} == \"1\"";
@@ -394,7 +428,9 @@ namespace Server {
 
 				case MySqlDbType.Set: return "{0}.Replace(StringifySplit, \"|\")";
 				case MySqlDbType.Enum: return "{0}.Replace(StringifySplit, \"|\")";
-                default: return "{0}";
+
+				case MySqlDbType.Geometry: return "{0}.Replace(StringifySplit, \"|\")";
+				default: return "{0}";
             }
         }
 
@@ -417,10 +453,11 @@ namespace Server {
 			if (columnInfo == null) return "";
 
 			string returnValue = place + string.Format("GetParameter(\"{0}{1}\", MySqlDbType.{2}, {3}, {4}), \r\n",
-				columnInfo.Name.StartsWith("?") ? null : "?", columnInfo.Name, columnInfo.Type.ToString().Replace("Datetime", "DateTime"),
-				columnInfo.Length.ToString(),
+				columnInfo.Name.StartsWith("?") ? null : "?", columnInfo.Name, columnInfo.Type.ToString().Replace("Datetime", "DateTime").Replace("Geometry", "Text"),
+				columnInfo.Type == MySqlDbType.Geometry ? "-1" : columnInfo.Length.ToString(),
 				//columnInfo.Type == MySqlDbType.Image ? string.Format("{0} == null ? 0 : {0}.Length", value + Lib.UFString(columnInfo.Name)) : columnInfo.Length.ToString(),
-				value + CodeBuild.UFString(columnInfo.Name) + (columnInfo.Type == MySqlDbType.Enum || columnInfo.Type == MySqlDbType.Set ? "?.ToInt64()" : ""));
+				value + CodeBuild.UFString(columnInfo.Name) + (columnInfo.Type == MySqlDbType.Enum || columnInfo.Type == MySqlDbType.Set ? "?.ToInt64()" : (
+					columnInfo.Type == MySqlDbType.Geometry ? "ToGeometry()?.AsText()" : "")));
 
 			return returnValue;
 		}
@@ -439,8 +476,8 @@ namespace Server {
 		protected static string AppendParameters(TableInfo table, string place) {
 			return AppendParameters(table.Columns, "item.", place);
 		}
-		protected static string AppendParameters(ColumnInfo columnInfo, string place) {
-			string returnValue = AppendParameter(columnInfo, "", place);
+		protected static string AppendParameters(ColumnInfo columnInfo, string value, string place) {
+			string returnValue = AppendParameter(columnInfo, value, place);
 			return returnValue == "" ? "" : returnValue.Substring(0, returnValue.Length - 4);
 		}
 

@@ -117,6 +117,9 @@ namespace {0}.DAL {{
 				Instance.Pool.ConnectionString = value;
 			}}
 		}}
+		static SqlHelper() {{
+			GeoAPI.GeometryServiceProvider.Instance = new NetTopologySuite.NtsGeometryServices {{ DefaultSRID = 4326 }};
+		}}
 		public static Executer Instance {{ get; }} = new Executer(new LoggerFactory().CreateLogger(""{0}_DAL_sqlhelper""), ConnectionString);
 
 		public static string Addslashes(string filter, params object[] parms) {{ return Executer.Addslashes(filter, parms); }}
@@ -421,6 +424,7 @@ namespace {0}.Model {{
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include=""..\Common\Common.csproj"" />
+		<PackageReference Include=""NetTopologySuite"" Version=""1.15.0-pre048"" />
 	</ItemGroup>
 </Project>
 ";
