@@ -117,11 +117,11 @@ namespace {0}.DAL {{
 				Instance.Pool.ConnectionString = value;
 			}}
 		}}
+		public static Executer Instance {{ get; }} = new Executer(new LoggerFactory().CreateLogger(""{0}_DAL_sqlhelper""), ConnectionString);
+
 		static SqlHelper() {{
 			GeoAPI.GeometryServiceProvider.Instance = new NetTopologySuite.NtsGeometryServices {{ DefaultSRID = 4326 }};
 		}}
-		public static Executer Instance {{ get; }} = new Executer(new LoggerFactory().CreateLogger(""{0}_DAL_sqlhelper""), ConnectionString);
-
 		public static string Addslashes(string filter, params object[] parms) {{ return Executer.Addslashes(filter, parms); }}
 		public static void ExecuteReader(Action<IDataReader> readerHander, string cmdText, params MySqlParameter[] cmdParms) {{
 			Instance.ExecuteReader(readerHander, CommandType.Text, cmdText, cmdParms);
