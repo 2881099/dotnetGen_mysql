@@ -217,6 +217,7 @@ namespace Server {
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\ConnectionPool.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_ConnectionPool_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\Executer.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_Executer_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\SelectBuild.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_SelectBuild_cs)));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\MygisTypes.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_MygisTypes_cs)));
 				clearSb();
 				#endregion
 
@@ -582,9 +583,11 @@ namespace {0}.Model {{
 		}}
 ", csType, uColumn_Name, prototype_comment);
 						if (column.Type == MySqlDbType.Geometry) {
+							/*
 							sb2.AppendFormat(
 @"		public {3} {1}ToGeometry() => string.IsNullOrEmpty(_{1}) ? null : new NetTopologySuite.IO.WKTReader().Read(_{1}) as {3};
 ", csType, uColumn_Name, prototype_comment, GetCSTypeGeometry(column.SqlType));
+							*/
 						}
 					}
 					sb3.AppendFormat("{0} {1}, ", csType, uColumn_Name);
@@ -982,11 +985,11 @@ namespace {0}.Model {{
 				clearSb();
 
 				Model_Build_ExtensionMethods_cs.AppendFormat(@"
-		public static string ToJson(this {0}Info item) {{ return string.Concat(item); }}
-		public static string ToJson(this {0}Info[] items) {{ return GetJson(items); }}
-		public static string ToJson(this IEnumerable<{0}Info> items) {{ return GetJson(items); }}
-		public static IDictionary[] ToBson(this {0}Info[] items, Func<{0}Info, object> func = null) {{ return GetBson(items, func); }}
-		public static IDictionary[] ToBson(this IEnumerable<{0}Info> items, Func<{0}Info, object> func = null) {{ return GetBson(items, func); }}
+	public static string ToJson(this {0}Info item) {{ return string.Concat(item); }}
+	public static string ToJson(this {0}Info[] items) {{ return GetJson(items); }}
+	public static string ToJson(this IEnumerable<{0}Info> items) {{ return GetJson(items); }}
+	public static IDictionary[] ToBson(this {0}Info[] items, Func<{0}Info, object> func = null) {{ return GetBson(items, func); }}
+	public static IDictionary[] ToBson(this IEnumerable<{0}Info> items, Func<{0}Info, object> func = null) {{ return GetBson(items, func); }}
 ", uClass_Name);
 				#endregion
 

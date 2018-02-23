@@ -55,6 +55,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Protocol.cs" />
+    <None Include="Resources\MySql.Data.MySqlClient\MygisTypes.cs" />
     <Compile Include="ServerSocket.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -119,9 +119,6 @@ namespace {0}.DAL {{
 		}}
 		public static Executer Instance {{ get; }} = new Executer(new LoggerFactory().CreateLogger(""{0}_DAL_sqlhelper""), ConnectionString);
 
-		static SqlHelper() {{
-			GeoAPI.GeometryServiceProvider.Instance = new NetTopologySuite.NtsGeometryServices {{ DefaultSRID = 4326 }};
-		}}
 		public static string Addslashes(string filter, params object[] parms) {{ return Executer.Addslashes(filter, parms); }}
 		public static void ExecuteReader(Action<IDataReader> readerHander, string cmdText, params MySqlParameter[] cmdParms) {{
 			Instance.ExecuteReader(readerHander, CommandType.Text, cmdText, cmdParms);
@@ -375,42 +372,41 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using {0}.Model;
 
-namespace {0}.Model {{
-	public static partial class ExtensionMethods {{{1}
-		public static string GetJson(IEnumerable items) {{
-			StringBuilder sb = new StringBuilder();
-			sb.Append(""["");
-			IEnumerator ie = items.GetEnumerator();
-			if (ie.MoveNext()) {{
-				while (true) {{
-					sb.Append(string.Concat(ie.Current));
-					if (ie.MoveNext()) sb.Append("","");
-					else break;
-				}}
+public static partial class ExtensionMethods {{{1}
+	public static string GetJson(IEnumerable items) {{
+		StringBuilder sb = new StringBuilder();
+		sb.Append(""["");
+		IEnumerator ie = items.GetEnumerator();
+		if (ie.MoveNext()) {{
+			while (true) {{
+				sb.Append(string.Concat(ie.Current));
+				if (ie.MoveNext()) sb.Append("","");
+				else break;
 			}}
-			sb.Append(""]"");
-			return sb.ToString();
 		}}
-		public static IDictionary[] GetBson(IEnumerable items, Delegate func = null) {{
-			List<IDictionary> ret = new List<IDictionary>();
-			IEnumerator ie = items.GetEnumerator();
-			while (ie.MoveNext()) {{
-				if (ie.Current == null) ret.Add(null);
-				else if (func == null) ret.Add(ie.Current.GetType().GetMethod(""ToBson"").Invoke(ie.Current, new object[] {{ false }}) as IDictionary);
+		sb.Append(""]"");
+		return sb.ToString();
+	}}
+	public static IDictionary[] GetBson(IEnumerable items, Delegate func = null) {{
+		List<IDictionary> ret = new List<IDictionary>();
+		IEnumerator ie = items.GetEnumerator();
+		while (ie.MoveNext()) {{
+			if (ie.Current == null) ret.Add(null);
+			else if (func == null) ret.Add(ie.Current.GetType().GetMethod(""ToBson"").Invoke(ie.Current, new object[] {{ false }}) as IDictionary);
+			else {{
+				object obj = func.GetMethodInfo().Invoke(func.Target, new object[] {{ ie.Current }});
+				if (obj is IDictionary) ret.Add(obj as IDictionary);
 				else {{
-					object obj = func.GetMethodInfo().Invoke(func.Target, new object[] {{ ie.Current }});
-					if (obj is IDictionary) ret.Add(obj as IDictionary);
-					else {{
-						Hashtable ht = new Hashtable();
-						PropertyInfo[] pis = obj.GetType().GetProperties();
-						foreach (PropertyInfo pi in pis) ht[pi.Name] = pi.GetValue(obj);
-						ret.Add(ht);
-					}}
+					Hashtable ht = new Hashtable();
+					PropertyInfo[] pis = obj.GetType().GetProperties();
+					foreach (PropertyInfo pi in pis) ht[pi.Name] = pi.GetValue(obj);
+					ret.Add(ht);
 				}}
 			}}
-			return ret.ToArray();
 		}}
+		return ret.ToArray();
 	}}
 }}";
 			#endregion
@@ -424,7 +420,6 @@ namespace {0}.Model {{
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include=""..\Common\Common.csproj"" />
-		<PackageReference Include=""NetTopologySuite"" Version=""1.15.0-pre048"" />
 	</ItemGroup>
 </Project>
 ";

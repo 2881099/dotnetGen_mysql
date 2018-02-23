@@ -107,7 +107,7 @@ namespace Server {
 				case MySqlDbType.Set:
 				case MySqlDbType.Enum: return "(long?)";
 
-				case MySqlDbType.Geometry: return "(GeoAPI.Geometries.IGeometry)";
+				case MySqlDbType.Geometry: return "(MygisGeometry)";
 				default: return "";
 			}
 		}
@@ -208,23 +208,23 @@ namespace Server {
 				case MySqlDbType.Set: return enumType + "?";
 				case MySqlDbType.Enum: return enumType + "?";
 
-				case MySqlDbType.Geometry: return "string";
+				case MySqlDbType.Geometry: return GetCSTypeGeometry(sqlType);
 				default: return "object";
 			}
 		}
 
 		protected static string GetCSTypeGeometry(string sqlType) {
 			switch (sqlType) {
-				case "point": return "GeoAPI.Geometries.IPoint";
-				case "linestring": return "GeoAPI.Geometries.ILineString";
-				case "polygon": return "GeoAPI.Geometries.IPolygon";
-				case "geometry": return "GeoAPI.Geometries.IGeometry";
-				case "multipoint": return "GeoAPI.Geometries.IMultiPoint";
-				case "multilinestring": return "GeoAPI.Geometries.IMultiLineString";
-				case "multipolygon": return "GeoAPI.Geometries.IMultiPolygon";
-				case "geometrycollection": return "GeoAPI.Geometries.IGeometryCollection";
+				case "point": return "MygisPoint";
+				case "linestring": return "MygisLineString";
+				case "polygon": return "MygisPolygon";
+				case "multipoint": return "MygisMultiPoint";
+				case "multilinestring": return "MygisMultiLineString";
+				case "multipolygon": return "MygisMultiPolygon";
+				case "geometrycollection": return "MygisGeometryCollection";
+				case "geometry": return "MygisGeometry";
 			}
-			return "object";
+			return "MygisGeometry";
 		}
 
 		protected static string GetDataReaderMethod(MySqlDbType type) {
