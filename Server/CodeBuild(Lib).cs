@@ -221,10 +221,8 @@ namespace Server {
 				case "multipoint": return "MygisMultiPoint";
 				case "multilinestring": return "MygisMultiLineString";
 				case "multipolygon": return "MygisMultiPolygon";
-				case "geometrycollection": return "MygisGeometryCollection";
-				case "geometry": return "MygisGeometry";
 			}
-			return "MygisGeometry";
+			return "object";
 		}
 
 		protected static string GetDataReaderMethod(MySqlDbType type) {
@@ -324,7 +322,10 @@ namespace Server {
 				case MySqlDbType.Set: return string.Format("{0} == null ? \"null\" : string.Format(\"[ '{{0}}' ]\", string.Join(\"', '\", {0}.ToInt64().ToSet<{1}>().Select<{1}, string>(a => a.ToDescriptionOrString().Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\"))))", CodeBuild.UFString(columnInfo.Name), csType);
 				case MySqlDbType.Enum: return string.Format("{0} == null ? \"null\" : string.Format(\"'{{0}}'\", {0}.ToDescriptionOrString().Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\"))", CodeBuild.UFString(columnInfo.Name));
 
-				case MySqlDbType.Geometry: return string.Format("{0} == null ? \"null\" : string.Format(\"'{{0}}'\", {0}.Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\"))", CodeBuild.UFString(columnInfo.Name));
+				case MySqlDbType.Geometry:
+					string csTypeGeom = GetCSTypeGeometry(columnInfo.SqlType);
+					string asText = csTypeGeom == "object" ? ".ToString()" : ".AsText()";
+					return string.Format("{0} == null ? \"null\" : string.Format(\"'{{0}}'\", {0}" + asText + ".Replace(\"\\\\\", \"\\\\\\\\\").Replace(\"\\r\\n\", \"\\\\r\\\\n\").Replace(\"'\", \"\\\\'\"))", CodeBuild.UFString(columnInfo.Name));
 				default: return string.Format("{0} == null ? \"null\" : {0}.ToString()", CodeBuild.UFString(columnInfo.Name));
 			}
 		}
@@ -377,7 +378,10 @@ namespace Server {
 				case MySqlDbType.Set:
 				case MySqlDbType.Enum: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".ToInt64().ToString()";
 
-				case MySqlDbType.Geometry: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".Replace(\"|\", StringifySplit)";
+				case MySqlDbType.Geometry:
+					string csTypeGeom = GetCSTypeGeometry(columnInfo.SqlType);
+					string asText = csTypeGeom == "object" ? ".ToString()" : ".AsText()";
+					return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + asText + ".Replace(\"|\", StringifySplit)";
 				default: return "_" + CodeBuild.UFString(columnInfo.Name) + " == null ? \"null\" : _" + CodeBuild.UFString(columnInfo.Name) + ".ToString().Replace(\"|\", StringifySplit)";
             }
         }
@@ -429,7 +433,9 @@ namespace Server {
 				case MySqlDbType.Set: return "{0}.Replace(StringifySplit, \"|\")";
 				case MySqlDbType.Enum: return "{0}.Replace(StringifySplit, \"|\")";
 
-				case MySqlDbType.Geometry: return "{0}.Replace(StringifySplit, \"|\")";
+				case MySqlDbType.Geometry:
+					string csTypeGeom = GetCSTypeGeometry(sqlType);
+					return "MygisGeometry.Parse({0}.Replace(StringifySplit, \"|\"))" + (csTypeGeom != "object" ? (" as " + csTypeGeom) : "");
 				default: return "{0}";
             }
         }
@@ -451,13 +457,15 @@ namespace Server {
 
 		protected static string AppendParameter(ColumnInfo columnInfo, string value, string place) {
 			if (columnInfo == null) return "";
+			string csTypeGeom = GetCSTypeGeometry(columnInfo.SqlType);
+			string asText = csTypeGeom == "object" ? ".ToString()" : ".AsText()";
 
 			string returnValue = place + string.Format("GetParameter(\"{0}{1}\", MySqlDbType.{2}, {3}, {4}), \r\n",
 				columnInfo.Name.StartsWith("?") ? null : "?", columnInfo.Name, columnInfo.Type.ToString().Replace("Datetime", "DateTime").Replace("Geometry", "Text"),
 				columnInfo.Type == MySqlDbType.Geometry ? "-1" : columnInfo.Length.ToString(),
 				//columnInfo.Type == MySqlDbType.Image ? string.Format("{0} == null ? 0 : {0}.Length", value + Lib.UFString(columnInfo.Name)) : columnInfo.Length.ToString(),
 				value + CodeBuild.UFString(columnInfo.Name) + (columnInfo.Type == MySqlDbType.Enum || columnInfo.Type == MySqlDbType.Set ? "?.ToInt64()" : (
-					columnInfo.Type == MySqlDbType.Geometry ? "ToGeometry()?.AsText()" : "")));
+					columnInfo.Type == MySqlDbType.Geometry ? asText : "")));
 
 			return returnValue;
 		}

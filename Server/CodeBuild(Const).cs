@@ -374,7 +374,15 @@ using System.Collections.Generic;
 using System.Reflection;
 using {0}.Model;
 
-public static partial class ExtensionMethods {{{1}
+public static partial class ExtensionMethods {{
+	public static double Distance(this MygisPoint that, MygisPoint point) {{
+		double radLat1 = (double)(that.Y) * Math.PI / 180d;
+		double radLng1 = (double)(that.X) * Math.PI / 180d;
+		double radLat2 = (double)(point.Y) * Math.PI / 180d;
+		double radLng2 = (double)(point.X) * Math.PI / 180d;
+		return 2 * Math.Asin(Math.Sqrt(Math.Pow(Math.Sin((radLat1 - radLat2) / 2), 2) + Math.Cos(radLat1) * Math.Cos(radLat2) * Math.Pow(Math.Sin((radLng1 - radLng2) / 2), 2))) * 6378137;
+	}}
+{1}
 	public static string GetJson(IEnumerable items) {{
 		StringBuilder sb = new StringBuilder();
 		sb.Append(""["");

@@ -1007,10 +1007,10 @@ namespace {0}.Model {{
 				ColumnInfo identityColumn = null;
 				foreach (ColumnInfo columnInfo in table.Columns) {
 					if (columnInfo.IsIdentity == false) {
-						if (columnInfo.Type == MySqlDbType.Geometry) temp1 += string.Format("`{0}` = ST_GeomFromText(?{0},4326), ", columnInfo.Name);
+						if (columnInfo.Type == MySqlDbType.Geometry) temp1 += string.Format("`{0}` = ST_GeomFromText(?{0}), ", columnInfo.Name);
 						else temp1 += string.Format("`{0}` = ?{0}, ", columnInfo.Name);
 						temp2 += string.Format("`{0}`, ", columnInfo.Name);
-						if (columnInfo.Type == MySqlDbType.Geometry) temp3 += string.Format("ST_GeomFromText(?{0},4326), ", columnInfo.Name);
+						if (columnInfo.Type == MySqlDbType.Geometry) temp3 += string.Format("ST_GeomFromText(?{0}), ", columnInfo.Name);
 						else temp3 += string.Format("?{0}, ", columnInfo.Name);
 					} else identityColumn = columnInfo;
 					if (columnInfo.Type == MySqlDbType.Geometry) temp4 += string.Format("AsText(a.`{0}`), ", columnInfo.Name);
@@ -1077,12 +1077,17 @@ namespace {0}.DAL {{
 			{0}Info item = new {0}Info();", uClass_Name);
 
 				foreach (ColumnInfo columnInfo in table.Columns) {
-					if (CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType) == "byte[]")
+					string csType = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType);
+					string csTypeGeometry = GetCSTypeGeometry(columnInfo.SqlType);
+					if (csType == "byte[]")
 						sb1.AppendFormat(@"
 			if (!dr.IsDBNull(++index)) item.{0} = dr.GetValue(index) as byte[];", CodeBuild.UFString(columnInfo.Name));
-					else if (columnInfo.Type == MySqlDbType.Geometry)
+					else if (columnInfo.Type == MySqlDbType.Geometry && csTypeGeometry != "object")
 						sb1.AppendFormat(@"
-			if (!dr.IsDBNull(++index)) item.{0} = dr.GetString(index);", CodeBuild.UFString(columnInfo.Name), GetCSTypeGeometry(columnInfo.SqlType));
+			if (!dr.IsDBNull(++index)) item.{0} = MygisGeometry.Parse(dr.GetString(index)) as {1};", CodeBuild.UFString(columnInfo.Name), csTypeGeometry);
+					else if (columnInfo.Type == MySqlDbType.Geometry && csTypeGeometry == "object")
+						sb1.AppendFormat(@"
+			if (!dr.IsDBNull(++index)) item.{0} = dr.GetString(index);", CodeBuild.UFString(columnInfo.Name), csTypeGeometry);
 					else if (columnInfo.Type == MySqlDbType.Enum)
 						sb1.AppendFormat(@"
 			if (!dr.IsDBNull(++index)) item.{0} = ({1}?)dr.GetInt64(index);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
@@ -1164,7 +1169,7 @@ namespace {0}.DAL {{
 							sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}({2} value) {{
 				if (_item != null) _item.{0} = value;
-				return this.Set(""`{1}`"", $""ST_GeomFromText(?{1}_{{_parameters.Count}},4326)"", 
+				return this.Set(""`{1}`"", $""ST_GeomFromText(?{1}_{{_parameters.Count}})"", 
 					{3});
 			}}", CodeBuild.UFString(col.Name), col.Name, CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType),
 							CodeBuild.AppendParameters(col, "_item.", "").Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{_parameters.Count}\""));
@@ -1754,6 +1759,21 @@ namespace {0}.BLL {{
 			return this.Where{1}_IN({1}1, {1}2, {1}3, {1}4, {1}5);
 		}}
 		#endregion", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name);
+						return;
+					}
+					if (csType == "MygisPoint") {
+						sb6.AppendFormat(@"
+		/// <summary>
+		/// 查找地理位置多少米范围内的记录，距离由近到远排序
+		/// </summary>
+		/// <param name=""point"">经纬度</param>
+		/// <param name=""meter"">米(=0时无限制)</param>
+		/// <returns></returns>
+		public {0}SelectBuild Where{1}MbrContains(MygisPoint point, double meter = 0) {{
+			return this.Where(meter > 0, @""MBRContains(LineString(
+  Point({{0}} + 10 / ( 111.1 / COS(RADIANS({{1}}))), {{1}} + 10 / 111.1),
+  Point({{0}} - 10 / ( 111.1 / COS(RADIANS({{1}}))), {{1}} - 10 / 111.1)), a.`{3}`)"", point.X, point.Y, meter);
+		}}", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name);
 						return;
 					}
 					if (csType == "string") {
