@@ -194,8 +194,7 @@ namespace MySql.Data.MySqlClient {
 				ConstructorInfo constructor = type.GetConstructor(types);
 				return constructor.Invoke(parms);
 			}
-			++dataIndex;
-			return dr.IsDBNull(dataIndex) ? null : dr.GetValue(dataIndex);
+			return dr.IsDBNull(++dataIndex) ? null : dr.GetValue(dataIndex);
 		}
 		public long Count() {
 			return this.AggregateScalar<long>("count(1)");
