@@ -125,10 +125,10 @@ namespace MySql.Data.MySqlClient {
 				TReturnInfo info = (TReturnInfo)_dals[0].GetItem(dr, ref index);
 				Type type = info.GetType();
 				ret.Add(info);
-				if (isCache) cacheList.Add(info.GetType().GetMethod("Stringify").Invoke(info, null));
+				if (isCache) cacheList.Add(type.GetMethod("Stringify").Invoke(info, null));
 				for (int b = 0; b < objNames.Length; b++) {
 					object obj = _dals[b + 1].GetItem(dr, ref index);
-					PropertyInfo prop = info.GetType().GetProperty(objNames[b]);
+					PropertyInfo prop = type.GetProperty(objNames[b]);
 					if (prop == null) throw new Exception(string.Concat(type.FullName, " 没有定义属性 ", objNames[b]));
 					prop.SetValue(info, obj, null);
 					if (isCache) cacheList.Add(obj.GetType().GetMethod("Stringify").Invoke(obj, null));
