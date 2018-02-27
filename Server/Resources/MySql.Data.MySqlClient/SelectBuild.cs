@@ -199,7 +199,7 @@ namespace MySql.Data.MySqlClient {
 		public long Count() {
 			return this.AggregateScalar<long>("count(1)");
 		}
-		public SelectBuild<TReturnInfo> Count(out long count) {
+		protected SelectBuild<TReturnInfo> Count(out long count) {
 			count = this.Count();
 			return this;
 		}
@@ -213,10 +213,10 @@ namespace MySql.Data.MySqlClient {
 			_table = string.Concat(" \r\nFROM ", dal.Table, " a");
 			_exec = exec;
 		}
-		public SelectBuild<TReturnInfo> From<TBLL>() {
+		protected SelectBuild<TReturnInfo> From<TBLL>() {
 			return this.From<TBLL>(string.Empty);
 		}
-		public SelectBuild<TReturnInfo> From<TBLL>(string alias) {
+		protected SelectBuild<TReturnInfo> From<TBLL>(string alias) {
 			IDAL dal = this.ConvertTBLL<TBLL>();
 			_table = string.Concat(_table, ", ", dal.Table, " ", alias);
 			return this;
@@ -240,10 +240,10 @@ namespace MySql.Data.MySqlClient {
 			_join = string.Concat(_join, " \r\n", joinType, " ", dal.Table, " ", alias, " ON ", on);
 			return this;
 		}
-		public SelectBuild<TReturnInfo> Where(string filter, params object[] parms) {
+		protected SelectBuild<TReturnInfo> Where(string filter, params object[] parms) {
 			return this.Where(true, filter, parms);
 		}
-		public SelectBuild<TReturnInfo> Where(bool isadd, string filter, params object[] parms) {
+		protected SelectBuild<TReturnInfo> Where(bool isadd, string filter, params object[] parms) {
 			if (isadd) {
 				//将参数 = null 转换成 IS NULL
 				if (parms != null && parms.Length > 0) {
@@ -255,48 +255,48 @@ namespace MySql.Data.MySqlClient {
 			}
 			return this;
 		}
-		public SelectBuild<TReturnInfo> GroupBy(string groupby) {
+		protected SelectBuild<TReturnInfo> GroupBy(string groupby) {
 			_groupby = groupby;
 			if (string.IsNullOrEmpty(_groupby)) return this;
 			_groupby = string.Concat(" \r\nGROUP BY ", _groupby);
 			return this;
 		}
-		public SelectBuild<TReturnInfo> Having(string filter, params object[] parms) {
+		protected SelectBuild<TReturnInfo> Having(string filter, params object[] parms) {
 			return this.Having(true, filter, parms);
 		}
-		public SelectBuild<TReturnInfo> Having(bool isadd, string filter, params object[] parms) {
+		protected SelectBuild<TReturnInfo> Having(bool isadd, string filter, params object[] parms) {
 			if (string.IsNullOrEmpty(_groupby)) return this;
 			if (isadd) _having = string.Concat(_having, " AND (", Executer.Addslashes(filter, parms), ")");
 			return this;
 		}
-		public SelectBuild<TReturnInfo> Sort(string sort) {
+		protected SelectBuild<TReturnInfo> Sort(string sort) {
 			if (!string.IsNullOrEmpty(sort)) _sort = string.Concat(" \r\nORDER BY ", sort);
 			return this;
 		}
-		public SelectBuild<TReturnInfo> OrderBy(string sort) {
+		protected SelectBuild<TReturnInfo> OrderBy(string sort) {
 			return this.Sort(sort);
 		}
-		public SelectBuild<TReturnInfo> InnerJoin<TBLL>(string alias, string on) {
+		protected SelectBuild<TReturnInfo> InnerJoin<TBLL>(string alias, string on) {
 			return this.Join<TBLL>(alias, on, "INNER JOIN");
 		}
-		public SelectBuild<TReturnInfo> LeftJoin<TBLL>(string alias, string on) {
+		protected SelectBuild<TReturnInfo> LeftJoin<TBLL>(string alias, string on) {
 			return this.Join<TBLL>(alias, on, "LEFT JOIN");
 		}
-		public SelectBuild<TReturnInfo> RightJoin<TBLL>(string alias, string on) {
+		protected SelectBuild<TReturnInfo> RightJoin<TBLL>(string alias, string on) {
 			return this.Join<TBLL>(alias, on, "RIGHT JOIN");
 		}
-		public SelectBuild<TReturnInfo> Skip(int skip) {
+		protected SelectBuild<TReturnInfo> Skip(int skip) {
 			_skip = skip;
 			return this;
 		}
-		public SelectBuild<TReturnInfo> Limit(int limit) {
+		protected SelectBuild<TReturnInfo> Limit(int limit) {
 			_limit = limit;
 			return this;
 		}
-		public SelectBuild<TReturnInfo> Take(int limit) {
+		protected SelectBuild<TReturnInfo> Take(int limit) {
 			return this.Limit(limit);
 		}
-		public SelectBuild<TReturnInfo> Page(int pageIndex, int pageSize) {
+		protected SelectBuild<TReturnInfo> Page(int pageIndex, int pageSize) {
 			return this.Skip(Math.Max(0, pageIndex - 1) * pageSize).Limit(pageSize);
 		}
 	}
