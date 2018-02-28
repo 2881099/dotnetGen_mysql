@@ -4,8 +4,26 @@ using System.Linq;
 
 namespace CSRedis {
 	public partial class QuickHelperBase {
-		protected static string Name { get; set; }
+		public static string Name { get; set; }
 		public static ConnectionPool Instance { get; protected set; }
+
+		private static DateTime dt1970 = new DateTime(1970, 1, 1);
+		private static Random rnd = new Random();
+		/// <summary>
+		/// 生成类似Mongodb的ObjectId有序Guid
+		/// </summary>
+		/// <returns></returns>
+		public static Guid NewMongodbId() {
+			var now = DateTime.Now;
+			var uninxtime = (int)DateTime.Now.Subtract(dt1970).TotalSeconds;
+			var key = $"NewMongodbId{now.ToString("yyyyMMddHH")}";
+			var value = (long)Increment(key);
+			Expire(key, TimeSpan.FromHours(24));
+			var rand = rnd.Next(0, int.MaxValue);
+			//e8f35037-887d-4f64-8355-f96e02e71807
+			var guid = $"{uninxtime.ToString("x8").PadLeft(8, '0')}{rand.ToString("x8").PadLeft(8, '0')}{value.ToString("x8").PadLeft(16, '0')}";
+			return Guid.Parse(guid);
+		}
 		/// <summary>
 		/// 设置指定 key 的值
 		/// </summary>
