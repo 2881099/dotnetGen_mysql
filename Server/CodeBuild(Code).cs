@@ -1548,8 +1548,9 @@ namespace {0}.BLL {{
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
 		}}
-		public {0}SelectBuild Where{1}({4}SelectBuild select) {{
-			return this.Where($""a.`{3}` IN ({{select.ToString(""`{5}`"")}})"");
+		public {0}SelectBuild Where{1}({4}SelectBuild select, bool isNotIn = false) {{
+			var opt = isNotIn ? ""NOT IN"" : ""IN"";
+			return this.Where($""a.`{3}` {{opt}} ({{select.ToString(""`{5}`"")}})"");
 		}}", uClass_Name, fkcsBy, csType, fk.Columns[0].Name, UFString(fk.ReferencedTable.ClassName), fk.ReferencedColumns[0].Name);
 					}
 				}
