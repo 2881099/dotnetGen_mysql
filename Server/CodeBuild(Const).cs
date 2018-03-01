@@ -374,7 +374,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using {0}.Model;
 
-public static partial class ExtensionMethods {{
+public static partial class {0}ExtensionMethods {{
 	public static double Distance(this MygisPoint that, MygisPoint point) {{
 		double radLat1 = (double)(that.Y) * Math.PI / 180d;
 		double radLng1 = (double)(that.X) * Math.PI / 180d;
