@@ -14,15 +14,15 @@ namespace MySql.Data.MySqlClient {
 		object GetItem(IDataReader dr, ref int index);
 	}
 	public class SelectBuild<TReturnInfo, TLinket> : SelectBuild<TReturnInfo> where TLinket : SelectBuild<TReturnInfo> {
-		protected SelectBuild<TReturnInfo> Where1Or(string filterFormat, Array values) {
+		protected TLinket Where1Or(string filterFormat, Array values) {
 			if (values == null) values = new object[] { null };
-			if (values.Length == 0) return this;
-			if (values.Length == 1) return base.Where(filterFormat, values.GetValue(0));
+			if (values.Length == 0) return this as TLinket;
+			if (values.Length == 1) return base.Where(filterFormat, values.GetValue(0)) as TLinket;
 			string filter = string.Empty;
 			for (int a = 0; a < values.Length; a++) filter = string.Concat(filter, " OR ", string.Format(filterFormat, "{" + a + "}"));
 			object[] parms = new object[values.Length];
 			values.CopyTo(parms, 0);
-			return base.Where(filter.Substring(4), parms);
+			return base.Where(filter.Substring(4), parms) as TLinket;
 		}
 		public new TLinket Count(out long count) => base.Count(out count) as TLinket;
 		public new TLinket Where(string filter, params object[] parms) => base.Where(true, filter, parms) as TLinket;
