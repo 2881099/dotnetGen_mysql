@@ -1496,12 +1496,9 @@ namespace {0}.BLL {{
 				}
 
 				sb1.AppendFormat(@"
-		public static List<{0}Info> GetItems() {{
-			return Select.ToList();
-		}}
-		public static {0}SelectBuild Select {{
-			get {{ return new {0}SelectBuild(dal); }}
-		}}", uClass_Name, solutionName);
+		public static List<{0}Info> GetItems() => Select.ToList();
+		public static {0}SelectBuild Select => new {0}SelectBuild(dal);
+		public static {0}SelectBuild SelectAs(string alias = ""a"") => Select.As(alias);", uClass_Name, solutionName);
 
 				Dictionary<string, bool> byItems = new Dictionary<string, bool>();
 				foreach (ForeignKeyInfo fk in table.ForeignKeys) {
@@ -1533,15 +1530,9 @@ namespace {0}.BLL {{
 					if (fk.Columns.Count > 1) {
 						sb1.AppendFormat(
 		@"
-		public static List<{0}Info> GetItemsBy{1}({2}) {{
-			return Select.Where{1}({3}).ToList();
-		}}
-		public static List<{0}Info> GetItemsBy{1}({2}, int limit) {{
-			return Select.Where{1}({3}).Limit(limit).ToList();
-		}}
-		public static {0}SelectBuild SelectBy{1}({2}) {{
-			return Select.Where{1}({3});
-		}}", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms);
+		public static List<{0}Info> GetItemsBy{1}({2}) => Select.Where{1}({3}).ToList();
+		public static List<{0}Info> GetItemsBy{1}({2}, int limit) => Select.Where{1}({3}).Limit(limit).ToList();
+		public static {0}SelectBuild SelectBy{1}({2}) => Select.Where{1}({3});", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}({2}) {{
 			return base.Where(""{4}"", {3}) as {0}SelectBuild;
@@ -1550,15 +1541,9 @@ namespace {0}.BLL {{
 						string csType = CodeBuild.GetCSType(fk.Columns[0].Type, CodeBuild.UFString(fk.Table.ClassName) + fk.Columns[0].Name.ToUpper(), fk.Columns[0].SqlType);
 						sb1.AppendFormat(
 		@"
-		public static List<{0}Info> GetItemsBy{1}(params {2}[] {1}) {{
-			return Select.Where{1}({1}).ToList();
-		}}
-		public static List<{0}Info> GetItemsBy{1}({2}[] {1}, int limit) {{
-			return Select.Where{1}({1}).Limit(limit).ToList();
-		}}
-		public static {0}SelectBuild SelectBy{1}(params {2}[] {1}) {{
-			return Select.Where{1}({1});
-		}}", uClass_Name, fkcsBy, csType);
+		public static List<{0}Info> GetItemsBy{1}(params {2}[] {1}) => Select.Where{1}({1}).ToList();
+		public static List<{0}Info> GetItemsBy{1}({2}[] {1}, int limit) => Select.Where{1}({1}).Limit(limit).ToList();
+		public static {0}SelectBuild SelectBy{1}(params {2}[] {1}) => Select.Where{1}({1});", uClass_Name, fkcsBy, csType);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
@@ -1609,12 +1594,8 @@ namespace {0}.BLL {{
 
 					string civ = string.Format(GetCSTypeValue(fk2[0].ReferencedTable.PrimaryKeys[0].Type), CodeBuild.UFString(fk2[0].ReferencedTable.PrimaryKeys[0].Name));
 					sb1.AppendFormat(@"
-		public static {0}SelectBuild SelectBy{1}(params {2}Info[] {5}s) {{
-			return Select.Where{1}({5}s);
-		}}
-		public static {0}SelectBuild SelectBy{1}_{4}(params {3}[] {5}_ids) {{
-			return Select.Where{1}_{4}({5}_ids);
-		}}", uClass_Name, fkcsBy, orgInfo,
+		public static {0}SelectBuild SelectBy{1}(params {2}Info[] {5}s) => Select.Where{1}({5}s);
+		public static {0}SelectBuild SelectBy{1}_{4}(params {3}[] {5}_ids) => Select.Where{1}_{4}({5}_ids);", uClass_Name, fkcsBy, orgInfo,
 		GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper(), fk2[0].ReferencedTable.PrimaryKeys[0].SqlType).Replace("?", ""), 
 		table.PrimaryKeys[0].Name, LFString(orgInfo));
 

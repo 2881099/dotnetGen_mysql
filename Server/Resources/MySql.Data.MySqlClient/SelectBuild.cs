@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Data;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace MySql.Data.MySqlClient {
@@ -23,57 +24,25 @@ namespace MySql.Data.MySqlClient {
 			values.CopyTo(parms, 0);
 			return base.Where(filter.Substring(4), parms);
 		}
-		public new TLinket Count(out long count) {
-			return base.Count(out count) as TLinket;
-		}
-		public new TLinket Where(string filter, params object[] parms) {
-			return base.Where(true, filter, parms) as TLinket;
-		}
-		public new TLinket Where(bool isadd, string filter, params object[] parms) {
-			return base.Where(isadd, filter, parms) as TLinket;
-		}
-		public new TLinket GroupBy(string groupby) {
-			return base.GroupBy(groupby) as TLinket;
-		}
-		public new TLinket Having(string filter, params object[] parms) {
-			return base.Having(true, filter, parms) as TLinket;
-		}
-		public new TLinket Having(bool isadd, string filter, params object[] parms) {
-			return base.Having(isadd, filter, parms) as TLinket;
-		}
-		public new TLinket Sort(string sort) {
-			return base.Sort(sort) as TLinket;
-		}
-		public new TLinket OrderBy(string sort) {
-			return base.Sort(sort) as TLinket;
-		}
-		public new TLinket From<TBLL>() {
-			return base.From<TBLL>() as TLinket;
-		}
-		public new TLinket From<TBLL>(string alias) {
-			return base.From<TBLL>(alias) as TLinket;
-		}
-		public new TLinket InnerJoin<TBLL>(string alias, string on) {
-			return base.InnerJoin<TBLL>(alias, on) as TLinket;
-		}
-		public new TLinket LeftJoin<TBLL>(string alias, string on) {
-			return base.LeftJoin<TBLL>(alias, on) as TLinket;
-		}
-		public new TLinket RightJoin<TBLL>(string alias, string on) {
-			return base.RightJoin<TBLL>(alias, on) as TLinket;
-		}
-		public new TLinket Skip(int skip) {
-			return base.Skip(skip) as TLinket;
-		}
-		public new TLinket Limit(int limit) {
-			return base.Limit(limit) as TLinket;
-		}
-		public new TLinket Take(int limit) {
-			return base.Limit(limit) as TLinket;
-		}
-		public new TLinket Page(int pageIndex, int pageSize) {
-			return base.Page(pageIndex, pageSize) as TLinket;
-		}
+		public new TLinket Count(out long count) => base.Count(out count) as TLinket;
+		public new TLinket Where(string filter, params object[] parms) => base.Where(true, filter, parms) as TLinket;
+		public new TLinket Where(bool isadd, string filter, params object[] parms) => base.Where(isadd, filter, parms) as TLinket;
+		public TLinket WhereExists<T>(SelectBuild<T> select, bool isNotExists = false) => this.Where((isNotExists ? "NOT " : "") + $"EXISTS({select.ToString("1")})") as TLinket;
+		public new TLinket GroupBy(string groupby) => base.GroupBy(groupby) as TLinket;
+		public new TLinket Having(string filter, params object[] parms) => base.Having(true, filter, parms) as TLinket;
+		public new TLinket Having(bool isadd, string filter, params object[] parms) => base.Having(isadd, filter, parms) as TLinket;
+		public new TLinket Sort(string sort) => base.Sort(sort) as TLinket;
+		public new TLinket OrderBy(string sort) => base.Sort(sort) as TLinket;
+		public new TLinket From<TBLL>() => base.From<TBLL>() as TLinket;
+		public new TLinket From<TBLL>(string alias) => base.From<TBLL>(alias) as TLinket;
+		public new TLinket As(string alias) => base.As(alias) as TLinket;
+		public new TLinket InnerJoin<TBLL>(string alias, string on) => base.InnerJoin<TBLL>(alias, on) as TLinket;
+		public new TLinket LeftJoin<TBLL>(string alias, string on) => base.LeftJoin<TBLL>(alias, on) as TLinket;
+		public new TLinket RightJoin<TBLL>(string alias, string on) => base.RightJoin<TBLL>(alias, on) as TLinket;
+		public new TLinket Skip(int skip) => base.Skip(skip) as TLinket;
+		public new TLinket Limit(int limit) => base.Limit(limit) as TLinket;
+		public new TLinket Take(int limit) => base.Limit(limit) as TLinket;
+		public new TLinket Page(int pageIndex, int pageSize) => base.Page(pageIndex, pageSize) as TLinket;
 		public SelectBuild(IDAL dal, Executer exec) : base(dal, exec) { }
 	}
 	public class SelectBuild<TReturnInfo> {
@@ -207,10 +176,11 @@ namespace MySql.Data.MySqlClient {
 			return new SelectBuild<TReturnInfo>(dal, exec);
 		}
 		int _fields_count = 0;
+		string _mainAlias = "a";
 		protected SelectBuild(IDAL dal, Executer exec) {
 			_dals.Add(dal);
 			_field = dal.Field;
-			_table = string.Concat(" \r\nFROM ", dal.Table, " a");
+			_table = string.Concat(" \r\nFROM ", dal.Table, " ", _mainAlias);
 			_exec = exec;
 		}
 		protected SelectBuild<TReturnInfo> From<TBLL>() {
@@ -219,6 +189,11 @@ namespace MySql.Data.MySqlClient {
 		protected SelectBuild<TReturnInfo> From<TBLL>(string alias) {
 			IDAL dal = this.ConvertTBLL<TBLL>();
 			_table = string.Concat(_table, ", ", dal.Table, " ", alias);
+			return this;
+		}
+		protected SelectBuild<TReturnInfo> As(string alias) {
+			string table = string.Concat(" \r\nFROM ", _dals.FirstOrDefault()?.Table, " ", _mainAlias);
+			if (_table.StartsWith(table)) _table = string.Concat(table, _mainAlias = alias, _table.Substring(table.Length));
 			return this;
 		}
 		protected IDAL ConvertTBLL<TBLL>() {
