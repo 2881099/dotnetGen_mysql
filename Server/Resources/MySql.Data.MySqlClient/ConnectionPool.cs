@@ -13,7 +13,7 @@ namespace MySql.Data.MySqlClient {
 		public int MaxPoolSize = 32;
 		public List<SqlConnection2> AllConnections = new List<SqlConnection2>();
 		public Queue<SqlConnection2> FreeConnections = new Queue<SqlConnection2>();
-		public Queue<ManualResetEvent> GetConnectionQueue = new Queue<ManualResetEvent>();
+		public Queue<ManualResetEventSlim> GetConnectionQueue = new Queue<ManualResetEventSlim>();
 		private static object _lock = new object();
 		private static object _lock_GetConnectionQueue = new object();
 		private string _connectionString;
@@ -51,12 +51,12 @@ namespace MySql.Data.MySqlClient {
 				}
 			}
 			if (conn == null) {
-				ManualResetEvent wait = new ManualResetEvent(false);
+				ManualResetEventSlim wait = new ManualResetEventSlim(false);
 				lock (_lock_GetConnectionQueue)
 					GetConnectionQueue.Enqueue(wait);
-				if (wait.WaitOne(TimeSpan.FromSeconds(10)))
+				if (wait.Wait(TimeSpan.FromSeconds(10)))
 					return GetConnection();
-				return null;
+				throw new Exception("MySql.Data.MySqlClient.ConnectionPool.GetConnection 连接池获取超时（10秒）");
 			}
 			conn.ThreadId = Thread.CurrentThread.ManagedThreadId;
 			conn.LastActive = DateTime.Now;
@@ -70,7 +70,7 @@ namespace MySql.Data.MySqlClient {
 				FreeConnections.Enqueue(conn);
 
 			if (GetConnectionQueue.Count > 0) {
-				ManualResetEvent wait = null;
+				ManualResetEventSlim wait = null;
 				lock (_lock_GetConnectionQueue)
 					if (GetConnectionQueue.Count > 0)
 						wait = GetConnectionQueue.Dequeue();
