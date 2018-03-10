@@ -140,10 +140,9 @@ namespace Server.Properties {
         /// <summary>
         ///   查找类似 using System;
         ///using System.Collections.Generic;
-        ///using System.Threading;
-        ///using System.Text.RegularExpressions;
         ///using System.Net;
-        ///using Microsoft.Extensions.Logging;
+        ///using System.Threading;
+        ///using System.Threading.Tasks;
         ///
         ///namespace CSRedis {
         ///	/// &lt;summary&gt;
@@ -153,7 +152,8 @@ namespace Server.Properties {
         ///
         ///		public List&lt;RedisConnection2&gt; AllConnections = new List&lt;RedisConnection2&gt;();
         ///		public Queue&lt;RedisConnection2&gt; FreeConnections = new Queue&lt;RedisConnection2&gt;();
-        ///		public Queue&lt;ManualResetEvent&gt; GetConnectionQueue = new Que [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		public Queue&lt;ManualResetEventSlim&gt; GetConnectionQueue = new Queue&lt;ManualResetEventSlim&gt;();
+        ///		public Que [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string CSRedis_ConnectionPool_cs {
             get {
@@ -1319,12 +1319,36 @@ namespace Server.Properties {
         /// <summary>
         ///   查找类似 using System;
         ///using System.Collections.Generic;
+        ///using System.Diagnostics;
         ///using System.Linq;
+        ///using System.Threading;
         ///
         ///namespace CSRedis {
         ///	public partial class QuickHelperBase {
-        ///		protected static string Name { get; set; }
+        ///		public static string Name { get; set; }
         ///		public static ConnectionPool Instance { get; protected set; }
+        ///
+        ///		private static DateTime dt1970 = new DateTime(1970, 1, 1);
+        ///		private static Random rnd = new Random();
+        ///		private static readonly int __staticMachine = ((0x00ffffff &amp; Environment.MachineName.GetHashCode()) +
+        ///#if  [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string CSRedis_QuickHelperBase_cs {
+            get {
+                return ResourceManager.GetString("CSRedis_QuickHelperBase_cs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 using System;
+        ///using System.Collections.Generic;
+        ///using System.Diagnostics;
+        ///using System.Linq;
+        ///using System.Threading;
+        ///using System.Threading.Tasks;
+        ///
+        ///namespace CSRedis {
+        ///	partial class QuickHelperBase {
         ///		/// &lt;summary&gt;
         ///		/// 设置指定 key 的值
         ///		/// &lt;/summary&gt;
@@ -1332,11 +1356,11 @@ namespace Server.Properties {
         ///		/// &lt;param name=&quot;value&quot;&gt;字符串值&lt;/param&gt;
         ///		/// &lt;param name=&quot;expireSeconds&quot;&gt;过期(秒单位)&lt;/param&gt;
         ///		/// &lt;returns&gt;&lt;/returns&gt;
-        ///		public static bool Set(string key [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		async public static Task&lt;bool&gt; SetAsync(string key, string value, in [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static string CSRedis_QuickHelperBase_cs {
+        internal static string CSRedis_QuickHelperBaseAsync_cs {
             get {
-                return ResourceManager.GetString("CSRedis_QuickHelperBase_cs", resourceCulture);
+                return ResourceManager.GetString("CSRedis_QuickHelperBaseAsync_cs", resourceCulture);
             }
         }
         
@@ -2168,9 +2192,9 @@ namespace Server.Properties {
         /// <summary>
         ///   查找类似 using System;
         ///using System.Collections.Generic;
-        ///using System.Threading;
         ///using System.Text.RegularExpressions;
-        ///using Microsoft.Extensions.Logging;
+        ///using System.Threading;
+        ///using System.Threading.Tasks;
         ///
         ///namespace MySql.Data.MySqlClient {
         ///	/// &lt;summary&gt;
@@ -2181,7 +2205,7 @@ namespace Server.Properties {
         ///		public int MaxPoolSize = 32;
         ///		public List&lt;SqlConnection2&gt; AllConnections = new List&lt;SqlConnection2&gt;();
         ///		public Queue&lt;SqlConnection2&gt; FreeConnections = new Queue&lt;SqlConnection2&gt;();
-        ///		public Queue&lt;ManualResetEvent&gt; GetConnectionQu [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		public Queue&lt;ManualResetEventSlim&gt; GetConnectionQueu [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string MySql_Data_MySqlClient_ConnectionPool_cs {
             get {
@@ -2190,24 +2214,21 @@ namespace Server.Properties {
         }
         
         /// <summary>
-        ///   查找类似 using System;
+        ///   查找类似 using Microsoft.Extensions.Logging;
+        ///using System;
         ///using System.Collections.Generic;
         ///using System.ComponentModel;
-        ///using System.Linq;
+        ///using System.Data;
         ///using System.Reflection;
         ///using System.Threading;
-        ///using System.Data;
-        ///using Microsoft.Extensions.Logging;
         ///
         ///namespace MySql.Data.MySqlClient {
         ///	public partial class Executer : IDisposable {
         ///
+        ///		public bool IsTracePerformance { get; set; } = string.Compare(Environment.GetEnvironmentVariable(&quot;ASPNETCORE_ENVIRONMENT&quot;), &quot;Development&quot;, true) == 0;
         ///		public ILogger Log { get; set; }
         ///		public ConnectionPool Pool { get; }
-        ///		public Executer() { }
-        ///		public Executer(ILogger log, string connectionString) {
-        ///			this.Log = log;
-        ///			this.Pool = new ConnectionPool(con [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///		publi [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string MySql_Data_MySqlClient_Executer_cs {
             get {
@@ -2219,6 +2240,31 @@ namespace Server.Properties {
         ///   查找类似 using System;
         ///using System.Collections;
         ///using System.Collections.Generic;
+        ///using System.ComponentModel;
+        ///using System.Data;
+        ///using System.Linq;
+        ///using System.Reflection;
+        ///using System.Threading;
+        ///using System.Threading.Tasks;
+        ///using Microsoft.Extensions.Logging;
+        ///using Newtonsoft.Json.Linq;
+        ///using NpgsqlTypes;
+        ///
+        ///namespace MySql.Data.MySqlClient {
+        ///	partial class Executer {
+        ///		async public Task ExecuteReaderAsync(Func&lt;MySqlDataReader, Task&gt; readerHander, CommandType cmdType, string cmdText, params MySqlPa [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string MySql_Data_MySqlClient_ExecuterAsync_cs {
+            get {
+                return ResourceManager.GetString("MySql_Data_MySqlClient_ExecuterAsync_cs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 using System;
+        ///using System.Collections;
+        ///using System.Collections.Generic;
+        ///using System.Text.RegularExpressions;
         ///using System.Linq;
         ///
         ///public struct MygisCoordinate2D : IEquatable&lt;MygisCoordinate2D&gt; {
@@ -2228,11 +2274,37 @@ namespace Server.Properties {
         ///
         ///	public bool Equals(MygisCoordinate2D c) =&gt; X == c.X &amp;&amp; Y == c.Y;
         ///	public override int GetHashCode() =&gt; X.GetHashCode() ^ MygisGeometry.RotateShift(Y.GetHashCode(), sizeof(int) / 2);
-        ///	public override bool Equals(object obj) [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///	 [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string MySql_Data_MySqlClient_MygisTypes_cs {
             get {
                 return ResourceManager.GetString("MySql_Data_MySqlClient_MygisTypes_cs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 using Newtonsoft.Json;
+        ///using System;
+        ///using System.Collections.Generic;
+        ///using System.Data;
+        ///using System.Linq;
+        ///using System.Reflection;
+        ///using System.Text.RegularExpressions;
+        ///using System.Threading.Tasks;
+        ///
+        ///namespace MySql.Data.MySqlClient {
+        ///	public partial interface IDAL {
+        ///		string Table { get; }
+        ///		string Field { get; }
+        ///		string Sort { get; }
+        ///		object GetItem(IDataReader dr, ref int index);
+        ///		Task&lt;(object result, int dataIndex)&gt; GetItemAsync(MySqlDataReader dr, int index);
+        ///	}
+        ///	public class Sel [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        /// </summary>
+        internal static string MySql_Data_MySqlClient_SelectBuild_cs {
+            get {
+                return ResourceManager.GetString("MySql_Data_MySqlClient_SelectBuild_cs", resourceCulture);
             }
         }
         
@@ -2242,21 +2314,18 @@ namespace Server.Properties {
         ///using System.Text.RegularExpressions;
         ///using System.Reflection;
         ///using System.Data;
+        ///using System.Linq;
         ///using Newtonsoft.Json;
+        ///using System.Threading.Tasks;
         ///
         ///namespace MySql.Data.MySqlClient {
-        ///	public partial interface IDAL {
-        ///		string Table { get; }
-        ///		string Field { get; }
-        ///		string Sort { get; }
-        ///		object GetItem(IDataReader dr, ref int index);
-        ///	}
-        ///	public class SelectBuild&lt;TReturnInfo, TLinket&gt; : SelectBuild&lt;TReturnInfo&gt; where TLinket : SelectBuild&lt;TReturnInfo&gt; {
-        ///		protected SelectBuild&lt;TReturnInf [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///	partial class SelectBuild&lt;TReturnInfo&gt; {
+        ///		async public Task&lt;List&lt;TReturnInfo&gt;&gt; ToListAsync(Func&lt;string, Task&lt;string&gt;&gt; cache_get, Func&lt;string, string, int, Task&lt;bool&gt;&gt; cache_set, TimeSpan expire, string cacheKey = null) {
+        ///			bool isCache = expire &gt; TimeSpan.Zer [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static string MySql_Data_MySqlClient_SelectBuild_cs {
+        internal static string MySql_Data_MySqlClient_SelectBuildAsync_cs {
             get {
-                return ResourceManager.GetString("MySql_Data_MySqlClient_SelectBuild_cs", resourceCulture);
+                return ResourceManager.GetString("MySql_Data_MySqlClient_SelectBuildAsync_cs", resourceCulture);
             }
         }
         

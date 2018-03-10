@@ -94,6 +94,7 @@ EndGlobal
 			#region 内容太长已被收起
  @"using System;
 using System.Data;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Logging;
 
@@ -120,18 +121,17 @@ namespace {0}.DAL {{
 		public static Executer Instance {{ get; }} = new Executer(new LoggerFactory().CreateLogger(""{0}_DAL_sqlhelper""), ConnectionString);
 
 		public static string Addslashes(string filter, params object[] parms) {{ return Executer.Addslashes(filter, parms); }}
-		public static void ExecuteReader(Action<IDataReader> readerHander, string cmdText, params MySqlParameter[] cmdParms) {{
-			Instance.ExecuteReader(readerHander, CommandType.Text, cmdText, cmdParms);
-		}}
-		public static object[][] ExeucteArray(string cmdText, params MySqlParameter[] cmdParms) {{
-			return Instance.ExeucteArray(CommandType.Text, cmdText, cmdParms);
-		}}
-		public static int ExecuteNonQuery(string cmdText, params MySqlParameter[] cmdParms) {{
-			return Instance.ExecuteNonQuery(CommandType.Text, cmdText, cmdParms);
-		}}
-		public static object ExecuteScalar(string cmdText, params MySqlParameter[] cmdParms) {{
-			return Instance.ExecuteScalar(CommandType.Text, cmdText, cmdParms);
-		}}
+
+		public static void ExecuteReader(Action<MySqlDataReader> readerHander, string cmdText, params MySqlParameter[] cmdParms) =>Instance.ExecuteReader(readerHander, CommandType.Text, cmdText, cmdParms);
+		public static object[][] ExeucteArray(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExeucteArray(CommandType.Text, cmdText, cmdParms);
+		public static int ExecuteNonQuery(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteNonQuery(CommandType.Text, cmdText, cmdParms);
+		public static object ExecuteScalar(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalar(CommandType.Text, cmdText, cmdParms);
+
+		public static Task ExecuteReaderAsync(Func<MySqlDataReader, Task> readerHander, string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteReaderAsync(readerHander, CommandType.Text, cmdText, cmdParms);
+		public static Task<object[][]> ExeucteArrayAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExeucteArrayAsync(CommandType.Text, cmdText, cmdParms);
+		public static Task<int> ExecuteNonQueryAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteNonQueryAsync(CommandType.Text, cmdText, cmdParms);
+		public static Task<object> ExecuteScalarAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalarAsync(CommandType.Text, cmdText, cmdParms);
+
 		/// <summary>
 		/// 开启事务（不支持异步），10秒未执行完将超时
 		/// </summary>
@@ -317,6 +317,7 @@ namespace {0}.BLL {{
 			#region 内容太长已被收起
  @"using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 
@@ -359,11 +360,13 @@ namespace {0}.BLL {{
 	//		Instance = new StackExchange.Redis.ConnectionMultiplexerPool($""{{ip}}:{{port}},password={{pass}},name={{Name}},defaultdatabase={{database}}"", poolsize);
 	//	}}
 	//}}
+}}
 
-	public static partial class BLLExtensionMethods {{
-		public static List<TReturnInfo> ToList<TReturnInfo>(this SelectBuild<TReturnInfo> select, int expireSeconds, string cacheKey = null) {{ return select.ToList(RedisHelper.Get, RedisHelper.Set, TimeSpan.FromSeconds(expireSeconds), cacheKey); }}
-	}}
-}}";
+public static partial class {0}BLLExtensionMethods {{
+	public static List<TReturnInfo> ToList<TReturnInfo>(this SelectBuild<TReturnInfo> select, int expireSeconds, string cacheKey = null) {{ return select.ToList({0}.BLL.RedisHelper.Get, {0}.BLL.RedisHelper.Set, TimeSpan.FromSeconds(expireSeconds), cacheKey); }}
+	public static Task<List<TReturnInfo>> ToListAsync<TReturnInfo>(this SelectBuild<TReturnInfo> select, int expireSeconds, string cacheKey = null) {{ return select.ToListAsync({0}.BLL.RedisHelper.GetAsync, {0}.BLL.RedisHelper.SetAsync, TimeSpan.FromSeconds(expireSeconds), cacheKey); }}
+}}
+";
 			#endregion
 			public static readonly string Model_Build_ExtensionMethods_cs =
 			#region 内容太长已被收起
@@ -1726,10 +1729,10 @@ namespace {0}.Module.Admin.Controllers {{
 		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
 
 		[HttpGet]
-		public ActionResult List([FromServices]IConfigurationRoot cfg, {12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
+		async public Task<ActionResult> List([FromServices]IConfigurationRoot cfg, {12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
 			var select = {1}.Select{8};{9}
 			long count;
-			var items = select.Count(out count){14}.Skip((page - 1) * limit).Limit(limit).ToList();
+			var items = await select.Count(out count){14}.Page(page, limit).ToListAsync();
 			ViewBag.items = items;
 			ViewBag.count = count;
 			return View();
@@ -1740,8 +1743,8 @@ namespace {0}.Module.Admin.Controllers {{
 			return View();
 		}}
 		[HttpGet(@""edit"")]
-		public ActionResult Edit({4}) {{
-			{1}Info item = {1}.GetItem({5});
+		async public Task<ActionResult> Edit({4}) {{
+			{1}Info item = await {1}.GetItemAsync({5});
 			if (item == null) return APIReturn.记录不存在_或者没有权限;
 			ViewBag.item = item;
 			return View();
@@ -1750,17 +1753,17 @@ namespace {0}.Module.Admin.Controllers {{
 		/***************************************** POST *****************************************/
 		[HttpPost(@""add"")]
 		[ValidateAntiForgeryToken]
-		public APIReturn _Add({10}) {{
+		async public Task<APIReturn> _Add({10}) {{
 			{1}Info item = new {1}Info();{13}{7}
-			item = {1}.Insert(item);{16}
+			item = await {1}.InsertAsync(item);{16}
 			return APIReturn.成功.SetData(""item"", item.ToBson());
 		}}
 		[HttpPost(@""edit"")]
 		[ValidateAntiForgeryToken]
-		public APIReturn _Edit({4}{11}) {{
-			{1}Info item = {1}.GetItem({5});
+		async public Task<APIReturn> _Edit({4}{11}) {{
+			{1}Info item = await {1}.GetItemAsync({5});
 			if (item == null) return APIReturn.记录不存在_或者没有权限;{6}{7}
-			int affrows = {1}.Update(item);{17}
+			int affrows = await {1}.UpdateAsync(item);{17}
 			if (affrows > 0) return APIReturn.成功.SetMessage($""更新成功，影响行数：{{affrows}}"");
 			return APIReturn.失败;
 		}}
@@ -2031,7 +2034,7 @@ namespace {0}.Module.Admin.Controllers {{
 		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
 
 		[HttpGet]
-		public ActionResult List([FromServices]IConfigurationRoot cfg) {{
+		public APIReturn List([FromServices]IConfigurationRoot cfg) {{
 			return APIReturn.成功;
 		}}
 	}}

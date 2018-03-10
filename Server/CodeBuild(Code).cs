@@ -157,6 +157,7 @@ namespace Server {
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\IRedisClientAsync.cs"), Deflate.Compress(Properties.Resources.CSRedis_IRedisClientAsync_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\IRedisClientSync.cs"), Deflate.Compress(Properties.Resources.CSRedis_IRedisClientSync_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\QuickHelperBase.cs"), Deflate.Compress(Properties.Resources.CSRedis_QuickHelperBase_cs)));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\QuickHelperBaseAsync.cs"), Deflate.Compress(Properties.Resources.CSRedis_QuickHelperBaseAsync_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\RedisClient.Async.cs"), Deflate.Compress(Properties.Resources.CSRedis_RedisClient_Async_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\RedisClient.cs"), Deflate.Compress(Properties.Resources.CSRedis_RedisClient_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\CSRedis\RedisClient.Sync.cs"), Deflate.Compress(Properties.Resources.CSRedis_RedisClient_Sync_cs)));
@@ -216,7 +217,9 @@ namespace Server {
 				#region MySql.Data.MySqlClient
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\ConnectionPool.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_ConnectionPool_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\Executer.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_Executer_cs)));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\ExecuterAsync.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_ExecuterAsync_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\SelectBuild.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_SelectBuild_cs)));
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\SelectBuildAsync.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_SelectBuildAsync_cs)));
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"Common\MySql.Data.MySqlClient\MygisTypes.cs"), Deflate.Compress(Properties.Resources.MySql_Data_MySqlClient_MygisTypes_cs)));
 				clearSb();
 				#endregion
@@ -338,6 +341,7 @@ namespace Server {
 				string CsParamNoType1 = "";
 				string CsParam2 = "";
 				string CsParamNoType2 = "";
+				string csItemAllFieldCopy = "";
 				string pkMvcRoute = "";
 				string orderBy = table.Clustereds.Count > 0 ?
 					string.Join(", ", table.Clustereds.ConvertAll<string>(delegate (ColumnInfo cli) {
@@ -371,6 +375,8 @@ namespace Server {
 				foreach (ColumnInfo columnInfo in table.Columns) {
 					CsParam1 += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 					CsParamNoType1 += CodeBuild.UFString(columnInfo.Name) + ", ";
+					csItemAllFieldCopy += string.Format(@"
+			item.{0} = newitem.{0};", UFString(columnInfo.Name));
 					if (columnInfo.IsIdentity) {
 						//CsParamNoType2 += "0, ";
 					} else {
@@ -1037,6 +1043,7 @@ namespace {0}.Model {{
 	@"using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using {0}.Model;
 
@@ -1070,10 +1077,10 @@ namespace {0}.DAL {{
 
 				sb1.AppendFormat(@"
 		public {0}Info GetItem(IDataReader dr) {{
-			int index = -1;
-			return GetItem(dr, ref index) as {0}Info;
+			int dataIndex = -1;
+			return GetItem(dr, ref dataIndex) as {0}Info;
 		}}
-		public object GetItem(IDataReader dr, ref int index) {{
+		public object GetItem(IDataReader dr, ref int dataIndex) {{
 			{0}Info item = new {0}Info();", uClass_Name);
 
 				foreach (ColumnInfo columnInfo in table.Columns) {
@@ -1081,31 +1088,71 @@ namespace {0}.DAL {{
 					string csTypeGeometry = GetCSTypeGeometry(columnInfo.SqlType);
 					if (csType == "byte[]")
 						sb1.AppendFormat(@"
-			if (!dr.IsDBNull(++index)) item.{0} = dr.GetValue(index) as byte[];", CodeBuild.UFString(columnInfo.Name));
+			if (!dr.IsDBNull(++dataIndex)) item.{0} = dr.GetValue(dataIndex) as byte[];", CodeBuild.UFString(columnInfo.Name));
 					else if (columnInfo.Type == MySqlDbType.Geometry && csTypeGeometry != "object")
 						sb1.AppendFormat(@"
-			if (!dr.IsDBNull(++index)) item.{0} = MygisGeometry.Parse(dr.GetString(index)) as {1};", CodeBuild.UFString(columnInfo.Name), csTypeGeometry);
+			if (!dr.IsDBNull(++dataIndex)) item.{0} = MygisGeometry.Parse(dr.GetString(dataIndex)) as {1};", CodeBuild.UFString(columnInfo.Name), csTypeGeometry);
 					else if (columnInfo.Type == MySqlDbType.Geometry && csTypeGeometry == "object")
 						sb1.AppendFormat(@"
-			if (!dr.IsDBNull(++index)) item.{0} = dr.GetString(index);", CodeBuild.UFString(columnInfo.Name), csTypeGeometry);
+			if (!dr.IsDBNull(++dataIndex)) item.{0} = dr.GetString(dataIndex);", CodeBuild.UFString(columnInfo.Name), csTypeGeometry);
 					else if (columnInfo.Type == MySqlDbType.Enum)
 						sb1.AppendFormat(@"
-			if (!dr.IsDBNull(++index)) item.{0} = ({1}?)dr.GetInt64(index);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
+			if (!dr.IsDBNull(++dataIndex)) item.{0} = ({1}?)dr.GetInt64(dataIndex);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
 					else if (columnInfo.Type == MySqlDbType.Set)
 						sb1.AppendFormat(@"
-			if (!dr.IsDBNull(++index)) item.{0} = ({1}?)dr.GetInt64(index);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
+			if (!dr.IsDBNull(++dataIndex)) item.{0} = ({1}?)dr.GetInt64(dataIndex);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
 					else
 						sb1.AppendFormat(@"
-			if (!dr.IsDBNull(++index)) item.{0} = {1}dr.{2}(index);", CodeBuild.UFString(columnInfo.Name), CodeBuild.GetDbToCsConvert(columnInfo.Type), CodeBuild.GetDataReaderMethod(columnInfo.Type));
+			if (!dr.IsDBNull(++dataIndex)) item.{0} = {1}dr.{2}(dataIndex);", CodeBuild.UFString(columnInfo.Name), CodeBuild.GetDbToCsConvert(columnInfo.Type), CodeBuild.GetDataReaderMethod(columnInfo.Type));
 					if (columnInfo.IsPrimaryKey)
 						sb1.AppendFormat(@" if (item.{0} == null) return null;", CodeBuild.UFString(columnInfo.Name));
 				}
 				sb1.AppendFormat(@"
 			return item;
-		}}");
+		}}
+		private void CopyItemAllField({0}Info item, {0}Info newitem) {{{1}
+		}}", uClass_Name, csItemAllFieldCopy);
 				sb1.Append(sb4.ToString());
 				sb1.AppendFormat(@"
 		#endregion", uClass_Name, table.Columns.Count + 1);
+
+				string dal_async_code = string.Format(@"
+		async public Task<{0}Info> GetItemAsync(MySqlDataReader dr) {{
+			var read = await GetItemAsync(dr, -1);
+			return read.result as {0}Info;
+		}}
+		async public Task<(object result, int dataIndex)> GetItemAsync(MySqlDataReader dr, int dataIndex) {{
+			{0}Info item = new {0}Info();", uClass_Name);
+
+				foreach (ColumnInfo columnInfo in table.Columns) {
+					string csType = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType);
+					string csTypeGeometry = GetCSTypeGeometry(columnInfo.SqlType);
+					if (csType == "byte[]")
+						dal_async_code += string.Format(@"
+			if (!await dr.IsDBNullAsync(++dataIndex)) item.{0} = dr.GetValue(dataIndex) as byte[];", CodeBuild.UFString(columnInfo.Name));
+					else if (columnInfo.Type == MySqlDbType.Geometry && csTypeGeometry != "object")
+						dal_async_code += string.Format(@"
+			if (!await dr.IsDBNullAsync(++dataIndex)) item.{0} = MygisGeometry.Parse(dr.GetString(dataIndex)) as {1};", CodeBuild.UFString(columnInfo.Name), csTypeGeometry);
+					else if (columnInfo.Type == MySqlDbType.Geometry && csTypeGeometry == "object")
+						dal_async_code += string.Format(@"
+			if (!await dr.IsDBNullAsync(++dataIndex)) item.{0} = dr.GetString(dataIndex);", CodeBuild.UFString(columnInfo.Name), csTypeGeometry);
+					else if (columnInfo.Type == MySqlDbType.Enum)
+						dal_async_code += string.Format(@"
+			if (!await dr.IsDBNullAsync(++dataIndex)) item.{0} = ({1}?)dr.GetInt64(dataIndex);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
+					else if (columnInfo.Type == MySqlDbType.Set)
+						dal_async_code += string.Format(@"
+			if (!await dr.IsDBNullAsync(++dataIndex)) item.{0} = ({1}?)dr.GetInt64(dataIndex);", CodeBuild.UFString(columnInfo.Name), uClass_Name + columnInfo.Name.ToUpper());
+					else
+						dal_async_code += string.Format(@"
+			if (!await dr.IsDBNullAsync(++dataIndex)) item.{0} = {1}dr.{2}(dataIndex);", CodeBuild.UFString(columnInfo.Name), CodeBuild.GetDbToCsConvert(columnInfo.Type), CodeBuild.GetDataReaderMethod(columnInfo.Type));
+					if (columnInfo.IsPrimaryKey)
+						dal_async_code += string.Format(@" if (item.{0} == null) return (null, dataIndex);", CodeBuild.UFString(columnInfo.Name));
+				}
+
+				dal_async_code += string.Format(@"
+			return (item, dataIndex);
+		}}", uClass_Name);
+
 				Dictionary<string, bool> del_exists = new Dictionary<string, bool>();
 				foreach (List<ColumnInfo> cs in table.Uniques) {
 					string parms = string.Empty;
@@ -1133,6 +1180,12 @@ namespace {0}.DAL {{
 			return SqlHelper.ExecuteNonQuery(string.Concat(TSQL.Delete, ""{1}""), 
 {3});
 		}}", parms, sqlParms, cs[0].IsPrimaryKey ? string.Empty : parmsBy, CodeBuild.AppendParameters(cs, "				").Replace("?.ToInt64()", ".ToInt64()"));
+
+					dal_async_code += string.Format(@"
+		public Task<int> Delete{2}Async({0}) {{
+			return SqlHelper.ExecuteNonQueryAsync(string.Concat(TSQL.Delete, ""{1}""), 
+{3});
+		}}", parms, sqlParms, cs[0].IsPrimaryKey ? string.Empty : parmsBy, CodeBuild.AppendParameters(cs, "				").Replace("?.ToInt64()", ".ToInt64()"));
 				}
 				table.ForeignKeys.ForEach(delegate (ForeignKeyInfo fkk) {
 					string parms = string.Empty;
@@ -1152,6 +1205,12 @@ namespace {0}.DAL {{
 					sb2.AppendFormat(@"
 		public int Delete{2}({0}) {{
 			return SqlHelper.ExecuteNonQuery(string.Concat(TSQL.Delete, ""{1}""), 
+{3});
+		}}", parms, sqlParms, parmsBy, CodeBuild.AppendParameters(fkk.Columns, "				"));
+
+					dal_async_code += string.Format(@"
+		public Task<int> Delete{2}Async({0}) {{
+			return SqlHelper.ExecuteNonQueryAsync(string.Concat(TSQL.Delete, ""{1}""), 
 {3});
 		}}", parms, sqlParms, parmsBy, CodeBuild.AppendParameters(fkk.Columns, "				"));
 				});
@@ -1251,11 +1310,26 @@ namespace {0}.DAL {{
 			if ({1}.TryParse(string.Concat(SqlHelper.ExecuteScalar(TSQL.Insert, GetParameters(item))), out loc1)) item.{0} = loc1;
 			return item;", CodeBuild.UFString(identityColumn.Name), CodeBuild.GetCSType(identityColumn.Type, uClass_Name + identityColumn.Name.ToUpper(), identityColumn.SqlType).Replace("?", ""));
 					}
+
+					if (identityColumn != null)
+						dal_async_code += string.Format(@"
+		async public Task<{0}Info> InsertAsync({0}Info item) {{
+			{2} loc1;
+			if ({2}.TryParse(string.Concat(await SqlHelper.ExecuteScalarAsync(TSQL.Insert, GetParameters(item))), out loc1)) item.{1} = loc1;
+			return item;
+		}}", uClass_Name, CodeBuild.UFString(identityColumn.Name), CodeBuild.GetCSType(identityColumn.Type, uClass_Name + identityColumn.Name.ToUpper(), identityColumn.SqlType).Replace("?", ""));
+					else
+						dal_async_code += string.Format(@"
+		async public Task<{0}Info> InsertAsync({0}Info item) {{
+			await SqlHelper.ExecuteNonQueryAsync(TSQL.Insert, GetParameters(item));
+			return item;
+		}}", uClass_Name);
+
 					sb1.AppendFormat(@"
 {1}
 
-		public int Update({0}Info item) {{
-			return new SqlUpdateBuild(null, item.{7}){8}.ExecuteNonQuery();
+		public SqlUpdateBuild Update({0}Info item) {{
+			return new SqlUpdateBuild(null, item.{7}){8};
 		}}
 		#region class SqlUpdateBuild
 		public partial class SqlUpdateBuild {{
@@ -1277,6 +1351,11 @@ namespace {0}.DAL {{
 				string sql = this.ToString();
 				if (string.IsNullOrEmpty(sql)) return 0;
 				return SqlHelper.ExecuteNonQuery(sql, _parameters.ToArray());
+			}}
+			public Task<int> ExecuteNonQueryAsync() {{
+				string sql = this.ToString();
+				if (string.IsNullOrEmpty(sql)) return Task.FromResult(0);
+				return SqlHelper.ExecuteNonQueryAsync(sql, _parameters.ToArray());
 			}}
 			public SqlUpdateBuild Where(string filterFormat, params object[] values) {{
 				if (!string.IsNullOrEmpty(_where)) _where = string.Concat(_where, "" AND "");
@@ -1302,14 +1381,19 @@ namespace {0}.DAL {{
 		public {0}Info Insert({0}Info item) {{{10}
 		}}
 {2}
+		#region async{11}
+		#endregion
 	}}
 }}", uClass_Name, sb2.ToString(), sb3.ToString(), pkCsParam, pkSqlParamFormat, pkCsParamNoType, sb5.ToString(),
-	pkCsParamNoTypeByval.Replace(", ", ", item."), sb6.ToString(), solutionName, dal_insert_code);
+	pkCsParamNoTypeByval.Replace(", ", ", item."), sb6.ToString(), solutionName, dal_insert_code, dal_async_code);
 					#endregion
 				} else {
 					sb1.AppendFormat(@"
+
+		#region async{1}
+		#endregion
 	}}
-}}", uClass_Name);
+}}", uClass_Name, dal_async_code);
 				}
 				#endregion
 
@@ -1322,6 +1406,7 @@ namespace {0}.DAL {{
 	@"using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 using {0}.Model;
 
@@ -1348,7 +1433,7 @@ namespace {0}.BLL {{
 					if (uniques_dic.ContainsKey(parms)) continue;
 					uniques_dic.Add(parms, true);
 				}
-
+				string bll_async_code = "";
 				Dictionary<string, bool> del_exists2 = new Dictionary<string, bool>();
 				foreach (List<ColumnInfo> cs in table.Uniques) {
 					string parms = string.Empty;
@@ -1393,6 +1478,19 @@ namespace {0}.BLL {{
 			return dal.Delete{2}({1});
 		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy, uClass_Name, parmsNewItem);
 
+					if (uniques_dic.Count > 1)
+						bll_async_code += string.Format(@"
+		async public static Task<int> Delete{2}Async({0}) {{
+			if (itemCacheTimeout > 0) await RemoveCacheAsync(GetItem{2}({1}));
+			return await dal.Delete{2}Async({1});
+		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy);
+					else
+						bll_async_code += string.Format(@"
+		async public static Task<int> Delete{2}Async({0}) {{
+			if (itemCacheTimeout > 0) await RemoveCacheAsync(new {3}Info {{ {4} }});
+			return await dal.Delete{2}Async({1});
+		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy, uClass_Name, parmsNewItem);
+
 					sb3.AppendFormat(@"
 		public static {1}Info GetItem{2}({4}) {{
 			if (itemCacheTimeout <= 0) return Select{7}.ToOne();
@@ -1403,6 +1501,20 @@ namespace {0}.BLL {{
 			{1}Info item = Select{7}.ToOne();
 			if (item == null) return null;
 			RedisHelper.Set(key, item.Stringify(), itemCacheTimeout);
+			return item;
+		}}", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
+		parms, parmsNoneType, cacheCond, whereCondi);
+
+					bll_async_code += string.Format(@"
+		async public static Task<{1}Info> GetItem{2}Async({4}) {{
+			if (itemCacheTimeout <= 0) return await Select{7}.ToOneAsync();
+			string key = string.Concat(""{0}_BLL_{1}{2}_"", {3});
+			string value = await RedisHelper.GetAsync(key);
+			if (!string.IsNullOrEmpty(value))
+				try {{ return {1}Info.Parse(value); }} catch {{ }}
+			{1}Info item = await Select{7}.ToOneAsync();
+			if (item == null) return null;
+			await RedisHelper.SetAsync(key, item.Stringify(), itemCacheTimeout);
 			return item;
 		}}", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
 		parms, parmsNoneType, cacheCond, whereCondi);
@@ -1425,7 +1537,7 @@ namespace {0}.BLL {{
 						sb1.AppendFormat(@"
 		public static int Update({1}Info item) {{
 			if (itemCacheTimeout > 0) RemoveCache(item);
-			return dal.Update(item);
+			return dal.Update(item).ExecuteNonQuery();
 		}}
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) {{
 			return UpdateDiy(null, {3});
@@ -1449,7 +1561,7 @@ namespace {0}.BLL {{
 						sb1.AppendFormat(@"
 		public static int Update({1}Info item) {{
 			if (itemCacheTimeout > 0) RemoveCache(item);
-			return dal.Update(item);
+			return dal.Update(item).ExecuteNonQuery();
 		}}
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) {{
 			return UpdateDiy(null, {3});
@@ -1466,6 +1578,14 @@ namespace {0}.BLL {{
 		}}
 ", solutionName, uClass_Name, pkCsParam, pkCsParamNoType, xxxxtempskdf.Substring(0, xxxxtempskdf.Length - 2));
 					}
+
+					bll_async_code += string.Format(@"
+		async public static Task<int> UpdateAsync({1}Info item) {{
+			if (itemCacheTimeout > 0) await RemoveCacheAsync(item);
+			return await dal.Update(item).ExecuteNonQueryAsync();
+		}}
+", solutionName, uClass_Name);
+
 					if (table.Columns.Count > 5)
 						sb1.AppendFormat(@"
 		/// <summary>
@@ -1475,6 +1595,17 @@ namespace {0}.BLL {{
 					sb1.AppendFormat(@"
 		public static {0}Info Insert({1}) {{
 			return Insert(new {0}Info {{{2}}});
+		}}", uClass_Name, CsParam2, CsParamNoType2);
+
+					if (table.Columns.Count > 5)
+						bll_async_code += string.Format(@"
+		/// <summary>
+		/// 适用字段较少的表；避规后续改表风险，字段数较大请改用 {0}.Insert({0}Info item)
+		/// </summary>
+		[Obsolete]", uClass_Name);
+					bll_async_code += string.Format(@"
+		public static Task<{0}Info> InsertAsync({1}) {{
+			return InsertAsync(new {0}Info {{{2}}});
 		}}", uClass_Name, CsParam2, CsParamNoType2);
 
 					var redisRemove = sb4.ToString();
@@ -1492,6 +1623,16 @@ namespace {0}.BLL {{
 		#endregion
 {1}
 ", uClass_Name, sb3.ToString(), redisRemove);
+					bll_async_code += string.Format(@"
+		async public static Task<{0}Info> InsertAsync({0}Info item) {{
+			item = await dal.InsertAsync(item);
+			if (itemCacheTimeout > 0) await RemoveCacheAsync(item);
+			return item;
+		}}
+		async private static Task RemoveCacheAsync({0}Info item) {{
+			if (item == null) return;{2}
+		}}
+", uClass_Name, "", redisRemove.Replace("RedisHelper.Remove", "await RedisHelper.RemoveAsync"));
 					#endregion
 				}
 
@@ -1499,6 +1640,8 @@ namespace {0}.BLL {{
 		public static List<{0}Info> GetItems() => Select.ToList();
 		public static {0}SelectBuild Select => new {0}SelectBuild(dal);
 		public static {0}SelectBuild SelectAs(string alias = ""a"") => Select.As(alias);", uClass_Name, solutionName);
+				bll_async_code += string.Format(@"
+		public static Task<List<{0}Info>> GetItemsAsync() => Select.ToListAsync();", uClass_Name, solutionName);
 
 				Dictionary<string, bool> byItems = new Dictionary<string, bool>();
 				foreach (ForeignKeyInfo fk in table.ForeignKeys) {
@@ -1525,6 +1668,11 @@ namespace {0}.BLL {{
 		public static int DeleteBy{2}({0}) {{
 			return dal.DeleteBy{2}({1});
 		}}", fkcsTypeParms, fkcsParms, fkcsBy);
+
+						bll_async_code = string.Format(@"
+		public static Task<int> DeleteBy{2}Async({0}) {{
+			return dal.DeleteBy{2}Async({1});
+		}}", fkcsTypeParms, fkcsParms, fkcsBy) + bll_async_code;
 						del_exists2.Add(fkcsTypeParms, true);
 					}
 					if (fk.Columns.Count > 1) {
@@ -1533,6 +1681,11 @@ namespace {0}.BLL {{
 		public static List<{0}Info> GetItemsBy{1}({2}) => Select.Where{1}({3}).ToList();
 		public static List<{0}Info> GetItemsBy{1}({2}, int limit) => Select.Where{1}({3}).Limit(limit).ToList();
 		public static {0}SelectBuild SelectBy{1}({2}) => Select.Where{1}({3});", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms);
+						bll_async_code += string.Format(
+		@"
+		public static Task<List<{0}Info>> GetItemsBy{1}Async({2}) => Select.Where{1}({3}).ToListAsync();
+		public static Task<List<{0}Info>> GetItemsBy{1}Async({2}, int limit) => Select.Where{1}({3}).Limit(limit).ToListAsync();", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms);
+
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}({2}) {{
 			return base.Where(""{4}"", {3});
@@ -1544,6 +1697,11 @@ namespace {0}.BLL {{
 		public static List<{0}Info> GetItemsBy{1}(params {2}[] {1}) => Select.Where{1}({1}).ToList();
 		public static List<{0}Info> GetItemsBy{1}({2}[] {1}, int limit) => Select.Where{1}({1}).Limit(limit).ToList();
 		public static {0}SelectBuild SelectBy{1}(params {2}[] {1}) => Select.Where{1}({1});", uClass_Name, fkcsBy, csType);
+						bll_async_code += string.Format(
+		@"
+		public static Task<List<{0}Info>> GetItemsBy{1}Async(params {2}[] {1}) => Select.Where{1}({1}).ToListAsync();
+		public static Task<List<{0}Info>> GetItemsBy{1}Async({2}[] {1}, int limit) => Select.Where{1}({1}).Limit(limit).ToListAsync();", uClass_Name, fkcsBy, csType);
+
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
@@ -1774,11 +1932,14 @@ namespace {0}.BLL {{
 				});
 
 				sb1.AppendFormat(@"
+
+		#region async{3}
+		#endregion
 	}}
 	public partial class {0}SelectBuild : SelectBuild<{0}Info, {0}SelectBuild> {{{2}
 		public {0}SelectBuild(IDAL dal) : base(dal, SqlHelper.Instance) {{ }}
 	}}
-}}", uClass_Name, solutionName, sb6.ToString());
+}}", uClass_Name, solutionName, sb6.ToString(), bll_async_code);
 
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\BLL\", basicName, @"\", uClass_Name, ".cs"), Deflate.Compress(sb1.ToString().Replace("|deleteby_fk|", sb5.ToString()))));
 				clearSb();
@@ -2099,10 +2260,10 @@ namespace {0}.BLL {{
 					});
 
 					string str_mvcdel = string.Format(@"
-		public APIReturn _Del([FromForm] {2}[] ids) {{
+		async public Task<APIReturn> _Del([FromForm] {2}[] ids) {{
 			int affrows = 0;
 			foreach ({2} id in ids)
-				affrows += {1}.Delete(id);
+				affrows += await {1}.DeleteAsync(id);
 			if (affrows > 0) return APIReturn.成功.SetMessage($""删除成功，影响行数：{{affrows}}"");
 			return APIReturn.失败;
 		}}", solutionName, uClass_Name, CodeBuild.GetCSType(table.PrimaryKeys[0].Type, CodeBuild.UFString(table.ClassName) + table.PrimaryKeys[0].Name.ToUpper(), table.PrimaryKeys[0].SqlType).Replace("?", ""));
@@ -2114,11 +2275,11 @@ namespace {0}.BLL {{
 						}
 						pkParses = pkParses.Substring(2);
 						str_mvcdel = string.Format(@"
-		public APIReturn _Del([FromForm] string[] ids) {{
+		async public Task<APIReturn> _Del([FromForm] string[] ids) {{
 			int affrows = 0;
 			foreach (string id in ids) {{
 				string[] vs = id.Split(',');
-				affrows += {1}.Delete({2});
+				affrows += await {1}.DeleteAsync({2});
 			}}
 			if (affrows > 0) return APIReturn.成功.SetMessage($""删除成功，影响行数：{{affrows}}"");
 			return APIReturn.失败;

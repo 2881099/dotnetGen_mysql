@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Logging;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MySql.Data.MySqlClient {
 	/// <summary>
@@ -14,6 +14,7 @@ namespace MySql.Data.MySqlClient {
 		public List<SqlConnection2> AllConnections = new List<SqlConnection2>();
 		public Queue<SqlConnection2> FreeConnections = new Queue<SqlConnection2>();
 		public Queue<ManualResetEventSlim> GetConnectionQueue = new Queue<ManualResetEventSlim>();
+		public Queue<TaskCompletionSource<SqlConnection2>> GetConnectionAsyncQueue = new Queue<TaskCompletionSource<SqlConnection2>>();
 		private static object _lock = new object();
 		private static object _lock_GetConnectionQueue = new object();
 		private string _connectionString;
@@ -33,7 +34,7 @@ namespace MySql.Data.MySqlClient {
 			ConnectionString = connectionString;
 		}
 
-		public SqlConnection2 GetConnection() {
+		public SqlConnection2 GetFreeConnection() {
 			SqlConnection2 conn = null;
 			if (FreeConnections.Count > 0)
 				lock (_lock)
@@ -50,6 +51,10 @@ namespace MySql.Data.MySqlClient {
 					conn.SqlConnection = new MySqlConnection(ConnectionString);
 				}
 			}
+			return conn;
+		}
+		public SqlConnection2 GetConnection() {
+			var conn = GetFreeConnection();
 			if (conn == null) {
 				ManualResetEventSlim wait = new ManualResetEventSlim(false);
 				lock (_lock_GetConnectionQueue)
@@ -64,12 +69,34 @@ namespace MySql.Data.MySqlClient {
 			return conn;
 		}
 
+		async public Task<SqlConnection2> GetConnectionAsync() {
+			var conn = GetFreeConnection();
+			if (conn == null) {
+				TaskCompletionSource<SqlConnection2> tcs = new TaskCompletionSource<SqlConnection2>();
+				lock (_lock_GetConnectionQueue)
+					GetConnectionAsyncQueue.Enqueue(tcs);
+				conn = await tcs.Task;
+			}
+			conn.ThreadId = Thread.CurrentThread.ManagedThreadId;
+			conn.LastActive = DateTime.Now;
+			Interlocked.Increment(ref conn.UseSum);
+			return conn;
+		}
+
 		public void ReleaseConnection(SqlConnection2 conn) {
 			//conn.SqlConnection.Close();
 			lock (_lock)
 				FreeConnections.Enqueue(conn);
 
-			if (GetConnectionQueue.Count > 0) {
+			bool isAsync = false;
+			if (GetConnectionAsyncQueue.Count > 0) {
+				TaskCompletionSource<SqlConnection2> tcs = null;
+				lock (_lock_GetConnectionQueue)
+					if (GetConnectionAsyncQueue.Count > 0)
+						tcs = GetConnectionAsyncQueue.Dequeue();
+				if (isAsync = (tcs != null)) tcs.SetResult(GetConnectionAsync().Result);
+			}
+			if (isAsync == false && GetConnectionQueue.Count > 0) {
 				ManualResetEventSlim wait = null;
 				lock (_lock_GetConnectionQueue)
 					if (GetConnectionQueue.Count > 0)

@@ -460,4 +460,13 @@
   <data name="MySql_Data_MySqlClient_MygisTypes_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySql.Data.MySqlClient\MygisTypes.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="CSRedis_QuickHelperBaseAsync_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CSRedis\QuickHelperBaseAsync.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="MySql_Data_MySqlClient_ExecuterAsync_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySql.Data.MySqlClient\ExecuterAsync.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
+  <data name="MySql_Data_MySqlClient_SelectBuildAsync_cs" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySql.Data.MySqlClient\SelectBuildAsync.cs;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
 </root>

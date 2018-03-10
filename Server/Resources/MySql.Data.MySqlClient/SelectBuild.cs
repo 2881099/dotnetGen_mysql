@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Reflection;
 using System.Data;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace MySql.Data.MySqlClient {
 	public partial interface IDAL {
@@ -12,6 +13,7 @@ namespace MySql.Data.MySqlClient {
 		string Field { get; }
 		string Sort { get; }
 		object GetItem(IDataReader dr, ref int index);
+		Task<(object result, int dataIndex)> GetItemAsync(MySqlDataReader dr, int index);
 	}
 	public class SelectBuild<TReturnInfo, TLinket> : SelectBuild<TReturnInfo> where TLinket : SelectBuild<TReturnInfo> {
 		protected TLinket Where1Or(string filterFormat, Array values) {
@@ -45,7 +47,7 @@ namespace MySql.Data.MySqlClient {
 		public new TLinket Page(int pageIndex, int pageSize) => base.Page(pageIndex, pageSize) as TLinket;
 		public SelectBuild(IDAL dal, Executer exec) : base(dal, exec) { }
 	}
-	public class SelectBuild<TReturnInfo> {
+	public partial class SelectBuild<TReturnInfo> {
 		protected int _limit, _skip;
 		protected string _sort, _field, _table, _join, _where, _groupby, _having;
 		protected List<IDAL> _dals = new List<IDAL>();
