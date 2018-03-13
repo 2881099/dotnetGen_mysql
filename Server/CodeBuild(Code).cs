@@ -1780,7 +1780,7 @@ namespace {0}.BLL {{
 			if ({10}_ids == null || {10}_ids.Length == 0) return this;
 			{5}SelectBuild subConditionSelect = {5}.Select.Where(string.Format(""`{6}` = a . `{7}` AND `{8}` IN ('{{0}}')"", string.Join(""','"", {10}_ids.Select(a => string.Concat(a).Replace(""'"", ""''"")))));
 			if (subCondition != null) subCondition(subConditionSelect);
-			var subConditionSql = subConditionSelect.ToString(""`{6}`"").Replace("" a \r\nWHERE ("", "" WHERE "");
+			var subConditionSql = subConditionSelect.ToString(""`{6}`"").Replace("" a \r\nWHERE ("", "" WHERE ("");
 			if (subCondition != null) subConditionSql = subConditionSql.Replace(""a.`"", ""`{12}`.`"");
 			return base.Where($""EXISTS({{subConditionSql}})"");
 		}}", uClass_Name, fkcsBy, orgInfo, civ, string.Empty, CodeBuild.UFString(t2.ClassName), _f6, _f7, _f8, _f9, LFString(orgInfo), t2.Owner, t2.Name);
