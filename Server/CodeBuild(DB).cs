@@ -49,10 +49,10 @@ namespace Server {
 			}
 			return loc1;
 		}
-
 		public List<TableInfo> GetTablesByDatabase(string database) {
 			_client.Database = database;
 			Logger.remotor.Info("GetTablesByDatabase: " + _client.Server + "," + _client.Username + "," + _client.Password + "," + _client.Database);
+			string[] dbs = database.Split(',');
 
 			List<TableInfo> loc1 = _tables = null;
 			Dictionary<string, TableInfo> loc2 = new Dictionary<string, TableInfo>();
@@ -60,13 +60,13 @@ namespace Server {
 
 			DataSet ds = this.GetDataSet(string.Format(@"
 select 
-a.table_name 'id',
-substr(a.table_name, 1, locate('.', a.table_name) - 1) 'owner',
-substr(a.table_name, locate('.', a.table_name) + 1) 'table',
+concat(a.table_schema, '.', a.table_name) 'id',
+a.table_schema 'owner',
+a.table_name 'table',
 'T'
 from information_schema.tables a
-where a.table_schema = '{0}'
-", database.Replace("'", "''")));
+where a.table_schema in ('{0}')
+", database.Replace("'", "''").Replace(",", "','")));
 			if (ds == null) return loc1;
 
 			List<string> loc6 = new List<string>();
@@ -76,14 +76,18 @@ where a.table_schema = '{0}'
 				string owner = string.Concat(row[1]);
 				string table = string.Concat(row[2]);
 				string type = string.Concat(row[3]);
+				if (dbs.Length == 1) {
+					table_id = table_id.Substring(table_id.IndexOf('.') + 1);
+					owner = "";
+				}
 				loc2.Add(table_id, new TableInfo(table_id, owner, table, type));
 				loc3.Add(table_id, new Dictionary<string, ColumnInfo>());
 				switch (type) {
 					case "T":
-						loc6.Add(table_id.Replace("'", "''"));
+						loc6.Add(table.Replace("'", "''"));
 						break;
 					case "P":
-						loc66.Add(table_id.Replace("'", "''"));
+						loc66.Add(table.Replace("'", "''"));
 						break;
 				}
 			}
@@ -93,7 +97,7 @@ where a.table_schema = '{0}'
 
 			ds = this.GetDataSet(string.Format(@"
 SELECT
-a.table_name,
+concat(a.table_schema, '.', a.table_name),
 a.column_name,
 a.data_type,
 ifnull(a.character_maximum_length, 0) 'len',
@@ -102,8 +106,8 @@ case when a.is_nullable then 1 else 0 end 'is_nullable',
 case when locate('auto_increment', a.extra) > 0 then 1 else 0 end 'is_identity',
 a.column_comment 'comment'
 from information_schema.columns a
-where a.table_schema = '{1}' and a.table_name in ({0})
-", loc8, database.Replace("'", "''")));
+where a.table_schema in ('{1}') and a.table_name in ({0})
+", loc8, database.Replace("'", "''").Replace(",", "','")));
 			if (ds == null) return loc1;
 
 			foreach (DataRow row in ds.Tables[0].Rows) {
@@ -119,6 +123,9 @@ where a.table_schema = '{1}' and a.table_name in ({0})
 				string comment = string.Concat(row[7]);
 				if (string.IsNullOrEmpty(comment)) comment = column;
 				if (max_length == 0) max_length = -1;
+				if (dbs.Length == 1) {
+					table_id = table_id.Substring(table_id.IndexOf('.') + 1);
+				}
 				loc3[table_id].Add(column, new ColumnInfo(
 					column, CodeBuild.GetDBType(type, sqlType.EndsWith(" unsigned")), max_length, sqlType,
 					DataSort.ASC, is_nullable, is_identity, false, false));
@@ -129,7 +136,7 @@ where a.table_schema = '{1}' and a.table_name in ({0})
 
 			ds = this.GetDataSet(string.Format(@"
 select 
-a.table_name 'table_id',
+concat(a.constraint_schema, '.', a.table_name) 'table_id',
 a.column_name,
 concat(a.constraint_schema, '/', a.table_name, '/', a.constraint_name) 'index_id',
 1 'IsUnique',
@@ -137,8 +144,8 @@ case when constraint_name = 'PRIMARY' then 1 else 0 end 'IsPrimaryKey',
 0 'IsClustered',
 0 'IsDesc'
 from information_schema.key_column_usage a
-where a.constraint_schema = '{1}' and a.table_name in ({0}) and isnull(position_in_unique_constraint)
-", loc8, database.Replace("'", "''")));
+where a.constraint_schema in ('{1}') and a.table_name in ({0}) and isnull(position_in_unique_constraint)
+", loc8, database.Replace("'", "''").Replace(",", "','")));
 			if (ds == null) return loc1;
 
 			Dictionary<string, Dictionary<string, List<ColumnInfo>>> indexColumns = new Dictionary<string, Dictionary<string, List<ColumnInfo>>>();
@@ -151,11 +158,14 @@ where a.constraint_schema = '{1}' and a.table_name in ({0}) and isnull(position_
 				bool is_primary_key = string.Concat(row[4]) == "1";
 				bool is_clustered = string.Concat(row[5]) == "1";
 				int is_desc = int.Parse(string.Concat(row[6]));
+				if (dbs.Length == 1) {
+					table_id = table_id.Substring(table_id.IndexOf('.') + 1);
+				}
 				ColumnInfo loc9 = loc3[table_id][column];
 				if (loc9.IsClustered == false && is_clustered) loc9.IsClustered = is_clustered;
 				if (loc9.IsPrimaryKey == false && is_primary_key) loc9.IsPrimaryKey = is_primary_key;
 				if (loc9.Orderby == DataSort.NONE) loc9.Orderby = (DataSort)is_desc;
-
+				
 				Dictionary<string, List<ColumnInfo>> loc10 = null;
 				List<ColumnInfo> loc11 = null;
 				if (!indexColumns.TryGetValue(table_id, out loc10)) {
@@ -190,17 +200,17 @@ where a.constraint_schema = '{1}' and a.table_name in ({0}) and isnull(position_
 			}
 			ds = this.GetDataSet(string.Format(@"
 select 
-a.table_name 'table_id',
+concat(a.constraint_schema, '.', a.table_name) 'table_id',
 a.column_name,
 concat(a.constraint_schema, '/', a.constraint_name) 'FKId',
-a.referenced_table_name 'ref_table_id',
+concat(a.referenced_table_schema, '.', a.referenced_table_name) 'ref_table_id',
 1 'IsForeignKey',
 a.referenced_column_name 'ref_column',
 null 'ref_sln',
 null 'ref_table'
 from information_schema.key_column_usage a
-where a.constraint_schema = '{1}' and a.table_name in ({0}) and not isnull(position_in_unique_constraint)
-", loc8, database.Replace("'", "''")));
+where a.constraint_schema in ('{1}') and a.table_name in ({0}) and not isnull(position_in_unique_constraint)
+", loc8, database.Replace("'", "''").Replace(",", "','")));
 			if (ds == null) return loc1;
 
 			Dictionary<string, Dictionary<string, ForeignKeyInfo>> fkColumns = new Dictionary<string, Dictionary<string, ForeignKeyInfo>>();
@@ -213,11 +223,15 @@ where a.constraint_schema = '{1}' and a.table_name in ({0}) and not isnull(posit
 				string referenced_column = string.Concat(row[5]);
 				string referenced_db = string.Concat(row[6]);
 				string referenced_table = string.Concat(row[7]);
+				if (dbs.Length == 1) {
+					table_id = table_id.Substring(table_id.IndexOf('.') + 1);
+					ref_table_id = ref_table_id.Substring(ref_table_id.IndexOf('.') + 1);
+				}
+
 				ColumnInfo loc9 = loc3[table_id][column];
 				TableInfo loc10 = null;
 				ColumnInfo loc11 = null;
 				bool isThisSln = !string.IsNullOrEmpty(ref_table_id);
-
 				if (isThisSln) {
 					if (loc2.ContainsKey(ref_table_id) == false) continue;
 					loc10 = loc2[ref_table_id];

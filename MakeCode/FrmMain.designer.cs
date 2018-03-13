@@ -41,7 +41,6 @@ namespace MakeCode {
 			this.labProject = new System.Windows.Forms.Label();
 			this.labUsername = new System.Windows.Forms.Label();
 			this.labPassword = new System.Windows.Forms.Label();
-			this.cmbDatabase = new System.Windows.Forms.ComboBox();
 			this.btnBuild = new System.Windows.Forms.Button();
 			this.btnConnect = new System.Windows.Forms.Button();
 			this.dgvGridview = new System.Windows.Forms.DataGridView();
@@ -53,11 +52,12 @@ namespace MakeCode {
 			this.txtSolution = new System.Windows.Forms.TextBox();
 			this.txtUsername = new System.Windows.Forms.TextBox();
 			this.txtPassword = new System.Windows.Forms.TextBox();
+			this.txtPort = new System.Windows.Forms.TextBox();
 			this.labDatabase = new System.Windows.Forms.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.webBrowser1 = new System.Windows.Forms.WebBrowser();
-			this.txtPort = new System.Windows.Forms.TextBox();
 			this.labPort = new System.Windows.Forms.Label();
+			this.clbDatabase = new System.Windows.Forms.CheckedListBox();
 			((System.ComponentModel.ISupportInitialize)(this.dgvGridview)).BeginInit();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
@@ -108,19 +108,6 @@ namespace MakeCode {
 			this.labPassword.TabIndex = 20;
 			this.labPassword.Text = "密  码";
 			// 
-			// cmbDatabase
-			// 
-			this.cmbDatabase.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.cmbDatabase.Enabled = false;
-			this.cmbDatabase.FormattingEnabled = true;
-			this.cmbDatabase.Location = new System.Drawing.Point(364, 374);
-			this.cmbDatabase.Margin = new System.Windows.Forms.Padding(4);
-			this.cmbDatabase.Name = "cmbDatabase";
-			this.cmbDatabase.Size = new System.Drawing.Size(117, 20);
-			this.cmbDatabase.TabIndex = 24;
-			this.toolTip1.SetToolTip(this.cmbDatabase, "请选择一个数据库");
-			this.cmbDatabase.SelectedIndexChanged += new System.EventHandler(this.cmbDatabase_SelectedIndexChanged);
-			// 
 			// btnBuild
 			// 
 			this.btnBuild.Enabled = false;
@@ -167,7 +154,7 @@ namespace MakeCode {
 			this.chkDownloadRes.AutoSize = true;
 			this.chkDownloadRes.Checked = global::MakeCode.Properties.Settings.Default.chkDownloadRes_checked;
 			this.chkDownloadRes.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::MakeCode.Properties.Settings.Default, "chkDownloadRes_checked", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-			this.chkDownloadRes.Location = new System.Drawing.Point(397, 347);
+			this.chkDownloadRes.Location = new System.Drawing.Point(214, 349);
 			this.chkDownloadRes.Name = "chkDownloadRes";
 			this.chkDownloadRes.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.chkDownloadRes.Size = new System.Drawing.Size(84, 16);
@@ -246,10 +233,21 @@ namespace MakeCode {
 			this.txtPassword.Text = global::MakeCode.Properties.Settings.Default.txtPassword_text;
 			this.toolTip1.SetToolTip(this.txtPassword, "密码\r\n如：123456");
 			// 
+			// txtPort
+			// 
+			this.txtPort.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::MakeCode.Properties.Settings.Default, "txtPort_text", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+			this.txtPort.Location = new System.Drawing.Point(243, 320);
+			this.txtPort.MaxLength = 5;
+			this.txtPort.Name = "txtPort";
+			this.txtPort.Size = new System.Drawing.Size(55, 21);
+			this.txtPort.TabIndex = 41;
+			this.txtPort.Text = "3306";
+			this.toolTip1.SetToolTip(this.txtPort, "\r\n如：127.0.0.1:5432");
+			// 
 			// labDatabase
 			// 
 			this.labDatabase.AutoSize = true;
-			this.labDatabase.Location = new System.Drawing.Point(302, 378);
+			this.labDatabase.Location = new System.Drawing.Point(302, 351);
 			this.labDatabase.Name = "labDatabase";
 			this.labDatabase.Size = new System.Drawing.Size(53, 12);
 			this.labDatabase.TabIndex = 23;
@@ -276,17 +274,6 @@ namespace MakeCode {
 			this.webBrowser1.Url = new System.Uri("http://www.penzz.com/nicpetshop.html", System.UriKind.Absolute);
 			this.webBrowser1.WebBrowserShortcutsEnabled = false;
 			// 
-			// txtPort
-			// 
-			this.txtPort.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::MakeCode.Properties.Settings.Default, "txtPort_text", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-			this.txtPort.Location = new System.Drawing.Point(243, 320);
-			this.txtPort.MaxLength = 5;
-			this.txtPort.Name = "txtPort";
-			this.txtPort.Size = new System.Drawing.Size(55, 21);
-			this.txtPort.TabIndex = 41;
-			this.txtPort.Text = "3306";
-			this.toolTip1.SetToolTip(this.txtPort, "\r\n如：127.0.0.1:5432");
-			// 
 			// labPort
 			// 
 			this.labPort.AutoSize = true;
@@ -296,12 +283,24 @@ namespace MakeCode {
 			this.labPort.TabIndex = 40;
 			this.labPort.Text = "端口";
 			// 
+			// clbDatabase
+			// 
+			this.clbDatabase.Enabled = false;
+			this.clbDatabase.FormattingEnabled = true;
+			this.clbDatabase.Location = new System.Drawing.Point(364, 343);
+			this.clbDatabase.Name = "clbDatabase";
+			this.clbDatabase.Size = new System.Drawing.Size(116, 52);
+			this.clbDatabase.TabIndex = 34;
+			this.toolTip1.SetToolTip(this.clbDatabase, "可将多个数据库生成为一个项目");
+			this.clbDatabase.SelectedValueChanged += new System.EventHandler(this.clbDatabase_SelectedValueChanged);
+			// 
 			// FrmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.NavajoWhite;
 			this.ClientSize = new System.Drawing.Size(586, 405);
+			this.Controls.Add(this.clbDatabase);
 			this.Controls.Add(this.txtPort);
 			this.Controls.Add(this.labPort);
 			this.Controls.Add(this.chkDownloadRes);
@@ -317,7 +316,6 @@ namespace MakeCode {
 			this.Controls.Add(this.labDatabase);
 			this.Controls.Add(this.labUsername);
 			this.Controls.Add(this.labPassword);
-			this.Controls.Add(this.cmbDatabase);
 			this.Controls.Add(this.btnBuild);
 			this.Controls.Add(this.btnConnect);
 			this.Controls.Add(this.dgvGridview);
@@ -348,7 +346,6 @@ namespace MakeCode {
 		private Label labProject;
 		private Label labUsername;
 		private Label labPassword;
-		private ComboBox cmbDatabase;
 		private Button btnBuild;
 		private Button btnConnect;
 		private DataGridView dgvGridview;
@@ -360,5 +357,6 @@ namespace MakeCode {
 		private CheckBox chkWebAdmin;
 		private TextBox txtPort;
 		private Label labPort;
+		private CheckedListBox clbDatabase;
 	}
 }

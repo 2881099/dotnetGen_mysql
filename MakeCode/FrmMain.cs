@@ -25,7 +25,7 @@ namespace MakeCode {
 		public string ConnectionString {
 			get {
 				string connStr = "Data Source={0};Port={1};User ID={2};Password={3};Initial Catalog={4};Charset=utf8";
-				return string.Format(connStr, this._client.Server, this._client.Port, this._client.Username, this._client.Password, this._client.Database);
+				return string.Format(connStr, this._client.Server, this._client.Port, this._client.Username, this._client.Password, string.IsNullOrEmpty(this._client.Database) ? "" : this._client.Database.Split(',')[0]);
 			}
 		}
 
@@ -156,18 +156,18 @@ namespace MakeCode {
 					this.btnConnect.Enabled = true;
 					return;
 				}
-				this.cmbDatabase.DisplayMember = "Name";
-				this.cmbDatabase.DataSource = dbs;
+				string[] dbs2 = new string[dbs.Count];
+				for (int a = 0; a < dbs2.Length; a++) dbs2[a] = dbs[a].Name;
+				this.clbDatabase.DataSource = dbs2;
 
-				if (this.cmbDatabase.Items.Count > 0) {
-					this.cmbDatabase.SelectedIndex = 0;
-					this.cmbDatabase.Enabled = true;
+				if (this.clbDatabase.Items.Count > 0) {
+					this.clbDatabase.Enabled = true;
 				}
 				this.txtServer.Enabled = this.txtUsername.Enabled = this.txtPassword.Enabled = false;
 			} else {
 				this.txtSolution.Clear();
-				this.cmbDatabase.DataSource = null;
-				this.cmbDatabase.Enabled = false;
+				this.clbDatabase.DataSource = null;
+				this.clbDatabase.Enabled = false;
 				this.btnBuild.Enabled = false;
 
 				this.txtServer.Enabled = this.txtUsername.Enabled = this.txtPassword.Enabled = true;
@@ -179,12 +179,21 @@ namespace MakeCode {
 			this.btnConnect.Enabled = true;
 		}
 
-		private void cmbDatabase_SelectedIndexChanged(object sender, EventArgs e) {
-            if (this.btnConnect.Text == "DisConnect" && this.btnConnect.Enabled == false) return;
-			this._client.Database = this.cmbDatabase.Text;
+		private void clbDatabase_SelectedValueChanged(object sender, EventArgs e) {
+			if (this.btnConnect.Text == "DisConnect" && this.btnConnect.Enabled == false) return;
+			string db = "";
+			for (int a = 0; a < this.clbDatabase.CheckedItems.Count; a++) db += "," + this.clbDatabase.CheckedItems[a];
+			if (string.IsNullOrEmpty(db)) {
+				this._client.Database = null;
+				this._tables = new List<TableInfo>();
+				this.BindGridView();
+				return;
+			}
+			if (this._client.Database == db.Substring(1)) return;
+			this._client.Database = db.Substring(1);
 			List<TableInfo> tables = null;
 			SocketMessager messager = new SocketMessager("GetTablesByDatabase", this._client.Database);
-			this._socket.Write(messager, delegate(object sender2, ClientSocketReceiveEventArgs e2) {
+			this._socket.Write(messager, delegate (object sender2, ClientSocketReceiveEventArgs e2) {
 				tables = e2.Messager.Arg as List<TableInfo>;
 			});
 			this._tables = tables;
@@ -361,5 +370,7 @@ namespace MakeCode {
 				}
 			}
 		}
+
+		
 	}
 }

@@ -16,7 +16,7 @@ namespace MakeCode {
 		public string ConnectionString {
 			get {
 				string connStr = "Data Source={0};User ID={1};Password={2};Initial Catalog={3};Charset=utf8";
-				return string.Format(connStr, this._client.Server, this._client.Username, this._client.Password, this._client.Database);
+				return string.Format(connStr, this._client.Server, this._client.Username, this._client.Password, string.IsNullOrEmpty(this._client.Database) ? "" : this._client.Database.Split(',')[0]);
 			}
 		}
 		public string Server;
@@ -41,7 +41,7 @@ Example：
 
 		-U	MySql账号
 		-P	MySql密码
-		-D	需要生成的数据库
+		-D	需要生成的数据库，多个使用,分隔
 
 		-N	字符串，生成代码的解决方案名，命名空间
 		-S	生成解决方案，在项目第一次生成时使用

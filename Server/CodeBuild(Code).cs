@@ -326,7 +326,8 @@ namespace Server {
 				#region commom variable define
 				string uClass_Name = CodeBuild.UFString(table.ClassName);
 				string nClass_Name = table.ClassName;
-				string nTable_Name = string.Concat("`", string.IsNullOrEmpty(table.Owner) ? string.Empty : string.Concat(table.Owner, "."), table.Name, "`");
+				string nTable_Name = string.Concat(string.IsNullOrEmpty(table.Owner) ? string.Empty : string.Concat(@"`", table.Owner, @"`."), @"`", table.Name, @"`");
+				//string.Concat("`", string.IsNullOrEmpty(table.Owner) ? string.Empty : string.Concat(table.Owner, "."), table.Name, "`");
 				string Class_Name_BLL_Full = string.Format(@"{0}.BLL.{1}", solutionName, uClass_Name);
 				string Class_Name_Model_Full = string.Format(@"{0}.Model.{1}", solutionName, uClass_Name);
 
