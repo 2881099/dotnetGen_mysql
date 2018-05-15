@@ -880,7 +880,7 @@ namespace {0}.Model {{
 		/// 遍历时，可通过 Obj_{3} 可获取中间表数据
 		/// </summary>
 		public List<{0}Info> Obj_{1}s =>_obj_{1}s ?? (_obj_{1}s = BLL.{0}.Select.InnerJoin<BLL.{2}>(""b"", ""b.`{6}` = a.`{5}`"").Where(""b.`{4}` = {{0}}"", {7}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname_schema), CodeBuild.UFString(t2.ClassName), CodeBuild.LFString(t2.ClassName),
-			_f6, _f7, _f8, civ);
+			_f6, _f7, _f8, civ.Replace(".Value", ""));
 							}
 							string objs_key = string.Format("Obj_{0}s", CodeBuild.LFString(addname));
 							if (dic_objs.ContainsKey(objs_key))
@@ -926,8 +926,15 @@ namespace {0}.Model {{
 			this." + UFString(colUpdateTime.Name) + " = DateTime.Now;" : "", colCreateTime != null ? @"
 			this." + UFString(colCreateTime.Name) + " = DateTime.Now;" : "", pkCsParamNoType.Replace(", ", " != null && this."), newguid));
 					}
+					string[] pkisnullfields = pkCsParamNoTypeByval.Split(new string[] { ", " }, StringSplitOptions.None);
+					string pkisnull = "";
+					foreach (string pkisnullfield in pkisnullfields) {
+						if (pkisnullfield.EndsWith(".Value")) pkisnull += string.Format("{0} == null || ", pkisnullfield.Replace(".Value", ""));
+					}
+					string pkisnullf3 = "";
+					if (!string.IsNullOrEmpty(pkisnull)) pkisnullf3 = string.Format("{0} ? null : ", pkisnull.Substring(0, pkisnull.Length - 4));
 					sb6.Insert(0, string.Format(@"
-		public {0}.DAL.{1}.SqlUpdateBuild UpdateDiy => BLL.{1}.UpdateDiy(this, _{2});", solutionName, uClass_Name, pkCsParamNoTypeByval.Replace(", ", ", _")));
+		public {0}.DAL.{1}.SqlUpdateBuild UpdateDiy => {3}BLL.{1}.UpdateDiy(this, _{2});", solutionName, uClass_Name, pkCsParamNoTypeByval.Replace(", ", ", _"), pkisnullf3));
 				}
 
 				sb1.AppendFormat(
