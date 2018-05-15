@@ -929,7 +929,7 @@ namespace {0}.Model {{
 					string[] pkisnullfields = pkCsParamNoTypeByval.Split(new string[] { ", " }, StringSplitOptions.None);
 					string pkisnull = "";
 					foreach (string pkisnullfield in pkisnullfields) {
-						if (pkisnullfield.EndsWith(".Value")) pkisnull += string.Format("{0} == null || ", pkisnullfield.Replace(".Value", ""));
+						if (pkisnullfield.EndsWith(".Value")) pkisnull += string.Format("_{0} == null || ", pkisnullfield.Replace(".Value", ""));
 					}
 					string pkisnullf3 = "";
 					if (!string.IsNullOrEmpty(pkisnull)) pkisnullf3 = string.Format("{0} ? null : ", pkisnull.Substring(0, pkisnull.Length - 4));
