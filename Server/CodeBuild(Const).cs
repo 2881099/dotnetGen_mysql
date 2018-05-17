@@ -1080,13 +1080,13 @@ return rTn;"");
 		<AssemblyName>Common</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""Google.Protobuf"" Version=""3.3.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Caching.Abstractions"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging.Abstractions"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""2.0.0"" />
-		<PackageReference Include=""MySql.Data"" Version=""8.0.8-dmr"" />
-		<PackageReference Include=""Newtonsoft.Json"" Version=""10.0.3"" />
+		<PackageReference Include=""Google.Protobuf"" Version=""3.5.1"" />
+		<PackageReference Include=""Microsoft.Extensions.Caching.Abstractions"" Version=""2.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging"" Version=""2.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Abstractions"" Version=""2.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""2.0.2"" />
+		<PackageReference Include=""MySql.Data"" Version=""8.0.11"" />
+		<PackageReference Include=""Newtonsoft.Json"" Version=""11.0.2"" />
 		<PackageReference Include=""System.Collections.Specialized"" Version=""4.3.0"" />
 		<PackageReference Include=""System.Diagnostics.TextWriterTraceListener"" Version=""4.3.0"" />
 		<PackageReference Include=""System.IO.FileSystem.Watcher"" Version=""4.3.0"" />
@@ -1112,12 +1112,13 @@ return rTn;"");
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""2.0.0"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.0.4"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.0.3"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.0.3"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""2.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""2.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""2.0.2"" />
+		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""2.4.0"" />
 	</ItemGroup>
 </Project>
 
@@ -1248,7 +1249,8 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 			var actattrs = context.ApiDescription.ActionAttributes();
 			if (actattrs.OfType<HttpPostAttribute>().Any() ||
 				actattrs.OfType<HttpPutAttribute>().Any())
-				operation.Consumes = new[] {{ ""multipart/form-data"" }};
+				if (operation.Consumes.Count == 0)
+					operation.Consumes.Add(""multipart/form-data"");
 		}}
 	}}
 
@@ -1267,7 +1269,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 				//options.IgnoreObsoleteControllers(); // 类、方法标记 [Obsolete]，可以阻止【Swagger文档】生成
 				options.DescribeAllEnumsAsStrings();
 				options.CustomSchemaIds(a => a.FullName);
-				//options.OperationFilter<FormDataOperationFilter>();
+				options.OperationFilter<FormDataOperationFilter>();
 
 				string root = Path.Combine(Directory.GetCurrentDirectory(), ""Module"");
 				string xmlFile = string.Empty;
@@ -1428,6 +1430,7 @@ namespace {0}.WebHost {{
 				a.IdleTimeout = TimeSpan.FromMinutes(30);
 				a.Cookie.Name = ""Session_{0}"";
 			}});
+			services.AddCors(options => options.AddPolicy(""cors_all"", builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
 			services.AddCustomizedMvc(Modules);
 			services.Configure<RazorViewEngineOptions>(options => {{ options.ViewLocationExpanders.Add(new ModuleViewLocationExpander()); }});
 
@@ -1441,7 +1444,8 @@ namespace {0}.WebHost {{
 			Console.InputEncoding = Encoding.GetEncoding(""GB2312"");
 
 			loggerFactory.AddConsole(Configuration.GetSection(""Logging""));
-			loggerFactory.AddNLog().AddDebug().ConfigureNLog(""nlog.config"");
+			//loggerFactory.AddNLog().AddDebug().ConfigureNLog(""nlog.config"");
+			NLog.LogManager.LoadConfiguration(""nlog.config"");
 
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
@@ -1450,6 +1454,7 @@ namespace {0}.WebHost {{
 			{0}.DAL.SqlHelper.Instance.Log = loggerFactory.CreateLogger(""{0}_DAL_sqlhelper"");
 
 			app.UseSession();
+			app.UseCors(""cors_all"");
 			app.UseCustomizedMvc(Modules);
 			app.UseCustomizedStaticFiles(Modules);
 
@@ -1480,13 +1485,12 @@ namespace {0}.WebHost {{
 		<ProjectReference Include=""..\Infrastructure\Infrastructure.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Microsoft.AspNetCore.All"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging.Console"" Version=""2.0.0"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging.Debug"" Version=""2.0.0"" />
-		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.0.0-rtm-beta5"" />
-		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.4.1"" />
+		<PackageReference Include=""Microsoft.AspNetCore.All"" Version=""2.0.8"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Console"" Version=""2.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Debug"" Version=""2.0.2"" />
+		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.0.2"" />
+		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.5.4"" />
 		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.4.0"" />
-		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""1.0.0"" />
 	</ItemGroup>
 	<ItemGroup>
 		<DotNetCliToolReference Include=""Microsoft.DotNet.Watcher.Tools"" Version=""2.0.0"" />

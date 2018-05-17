@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 
-[ServiceFilter(typeof(CustomExceptionFilter))]
+[ServiceFilter(typeof(CustomExceptionFilter)), EnableCors("cors_all")]
 public partial class BaseController : Controller {
 	public ILogger _logger;
 	public ISession Session { get { return HttpContext.Session; } }
