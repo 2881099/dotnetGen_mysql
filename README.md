@@ -1,7 +1,7 @@
 ﻿# dotnetGen_mysql
-.NETCore 2.0 + Mysql 生成器
+.NETCore 2.1 + Mysql 生成器
 
-本项目为生成器，用于快速创建和更新 .NETCore 2.0 + Mysql 项目，非常合适敏捷开发；
+本项目为生成器，用于快速创建和更新 .NETCore 2.1 + Mysql 项目，非常合适敏捷开发；
 
 优势：
  * 1、根据主键、唯一键、外键（1对1，1对多，多对多）生成功能丰富的数据库 SDK；
