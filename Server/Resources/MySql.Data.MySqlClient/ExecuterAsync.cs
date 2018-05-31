@@ -33,7 +33,7 @@ namespace MySql.Data.MySqlClient {
 							if (IsTracePerformance) {
 								logtxt_dt = DateTime.Now;
 								values = new object[dr.FieldCount];
-								for (int a = 0; a < values.Length; a++) values[a] = await dr.GetFieldValueAsync<object>(a);
+								for (int a = 0; a < values.Length; a++) if (!await dr.IsDBNullAsync(a)) values[a] = await dr.GetFieldValueAsync<object>(a);
 								logtxt += $"	dr.GetValues: {DateTime.Now.Subtract(logtxt_dt).TotalMilliseconds}ms Total: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms\r\n";
 								logtxt_dt = DateTime.Now;
 							}

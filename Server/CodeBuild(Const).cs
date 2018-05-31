@@ -1081,19 +1081,20 @@ return rTn;"");
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include=""Google.Protobuf"" Version=""3.5.1"" />
-		<PackageReference Include=""Microsoft.Extensions.Caching.Abstractions"" Version=""2.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging"" Version=""2.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging.Abstractions"" Version=""2.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""2.0.2"" />
+		<PackageReference Include=""Microsoft.Extensions.Caching.Abstractions"" Version=""2.1.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging"" Version=""2.1.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Logging.Abstractions"" Version=""2.1.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Options.ConfigurationExtensions"" Version=""2.1.0"" />
 		<PackageReference Include=""MySql.Data"" Version=""8.0.11"" />
 		<PackageReference Include=""Newtonsoft.Json"" Version=""11.0.2"" />
 		<PackageReference Include=""System.Collections.Specialized"" Version=""4.3.0"" />
 		<PackageReference Include=""System.Diagnostics.TextWriterTraceListener"" Version=""4.3.0"" />
 		<PackageReference Include=""System.IO.FileSystem.Watcher"" Version=""4.3.0"" />
+		<PackageReference Include=""System.Memory"" Version=""4.5.0"" />
 		<PackageReference Include=""System.Runtime.Serialization.Formatters"" Version=""4.3.0"" />
 		<PackageReference Include=""System.Runtime.Serialization.Json"" Version=""4.3.0"" />
 		<PackageReference Include=""System.Threading.Thread"" Version=""4.3.0"" />
-		<PackageReference Include=""System.ValueTuple"" Version=""4.4.0"" />
+		<PackageReference Include=""System.ValueTuple"" Version=""4.5.0"" />
 		<PackageReference Include=""System.Xml.XmlDocument"" Version=""4.3.0"" />
 		<PackageReference Include=""StackExchange.Redis"" Version=""1.2.6"" />
 	</ItemGroup>
@@ -1112,16 +1113,15 @@ return rTn;"");
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.0.4"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.0.3"" />
-		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.0.3"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""2.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""2.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""2.0.2"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.0"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.0"" />
+		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""2.1.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""2.1.0"" />
+		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""2.1.0"" />
 		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""2.4.0"" />
 	</ItemGroup>
 </Project>
-
 ";
 			#endregion
 
@@ -1345,9 +1345,9 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 	""ConnectionStrings"": {{
 		""MySql"": ""{{connectionString}};Encrypt=False;Max pool size=32"",
 		""redis"": {{
-			""ip"": ""192.168.1.2"",
+			""ip"": ""127.0.0.1"",
 			""port"": 6379,
-			""pass"": ""123456"",
+			""pass"": """",
 			""database"": 13,
 			""poolsize"": 50,
 			""name"": ""{0}""
@@ -1412,6 +1412,8 @@ namespace {0}.WebHost {{
 			Newtonsoft.Json.JsonConvert.DefaultSettings = () => {{
 				var st = new Newtonsoft.Json.JsonSerializerSettings();
 				st.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+				st.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat;
+				st.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
 				return st;
 			}};
 		}}
@@ -1469,14 +1471,20 @@ namespace {0}.WebHost {{
 			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk.Web"">
 	<PropertyGroup>
-		<TargetFramework>netcoreapp2.0</TargetFramework>
-		<OutputType>Exe</OutputType>
-		<DebugType>Portable</DebugType>
-		<RuntimeIdentifiers>win;debian.8-x64</RuntimeIdentifiers>
+		<TargetFramework>netcoreapp2.1</TargetFramework>
 		<WarningLevel>3</WarningLevel>
 		<PostBuildEvent>gulp --gulpfile ../../../gulpfile.js copy-module</PostBuildEvent>
 	</PropertyGroup>
 	<ItemGroup>
+		<Folder Include=""wwwroot\"" />
+		<Compile Remove=""Module\**"" />
+		<Compile Remove=""wwwroot\module\**"" />
+		<Content Remove=""Module\**"" />
+		<Content Remove=""wwwroot\module\**"" />
+		<EmbeddedResource Remove=""Module\**"" />
+		<EmbeddedResource Remove=""wwwroot\module\**"" />
+		<None Remove=""Module\**"" />
+		<None Remove=""wwwroot\module\**"" />
 		<Content Update=""nlog.config"">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
@@ -1485,15 +1493,11 @@ namespace {0}.WebHost {{
 		<ProjectReference Include=""..\Infrastructure\Infrastructure.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Microsoft.AspNetCore.All"" Version=""2.0.8"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging.Console"" Version=""2.0.2"" />
-		<PackageReference Include=""Microsoft.Extensions.Logging.Debug"" Version=""2.0.2"" />
-		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.0.2"" />
+		<PackageReference Include=""Microsoft.AspNetCore.App"" />
+		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.1.0"" />
 		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.5.4"" />
-		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.4.0"" />
-	</ItemGroup>
-	<ItemGroup>
-		<DotNetCliToolReference Include=""Microsoft.DotNet.Watcher.Tools"" Version=""2.0.0"" />
+		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""2.4.0"" />
+		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.5.0"" />
 	</ItemGroup>
 </Project>
 ";

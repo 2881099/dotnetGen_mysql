@@ -79,8 +79,8 @@ namespace StackExchange.Redis {
 		public IDatabase Database;
 		public DateTime LastActive;
 		public long UseSum;
-		internal int ThreadId;
-		internal ConnectionMultiplexerPool Pool;
+		//internal int ThreadId;
+		//internal ConnectionMultiplexerPool Pool;
 
 		public void Dispose() {
 			//if (Pool != null) Pool.ReleaseConnectionMultiplexer(this);
