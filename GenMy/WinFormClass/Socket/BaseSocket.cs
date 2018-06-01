@@ -19,6 +19,7 @@ using System.Text;
 using System.Threading;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
 
 public class BaseSocket {
 
@@ -78,7 +79,7 @@ public class BaseSocket {
 		if (startIndex < 0) startIndex = 0;
 		int idx = -1, idx2 = startIndex - 1;
 		do {
-			idx2 = idx = Array.FindIndex<byte>(source, Math.Min(idx2 + 1, source.Length), delegate(byte b) {
+			idx2 = idx = Array.FindIndex<byte>(source, Math.Min(idx2 + 1, source.Length), delegate (byte b) {
 				return b == find[0];
 			});
 			if (idx2 != -1) {
@@ -114,11 +115,11 @@ public class BaseSocket {
 
 internal class TransmissionBinder : SerializationBinder {
 	public override Type BindToType(string assemblyName, string typeName) {
-		var ass = AppDomain.CurrentDomain.GetAssemblies();
-		foreach (var a in ass) if (a.FullName == assemblyName) return a.GetType(typeName);
-		foreach (var a in ass) if (a.GetName().Name == "Common") return a.GetType(typeName);
+		//var ass = AppDomain.CurrentDomain.GetAssemblies();
+		//foreach (var a in ass) if (a.FullName == assemblyName) return a.GetType(typeName);
+		//foreach (var a in ass) if (a.GetName().Name == "Common") return a.GetType(typeName);
 
-		return Type.GetType(typeName);
+		return Type.GetType(typeName.Replace("Common, ", "GenMy, "));
 	}
 }
 

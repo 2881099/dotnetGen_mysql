@@ -18,12 +18,22 @@ namespace Server {
 			_socket = socket;
 		}
 
-		private DataSet GetDataSet(string commandText) {
+		private object[][] GetDataSet(string commandText) {
 			SocketMessager messager = new SocketMessager("ExecuteDataSet", commandText);
 			_socket.Write(messager, delegate(object sender, ServerSocketReceiveEventArgs e) {
 				messager = e.Messager;
 			});
-			return messager.Arg as DataSet;
+			object[][] ret = messager.Arg as object[][]; //兼容.netcore传过来的数据
+			if (ret == null) {
+				DataSet ds = messager.Arg as DataSet; //兼容.net传过来的数据
+				if (ds != null) {
+					List<object[]> tmp = new List<object[]>();
+					foreach (DataRow row in ds.Tables[0].Rows)
+						tmp.Add(row.ItemArray);
+					ret = tmp.ToArray();
+				}
+			}
+			return ret;
 		}
 		private int ExecuteNonQuery(string commandText) {
 			SocketMessager messager = new SocketMessager("ExecuteNonQuery", commandText);
@@ -40,11 +50,11 @@ namespace Server {
 
 			List<DatabaseInfo> loc1 = null;
 
-			DataSet ds = this.GetDataSet(@"select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'mysql', 'performance_schema')");
+			object[][] ds = this.GetDataSet(@"select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'mysql', 'performance_schema')");
 			if (ds == null) return loc1;
 
 			loc1 = new List<DatabaseInfo>();
-			foreach (DataRow row in ds.Tables[0].Rows) {
+			foreach (object[] row in ds) {
 				loc1.Add(new DatabaseInfo(string.Concat(row[0])));
 			}
 			return loc1;
@@ -58,7 +68,7 @@ namespace Server {
 			Dictionary<string, TableInfo> loc2 = new Dictionary<string, TableInfo>();
 			Dictionary<string, Dictionary<string, ColumnInfo>> loc3 = new Dictionary<string, Dictionary<string, ColumnInfo>>();
 
-			DataSet ds = this.GetDataSet(string.Format(@"
+			object[][] ds = this.GetDataSet(string.Format(@"
 select 
 concat(a.table_schema, '.', a.table_name) 'id',
 a.table_schema 'owner',
@@ -71,7 +81,7 @@ where a.table_schema in ('{0}')
 
 			List<string> loc6 = new List<string>();
 			List<string> loc66 = new List<string>();
-			foreach (DataRow row in ds.Tables[0].Rows) {
+			foreach (object[] row in ds) {
 				string table_id = string.Concat(row[0]);
 				string owner = string.Concat(row[1]);
 				string table = string.Concat(row[2]);
@@ -110,7 +120,7 @@ where a.table_schema in ('{1}') and a.table_name in ({0})
 ", loc8, database.Replace("'", "''").Replace(",", "','")));
 			if (ds == null) return loc1;
 
-			foreach (DataRow row in ds.Tables[0].Rows) {
+			foreach (object[] row in ds) {
 				string table_id = string.Concat(row[0]);
 				string column = string.Concat(row[1]);
 				string type = string.Concat(row[2]);
@@ -150,7 +160,7 @@ where a.constraint_schema in ('{1}') and a.table_name in ({0}) and isnull(positi
 
 			Dictionary<string, Dictionary<string, List<ColumnInfo>>> indexColumns = new Dictionary<string, Dictionary<string, List<ColumnInfo>>>();
 			Dictionary<string, Dictionary<string, List<ColumnInfo>>> uniqueColumns = new Dictionary<string, Dictionary<string, List<ColumnInfo>>>();
-			foreach (DataRow row in ds.Tables[0].Rows) {
+			foreach (object[] row in ds) {
 				string table_id = string.Concat(row[0]);
 				string column = string.Concat(row[1]);
 				string index_id = string.Concat(row[2]);
@@ -214,7 +224,7 @@ where a.constraint_schema in ('{1}') and a.table_name in ({0}) and not isnull(po
 			if (ds == null) return loc1;
 
 			Dictionary<string, Dictionary<string, ForeignKeyInfo>> fkColumns = new Dictionary<string, Dictionary<string, ForeignKeyInfo>>();
-			foreach (DataRow row in ds.Tables[0].Rows) {
+			foreach (object[] row in ds) {
 				string table_id = string.Concat(row[0]);
 				string column = string.Concat(row[1]);
 				string fk_id = string.Concat(row[2]);

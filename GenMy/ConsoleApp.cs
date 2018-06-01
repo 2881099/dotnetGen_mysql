@@ -8,7 +8,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace MakeCode {
+namespace GenMy {
 	public class ConsoleApp {
 
 		ClientInfo _client;
@@ -32,12 +32,80 @@ namespace MakeCode {
 		public string OutputPath;
 
 		public ConsoleApp(string[] args, ManualResetEvent wait) {
+			this.OutputPath = AppContext.BaseDirectory;
 			string args0 = args[0].Trim().ToLower();
 			if (args[0] == "?" || args0 == "--help" || args0 == "-help") {
-				Console.WriteLine(@"
-Example：
+				var bgcolor = Console.BackgroundColor;
+				var fgcolor = Console.ForegroundColor;
 
-	> MakeCode 127.0.0.1[:3306] -U root -P 123456 -D dyschool -N dyschool -S -A -R -O ""c:/dyschool/""
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Write("##");
+				Console.Write("#################################");
+				Console.Write("##");
+				Console.BackgroundColor = bgcolor;
+				Console.ForegroundColor = fgcolor;
+				Console.WriteLine("");
+
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Write("##");
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				Console.Write("                                 ");
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Write("##");
+				Console.BackgroundColor = bgcolor;
+				Console.ForegroundColor = fgcolor;
+				Console.WriteLine("");
+
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Write("##");
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				Console.Write("   .NETCore 2.1 + MySQL 生成器   ");
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Write("##");
+				Console.BackgroundColor = bgcolor;
+				Console.ForegroundColor = fgcolor;
+				Console.WriteLine("");
+
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Write("##");
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				Console.Write("                                 ");
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Write("##");
+				Console.BackgroundColor = bgcolor;
+				Console.ForegroundColor = fgcolor;
+				Console.WriteLine("");
+
+				Console.BackgroundColor = ConsoleColor.DarkYellow;
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.Write("##");
+				Console.Write("#################################");
+				Console.Write("##");
+
+				Console.BackgroundColor = bgcolor;
+				Console.ForegroundColor = ConsoleColor.DarkYellow;
+				Console.Write(@"
+
+用于快速创建和更新 .NETCore 2.1 + MySQL 项目，非常合适敏捷开发；
+Github: https://github.com/2881099/dotnetgen_mysql
+
+");
+				Console.ForegroundColor = ConsoleColor.DarkYellow;
+				Console.Write("Example：");
+				Console.ForegroundColor = fgcolor;
+				Console.WriteLine(@"
+
+	> GenMy 127.0.0.1[:3306] -U root -P 123456 -D dyschool -N dyschool -S -A -R -O ""c:/dyschool/""
 
 		-U	MySql账号
 		-P	MySql密码
@@ -48,13 +116,13 @@ Example：
 		-A	生成后台管理
 		-R	下载资源
 
-		-O	路径，生成后的代码保存到哪里");
+		-O	输出路径(默认:当前目录)");
 				wait.Set();
 				return;
 			}
 			string[] ss = args[0].Split(new char[] { ':' }, 2);
 			this.Server = ss[0];
-			if (int.TryParse(ss.Length == 2 ? ss[1] : "5432", out this.Port) == false) this.Port = 5432;
+			if (int.TryParse(ss.Length == 2 ? ss[1] : "3306", out this.Port) == false) this.Port = 3306;
 			for (int a = 1; a < args.Length; a++) {
 				switch (args[a]) {
 					case "-U":
@@ -94,7 +162,10 @@ Example：
 				}
 			}
 			this._client = new ClientInfo(this.Server, this.Port, this.Username, this.Password);
-			Uri uri = new Uri("tcp://" + Settings.Default.server + "/");
+			StreamReader sr = new StreamReader(System.Net.WebRequest.Create("https://files.cnblogs.com/files/kellynic/GenMy_server.css").GetResponse().GetResponseStream(), Encoding.UTF8);
+			string server = sr.ReadToEnd()?.Trim();
+			//server = "127.0.0.1:18888";
+			Uri uri = new Uri("tcp://" + server + "/");
 			this._socket = new ClientSocket();
 			this._socket.Error += Socket_OnError;
 			this._socket.Receive += Socket_OnReceive;
@@ -222,7 +293,7 @@ Example：
 
 		public static int ExecuteNonQuery(string connectionString, string cmdText) {
 			int val = 0;
-			using (MySqlConnection conn = new MySqlConnection(connectionString)) {
+			using (MySqlConnection conn = new MySqlConnection(connectionString + ";Encrypt=False")) {
 				MySqlCommand cmd = new MySqlCommand(cmdText, conn);
 				try {
 					cmd.Connection.Open();
@@ -237,7 +308,7 @@ Example：
 		}
 		public static DataSet ExecuteDataSet(string connectionString, string cmdText) {
 			DataSet ds = new DataSet();
-			using (MySqlConnection conn = new MySqlConnection(connectionString)) {
+			using (MySqlConnection conn = new MySqlConnection(connectionString + ";Encrypt=False")) {
 				MySqlCommand cmd = new MySqlCommand(cmdText, conn);
 				MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
 				try {
