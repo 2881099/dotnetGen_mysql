@@ -32,7 +32,7 @@ namespace GenMy {
 		public string OutputPath;
 
 		public ConsoleApp(string[] args, ManualResetEvent wait) {
-			this.OutputPath = AppContext.BaseDirectory;
+			this.OutputPath = Directory.GetCurrentDirectory();
 			string args0 = args[0].Trim().ToLower();
 			if (args[0] == "?" || args0 == "--help" || args0 == "-help") {
 				var bgcolor = Console.BackgroundColor;

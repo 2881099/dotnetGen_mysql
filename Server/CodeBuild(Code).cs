@@ -1337,16 +1337,18 @@ namespace {0}.DAL {{
 {1}
 
 		public SqlUpdateBuild Update({0}Info item) {{
-			return new SqlUpdateBuild(null, item.{7}){8};
+			return new SqlUpdateBuild(null, item, item.{7}){8};
 		}}
 		#region class SqlUpdateBuild
 		public partial class SqlUpdateBuild {{
 			protected {0}Info _item;
+			protected {0}Info _cacheItem;
 			protected string _fields;
 			protected string _where;
 			protected List<MySqlParameter> _parameters = new List<MySqlParameter>();
-			public SqlUpdateBuild({0}Info item, {3}) {{
+			public SqlUpdateBuild({0}Info item, {0}Info cacheItem, {3}) {{
 				_item = item;
+				_cacheItem = cacheItem;
 				_where = SqlHelper.Addslashes(""{4}"", {5});
 			}}
 			public SqlUpdateBuild() {{ }}
@@ -1358,12 +1360,16 @@ namespace {0}.DAL {{
 			public int ExecuteNonQuery() {{
 				string sql = this.ToString();
 				if (string.IsNullOrEmpty(sql)) return 0;
-				return SqlHelper.ExecuteNonQuery(sql, _parameters.ToArray());
+				var affrows = SqlHelper.ExecuteNonQuery(sql, _parameters.ToArray());
+				if (_cacheItem != null) BLL.{0}.RemoveCache(_cacheItem);
+				return affrows;
 			}}
-			public Task<int> ExecuteNonQueryAsync() {{
+			async public Task<int> ExecuteNonQueryAsync() {{
 				string sql = this.ToString();
-				if (string.IsNullOrEmpty(sql)) return Task.FromResult(0);
-				return SqlHelper.ExecuteNonQueryAsync(sql, _parameters.ToArray());
+				if (string.IsNullOrEmpty(sql)) return 0;
+				var affrows = await SqlHelper.ExecuteNonQueryAsync(sql, _parameters.ToArray());
+				if (_cacheItem != null) await BLL.{0}.RemoveCacheAsync(_cacheItem);
+				return affrows;
 			}}
 			public SqlUpdateBuild Where(string filterFormat, params object[] values) {{
 				if (!string.IsNullOrEmpty(_where)) _where = string.Concat(_where, "" AND "");
@@ -1415,6 +1421,7 @@ namespace {0}.DAL {{
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using {0}.Model;
 
@@ -1476,27 +1483,31 @@ namespace {0}.BLL {{
 					if (uniques_dic.Count > 1)
 						sb2.AppendFormat(@"
 		public static int Delete{2}({0}) {{
+			var affrows = dal.Delete{2}({1});
 			if (itemCacheTimeout > 0) RemoveCache(GetItem{2}({1}));
-			return dal.Delete{2}({1});
+			return affrows;
 		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy);
 					else
 						sb2.AppendFormat(@"
 		public static int Delete{2}({0}) {{
+			var affrows = dal.Delete{2}({1});
 			if (itemCacheTimeout > 0) RemoveCache(new {3}Info {{ {4} }});
-			return dal.Delete{2}({1});
+			return affrows;
 		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy, uClass_Name, parmsNewItem);
 
 					if (uniques_dic.Count > 1)
 						bll_async_code += string.Format(@"
 		async public static Task<int> Delete{2}Async({0}) {{
+			var affrows = await dal.Delete{2}Async({1});
 			if (itemCacheTimeout > 0) await RemoveCacheAsync(GetItem{2}({1}));
-			return await dal.Delete{2}Async({1});
+			return affrows;
 		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy);
 					else
 						bll_async_code += string.Format(@"
 		async public static Task<int> Delete{2}Async({0}) {{
+			var affrows = await dal.Delete{2}Async({1});
 			if (itemCacheTimeout > 0) await RemoveCacheAsync(new {3}Info {{ {4} }});
-			return await dal.Delete{2}Async({1});
+			return affrows;
 		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy, uClass_Name, parmsNewItem);
 
 					sb3.AppendFormat(@"
@@ -1505,7 +1516,7 @@ namespace {0}.BLL {{
 			string key = string.Concat(""{0}_BLL_{1}{2}_"", {3});
 			string value = RedisHelper.Get(key);
 			if (!string.IsNullOrEmpty(value))
-				try {{ return {1}Info.Parse(value); }} catch {{ }}
+				try {{ return {1}Info.Parse(value); }} catch {{ SqlHelper.Instance.Log.LogWarning(""性能警告：{1}.GetItem{2}从缓存中反序列化失败""); }}
 			{1}Info item = Select{7}.ToOne();
 			if (item == null) return null;
 			RedisHelper.Set(key, item.Stringify(), itemCacheTimeout);
@@ -1519,7 +1530,7 @@ namespace {0}.BLL {{
 			string key = string.Concat(""{0}_BLL_{1}{2}_"", {3});
 			string value = await RedisHelper.GetAsync(key);
 			if (!string.IsNullOrEmpty(value))
-				try {{ return {1}Info.Parse(value); }} catch {{ }}
+				try {{ return {1}Info.Parse(value); }} catch {{ SqlHelper.Instance.Log.LogWarning(""性能警告：{1}.GetItem{2}Async从缓存中反序列化失败""); }}
 			{1}Info item = await Select{7}.ToOneAsync();
 			if (item == null) return null;
 			await RedisHelper.SetAsync(key, item.Stringify(), itemCacheTimeout);
@@ -1543,23 +1554,13 @@ namespace {0}.BLL {{
 
 					if (uniques_dic.Count > 1)
 						sb1.AppendFormat(@"
-		public static int Update({1}Info item) {{
-			if (itemCacheTimeout > 0) RemoveCache(item);
-			return dal.Update(item).ExecuteNonQuery();
-		}}
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) {{
-			return UpdateDiy(null, {3});
-		}}
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({1}Info item, {2}) {{
-			if (itemCacheTimeout > 0) RemoveCache(item != null ? item : GetItem({3}));
-			return new {0}.DAL.{1}.SqlUpdateBuild(item, {3});
-		}}
+		public static int Update({1}Info item) => dal.Update(item).ExecuteNonQuery();
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => UpdateDiy(null, {3});
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({1}Info item, {2}) => new {0}.DAL.{1}.SqlUpdateBuild(item, itemCacheTimeout > 0 > (item != null ? item : GetItem({3})) ? null, {3});
 		/// <summary>
-		/// 用于批量更新
+		/// 用于批量更新，不会更新缓存
 		/// </summary>
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiyDangerous {{
-			get {{ return new {0}.DAL.{1}.SqlUpdateBuild(); }}
-		}}
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiyDangerous => new {0}.DAL.{1}.SqlUpdateBuild();
 ", solutionName, uClass_Name, pkCsParam, pkCsParamNoType);
 					else {
 						var xxxxtempskdf = "";
@@ -1567,31 +1568,18 @@ namespace {0}.BLL {{
 							xxxxtempskdf += xxxxtempskdfstr + " = " + xxxxtempskdfstr + ", ";
 						}
 						sb1.AppendFormat(@"
-		public static int Update({1}Info item) {{
-			if (itemCacheTimeout > 0) RemoveCache(item);
-			return dal.Update(item).ExecuteNonQuery();
-		}}
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) {{
-			return UpdateDiy(null, {3});
-		}}
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({1}Info item, {2}) {{
-			if (itemCacheTimeout > 0) RemoveCache(item ?? new {1}Info {{ {4} }});
-			return new {0}.DAL.{1}.SqlUpdateBuild(item, {3});
-		}}
+		public static int Update({1}Info item) => dal.Update(item).ExecuteNonQuery();
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => UpdateDiy(null, {3});
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({1}Info item, {2}) => new {0}.DAL.{1}.SqlUpdateBuild(item, itemCacheTimeout > 0 ? (item ?? new {1}Info {{ {4} }}) : null, {3});
 		/// <summary>
-		/// 用于批量更新
+		/// 用于批量更新，不会更新缓存
 		/// </summary>
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiyDangerous {{
-			get {{ return new {0}.DAL.{1}.SqlUpdateBuild(); }}
-		}}
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiyDangerous => new {0}.DAL.{1}.SqlUpdateBuild();
 ", solutionName, uClass_Name, pkCsParam, pkCsParamNoType, xxxxtempskdf.Substring(0, xxxxtempskdf.Length - 2));
 					}
 
 					bll_async_code += string.Format(@"
-		async public static Task<int> UpdateAsync({1}Info item) {{
-			if (itemCacheTimeout > 0) await RemoveCacheAsync(item);
-			return await dal.Update(item).ExecuteNonQueryAsync();
-		}}
+		async public static Task<int> UpdateAsync({1}Info item) => await dal.Update(item).ExecuteNonQueryAsync();
 ", solutionName, uClass_Name);
 
 					if (table.Columns.Count > 5)
@@ -1625,8 +1613,8 @@ namespace {0}.BLL {{
 			if (itemCacheTimeout > 0) RemoveCache(item);
 			return item;
 		}}
-		private static void RemoveCache({0}Info item) {{
-			if (item == null) return;{2}
+		internal static void RemoveCache({0}Info item) {{
+			if (itemCacheTimeout <= 0 || item == null) return;{2}
 		}}
 		#endregion
 {1}
@@ -1637,8 +1625,8 @@ namespace {0}.BLL {{
 			if (itemCacheTimeout > 0) await RemoveCacheAsync(item);
 			return item;
 		}}
-		async private static Task RemoveCacheAsync({0}Info item) {{
-			if (item == null) return;{2}
+		async internal static Task RemoveCacheAsync({0}Info item) {{
+			if (itemCacheTimeout <= 0 || item == null) return;{2}
 		}}
 ", uClass_Name, "", redisRemove.Replace("RedisHelper.Remove", "await RedisHelper.RemoveAsync"));
 					#endregion
@@ -2790,6 +2778,12 @@ namespace {0}.BLL {{
 				#region readme.md
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\readme.md"), Deflate.Compress(string.Format(@"# {0}
 .net core模块化开发架构", solutionName))));
+				clearSb();
+				#endregion
+
+				#region GenMy只更新db.bat
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\GenMy只更新db.bat"), Deflate.Compress(string.Format(@"
+GenMy {0}:{1} -U {2} -P {3} -D {4} -N {5}", _client.Server, _client.Port, _client.Username, _client.Password, _client.Database, solutionName))));
 				clearSb();
 				#endregion
 			}
