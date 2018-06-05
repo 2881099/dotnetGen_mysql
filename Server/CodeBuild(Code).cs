@@ -333,6 +333,7 @@ namespace Server {
 
 				string pkCsParam = "";
 				string pkCsParamNoType = "";
+				string pkCsParamNoTypeFieldInit = "";
 				string pkCsParamNoTypeByval = "";
 				string pkSqlParamFormat = "";
 				string pkSqlParam = "";
@@ -358,6 +359,7 @@ namespace Server {
 					foreach (ColumnInfo columnInfo in table.PrimaryKeys) {
 						pkCsParam += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType).Replace("?", "") + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						pkCsParamNoType += CodeBuild.UFString(columnInfo.Name) + ", ";
+						pkCsParamNoTypeFieldInit += UFString(columnInfo.Name) + " = " + UFString(columnInfo.Name) + ", ";
 						pkCsParamNoTypeByval += string.Format(GetCSTypeValue(columnInfo.Type), CodeBuild.UFString(columnInfo.Name)) + ", ";
 						pkSqlParamFormat += "`" + columnInfo.Name + "` = {" + ++pkSqlParamFormat_idx + "} AND ";
 						pkSqlParam += "`" + columnInfo.Name + "` = ?" + columnInfo.Name + " AND ";
@@ -980,7 +982,7 @@ namespace {0}.Model {{
 					string pkisnullf3 = "";
 					if (!string.IsNullOrEmpty(pkisnull)) pkisnullf3 = string.Format("{0} ? null : ", pkisnull.Substring(0, pkisnull.Length - 4));
 					pkupdatediy = string.Format(@"
-		public {0}.DAL.{1}.SqlUpdateBuild UpdateDiy => {3}BLL.{1}.UpdateDiy(this, _{2});
+		public {0}.DAL.{1}.SqlUpdateBuild UpdateDiy => {3}BLL.{1}.UpdateDiy(new List<{1}Info> {{ this }});
 ", solutionName, uClass_Name, pkCsParamNoTypeByval.Replace(", ", ", _"), pkisnullf3);
 				}
 
@@ -1053,12 +1055,13 @@ namespace {0}.Model {{
 				clearSb();
 
 				Model_Build_ExtensionMethods_cs.AppendFormat(@"
-	public static string ToJson(this {0}Info item) {{ return string.Concat(item); }}
-	public static string ToJson(this {0}Info[] items) {{ return GetJson(items); }}
-	public static string ToJson(this IEnumerable<{0}Info> items) {{ return GetJson(items); }}
-	public static IDictionary[] ToBson(this {0}Info[] items, Func<{0}Info, object> func = null) {{ return GetBson(items, func); }}
-	public static IDictionary[] ToBson(this IEnumerable<{0}Info> items, Func<{0}Info, object> func = null) {{ return GetBson(items, func); }}
-", uClass_Name);
+	public static string ToJson(this {0}Info item) => GetJson(new [] {{ item }});
+	public static string ToJson(this {0}Info[] items) => GetJson(items);
+	public static string ToJson(this IEnumerable<{0}Info> items) => GetJson(items);
+	public static IDictionary[] ToBson(this {0}Info[] items, Func<{0}Info, object> func = null) => GetBson(items, func);
+	public static IDictionary[] ToBson(this IEnumerable<{0}Info> items, Func<{0}Info, object> func = null) => GetBson(items, func);
+	public static {1}.DAL.{0}.SqlUpdateBuild UpdateDiy(this List<{0}Info> items) => {1}.BLL.{0}.UpdateDiy(items);
+", uClass_Name, solutionName);
 				#endregion
 
 				#region DAL *.cs
@@ -1104,6 +1107,7 @@ namespace {0}.Model {{
 				sb1.AppendFormat(
 	@"using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Data;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
@@ -1289,15 +1293,15 @@ namespace {0}.DAL {{
 						if (col.Type == MySqlDbType.Geometry)
 							sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}({2} value) {{
-				if (_item != null) _item.{0} = value;
+				if (_dataSource != null) foreach (var item in _dataSource) item.{0} = value;
 				return this.Set(""`{1}`"", $""ST_GeomFromText(?{1}_{{_parameters.Count}})"", 
 					{3});
 			}}", CodeBuild.UFString(col.Name), col.Name, CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType),
-							CodeBuild.AppendParameters(col, "_item.", "").Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{_parameters.Count}\""));
+							CodeBuild.AppendParameters(col, "item.", "").Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{_parameters.Count}\"").Replace("item." + UFString(col.Name), "value"));
 						else
 							sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}({2} value) {{
-				if (_item != null) _item.{0} = value;
+				if (_dataSource != null) foreach (var item in _dataSource) item.{0} = value;
 				return this.Set(""`{1}`"", $""?{1}_{{_parameters.Count}}"", 
 					{3}value{4}));
 			}}", CodeBuild.UFString(col.Name), col.Name, CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType),
@@ -1305,7 +1309,7 @@ namespace {0}.DAL {{
 							col.Type == MySqlDbType.Enum || col.Type == MySqlDbType.Set ? "?.ToInt64()" : "");
 						if (table.ForeignKeys.FindIndex(delegate (ForeignKeyInfo fkf) { return fkf.Columns.FindIndex(delegate (ColumnInfo fkfpkf) { return fkfpkf.Name == col.Name; }) != -1; }) == -1) {
 							string fptype = "";
-							string fpset_ = string.Format("_item.{0} += value;", CodeBuild.UFString(col.Name));
+							string fpset_ = string.Format("item.{0} += value;", CodeBuild.UFString(col.Name));
 							string fparam = valueParm.Replace("\"?" + col.Name + "\"", "$\"?" + col.Name + "_{_parameters.Count}\"");
 							if (col.Type == MySqlDbType.Byte || col.Type == MySqlDbType.UByte) {
 								fptype = "byte";
@@ -1313,15 +1317,15 @@ namespace {0}.DAL {{
 							} else if (col.Type == MySqlDbType.Int16 || col.Type == MySqlDbType.UInt16) {
 								fptype = "short";
 								fparam = fparam.Replace("MySqlDbType.UInt16", "MySqlDbType.Int16");
-								if (col.Type == MySqlDbType.UInt16) fpset_ = string.Format("_item.{0} = (ushort?)((short?)_item.{0} + value);", CodeBuild.UFString(col.Name));
+								if (col.Type == MySqlDbType.UInt16) fpset_ = string.Format("item.{0} = (ushort?)((short?)item.{0} + value);", CodeBuild.UFString(col.Name));
 							} else if (col.Type == MySqlDbType.Int24 || col.Type == MySqlDbType.UInt24 || col.Type == MySqlDbType.Int32 || col.Type == MySqlDbType.UInt32) {
 								fptype = "int";
 								fparam = fparam.Replace("MySqlDbType.UInt24", "MySqlDbType.Int32").Replace("MySqlDbType.UInt32", "MySqlDbType.Int32");
-								if (col.Type == MySqlDbType.UInt24 || col.Type == MySqlDbType.UInt32) fpset_ = string.Format("_item.{0} = (uint?)((int?)_item.{0} + value);", CodeBuild.UFString(col.Name));
+								if (col.Type == MySqlDbType.UInt24 || col.Type == MySqlDbType.UInt32) fpset_ = string.Format("item.{0} = (uint?)((int?)item.{0} + value);", CodeBuild.UFString(col.Name));
 							} else if (col.Type == MySqlDbType.Int64 || col.Type == MySqlDbType.UInt64) {
 								fptype = "long";
 								fparam = fparam.Replace("MySqlDbType.UInt64", "MySqlDbType.Int64");
-								if (col.Type == MySqlDbType.UInt64) fpset_ = string.Format("_item.{0} = (ulong?)((long?)_item.{0} + value);", CodeBuild.UFString(col.Name));
+								if (col.Type == MySqlDbType.UInt64) fpset_ = string.Format("item.{0} = (ulong?)((long?)item.{0} + value);", CodeBuild.UFString(col.Name));
 							} else if (col.Type == MySqlDbType.Double || col.Type == MySqlDbType.Float || col.Type == MySqlDbType.Decimal) {
 								fptype = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType).Replace("?", "");
 							}
@@ -1330,7 +1334,7 @@ namespace {0}.DAL {{
 								sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}Flag(int _0_16, bool isUnFlag = false) {{
 				{2} tmp1 = ({2})Math.Pow(2, _0_16);
-				if (_item != null) _item.{0} = isUnFlag ? ((_item.{0} ?? 0) ^ tmp1) : ((_item.{0} ?? 0) | tmp1);
+				if (_dataSource != null) foreach (var item in _dataSource) item.{0} = isUnFlag ? ((item.{0} ?? 0) ^ tmp1) : ((item.{0} ?? 0) | tmp1);
 				return this.Set(""`{1}`"", $""ifnull(`{1}`,0) {{(isUnFlag ? '^' : '|')}} ?{1}_{{_parameters.Count}}"", 
 					{3}tmp1));
 			}}
@@ -1342,7 +1346,7 @@ namespace {0}.DAL {{
 								fptype = "";
 								sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}Flag({4} value, bool isUnFlag = false) {{
-				if (_item != null) _item.{0} = isUnFlag ? ((_item.{0} ?? 0) ^ value) : ((_item.{0} ?? 0) | value);
+				if (_dataSource != null) foreach (var item in _dataSource) item.{0} = isUnFlag ? ((item.{0} ?? 0) ^ value) : ((item.{0} ?? 0) | value);
 				return this.Set(""`{1}`"", $""ifnull(`{1}`+0,0) {{(isUnFlag ? '^' : '|')}} ?{1}_{{_parameters.Count}}"", 
 					{3}value.ToInt64()));
 			}}
@@ -1353,7 +1357,7 @@ namespace {0}.DAL {{
 							if (!string.IsNullOrEmpty(fptype)) {
 								sb5.AppendFormat(@"
 			public SqlUpdateBuild Set{0}Increment({2} value) {{
-				if (_item != null) {4}
+				if (_dataSource != null) foreach (var item in _dataSource) {4}
 				return this.Set(""`{1}`"", $""ifnull(`{1}`, 0) + ?{1}_{{_parameters.Count}}"", 
 					{3}value));
 			}}", CodeBuild.UFString(col.Name), col.Name, fptype, fparam, fpset_);
@@ -1387,23 +1391,28 @@ namespace {0}.DAL {{
 			return item;
 		}}", uClass_Name);
 
+					string strdalpkwherein = "";
+					foreach (ColumnInfo dalpkcol001 in table.PrimaryKeys) strdalpkwherein += string.Format(@"
+						.Where(@""`{0}` IN {{0}}"", _dataSource.Select(a => a.{1}))", dalpkcol001.Name, UFString(dalpkcol001.Name));
+					if (!string.IsNullOrEmpty(strdalpkwherein)) strdalpkwherein = strdalpkwherein.Substring(strdalpkwherein.IndexOf("						") + 6);
 					sb1.AppendFormat(@"
 {1}
 
 		public SqlUpdateBuild Update({0}Info item) {{
-			return new SqlUpdateBuild(null, item, item.{7}){8};
+			return new SqlUpdateBuild(new List<{0}Info> {{ item }}){8};
 		}}
 		#region class SqlUpdateBuild
 		public partial class SqlUpdateBuild {{
-			protected {0}Info _item;
-			protected {0}Info _cacheItem;
+			protected List<{0}Info> _dataSource;
+			protected Dictionary<string, {0}Info> _itemsDic;
 			protected string _fields;
 			protected string _where;
 			protected List<MySqlParameter> _parameters = new List<MySqlParameter>();
-			public SqlUpdateBuild({0}Info item, {0}Info cacheItem, {3}) {{
-				_item = item;
-				_cacheItem = cacheItem;
-				_where = SqlHelper.Addslashes(""{4}"", {5});
+			public SqlUpdateBuild(List<{0}Info> dataSource) {{
+				_dataSource = dataSource;
+				_itemsDic = _dataSource == null ? null : _dataSource.ToDictionary(a => $""{{a.{12}}}"");
+				if (_dataSource != null && _dataSource.Any())
+					this{13};
 			}}
 			public SqlUpdateBuild() {{ }}
 			public override string ToString() {{
@@ -1415,14 +1424,14 @@ namespace {0}.DAL {{
 				string sql = this.ToString();
 				if (string.IsNullOrEmpty(sql)) return 0;
 				var affrows = SqlHelper.ExecuteNonQuery(sql, _parameters.ToArray());
-				if (_cacheItem != null) BLL.{0}.RemoveCache(_cacheItem);
+				BLL.{0}.RemoveCache(_dataSource);
 				return affrows;
 			}}
 			async public Task<int> ExecuteNonQueryAsync() {{
 				string sql = this.ToString();
 				if (string.IsNullOrEmpty(sql)) return 0;
 				var affrows = await SqlHelper.ExecuteNonQueryAsync(sql, _parameters.ToArray());
-				if (_cacheItem != null) await BLL.{0}.RemoveCacheAsync(_cacheItem);
+				await BLL.{0}.RemoveCacheAsync(_dataSource);
 				return affrows;
 			}}
 			public SqlUpdateBuild Where(string filterFormat, params object[] values) {{
@@ -1453,7 +1462,7 @@ namespace {0}.DAL {{
 		#endregion
 	}}
 }}", uClass_Name, sb2.ToString(), sb3.ToString(), pkCsParam, pkSqlParamFormat, pkCsParamNoType, sb5.ToString(),
-	pkCsParamNoTypeByval.Replace(", ", ", item."), sb6.ToString(), solutionName, dal_insert_code, dal_async_code);
+	pkCsParamNoTypeByval.Replace(", ", ", item."), sb6.ToString(), solutionName, dal_insert_code, dal_async_code, pkCsParamNoType.Replace(", ", "}_{a."), strdalpkwherein);
 					#endregion
 				} else {
 					sb1.AppendFormat(@"
@@ -1593,7 +1602,7 @@ namespace {0}.BLL {{
 		parms, parmsNoneType, cacheCond, whereCondi);
 
 					sb4.AppendFormat(@"
-				string.Concat(""{0}_BLL_{1}{2}_"", {3}), ", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove);
+				keys[keysIdx++] = string.Concat(""{0}_BLL_{1}{2}_"", {3});", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove);
 				}
 
 				if (table.PrimaryKeys.Count > 0) {
@@ -1609,13 +1618,13 @@ namespace {0}.BLL {{
 					if (uniques_dic.Count > 1)
 						sb1.AppendFormat(@"
 		public static int Update({1}Info item) => dal.Update(item).ExecuteNonQuery();
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => UpdateDiy(null, {3});
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({1}Info item, {2}) => new {0}.DAL.{1}.SqlUpdateBuild(item, itemCacheTimeout > 0 > (item != null ? item : GetItem({3})) ? null, {3});
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ itemCacheTimeout > 0 ? new {1}Info {{ {4} }} : GetItem({3}) }});
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy(List<{1}Info> dataSource) => new {0}.DAL.{1}.SqlUpdateBuild(dataSource);
 		/// <summary>
 		/// 用于批量更新，不会更新缓存
 		/// </summary>
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiyDangerous => new {0}.DAL.{1}.SqlUpdateBuild();
-", solutionName, uClass_Name, pkCsParam, pkCsParamNoType);
+", solutionName, uClass_Name, pkCsParam, pkCsParamNoType, pkCsParamNoTypeFieldInit);
 					else {
 						var xxxxtempskdf = "";
 						foreach (var xxxxtempskdfstr in pkCsParamNoType.Split(new string[] { ", " }, StringSplitOptions.None)) {
@@ -1623,8 +1632,8 @@ namespace {0}.BLL {{
 						}
 						sb1.AppendFormat(@"
 		public static int Update({1}Info item) => dal.Update(item).ExecuteNonQuery();
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => UpdateDiy(null, {3});
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({1}Info item, {2}) => new {0}.DAL.{1}.SqlUpdateBuild(item, itemCacheTimeout > 0 ? (item ?? new {1}Info {{ {4} }}) : null, {3});
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ new {1}Info {{ {4} }} }});
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy(List<{1}Info> dataSource) => new {0}.DAL.{1}.SqlUpdateBuild(dataSource);
 		/// <summary>
 		/// 用于批量更新，不会更新缓存
 		/// </summary>
@@ -1659,16 +1668,20 @@ namespace {0}.BLL {{
 		}}", uClass_Name, CsParam2, CsParamNoType2);
 
 					var redisRemove = sb4.ToString();
-					if (!string.IsNullOrEmpty(redisRemove)) redisRemove = string.Concat(@"
-			RedisHelper.Remove(", redisRemove.Substring(0, redisRemove.Length - 2), ");");
 					sb1.AppendFormat(@"
 		public static {0}Info Insert({0}Info item) {{
 			item = dal.Insert(item);
 			if (itemCacheTimeout > 0) RemoveCache(item);
 			return item;
 		}}
-		internal static void RemoveCache({0}Info item) {{
-			if (itemCacheTimeout <= 0 || item == null) return;{2}
+		internal static void RemoveCache({0}Info item) => RemoveCache(item == null ? null : new [] {{ item }});
+		internal static void RemoveCache(IEnumerable<{0}Info> items) {{
+			if (itemCacheTimeout <= 0 || items == null || items.Any() == false) return;
+			var keys = new string[items.Count()];
+			var keysIdx = 0;
+			foreach (var item in items) {{{2}
+			}}
+			RedisHelper.Remove(keys.Distinct().ToArray());
 		}}
 		#endregion
 {1}
@@ -1679,8 +1692,14 @@ namespace {0}.BLL {{
 			if (itemCacheTimeout > 0) await RemoveCacheAsync(item);
 			return item;
 		}}
-		async internal static Task RemoveCacheAsync({0}Info item) {{
-			if (itemCacheTimeout <= 0 || item == null) return;{2}
+		async internal static Task RemoveCacheAsync({0}Info item) => await RemoveCacheAsync(item == null ? null : new [] {{ item }});
+		async internal static Task RemoveCacheAsync(IEnumerable<{0}Info> items) {{
+			if (itemCacheTimeout <= 0 || items == null || items.Any() == false) return;
+			var keys = new string[items.Count()];
+			var keysIdx = 0;
+			foreach (var item in items) {{{2}
+			}}
+			await RedisHelper.RemoveAsync(keys.Distinct().ToArray());
 		}}
 ", uClass_Name, "", redisRemove.Replace("RedisHelper.Remove", "await RedisHelper.RemoveAsync"));
 					#endregion

@@ -27,4 +27,14 @@ public static class GlobalExtensions {
 	public static long GetTime(this DateTime time) {
 		return (long)time.ToUniversalTime().Subtract(new DateTime(1970, 1, 1).ToUniversalTime()).TotalSeconds;
 	}
+
+	static DateTime dt19700101 = new DateTime(1970, 1, 1);
+	/// <summary>
+	/// 获取时间戳毫秒数，按1970-1-1
+	/// </summary>
+	/// <param name="time"></param>
+	/// <returns></returns>
+	public static long GetTimeMilliseconds(this DateTime time) {
+		return (long) time.Subtract(dt19700101).TotalMilliseconds;
+	}
 }
