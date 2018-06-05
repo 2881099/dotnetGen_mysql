@@ -133,17 +133,17 @@ namespace {0}.DAL {{
 		public static Task<object> ExecuteScalarAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalarAsync(CommandType.Text, cmdText, cmdParms);
 
 		/// <summary>
-		/// 开启事务（不支持异步），10秒未执行完将超时
+		/// 开启事务（不支持异步），60秒未执行完将自动提交
 		/// </summary>
 		/// <param name=""handler"">事务体 () => {{}}</param>
 		public static void Transaction(AnonymousHandler handler) {{
-			Transaction(handler, TimeSpan.FromSeconds(10));
+			Transaction(handler, TimeSpan.FromSeconds(60));
 		}}
 		/// <summary>
 		/// 开启事务（不支持异步）
 		/// </summary>
 		/// <param name=""handler"">事务体 () => {{}}</param>
-		/// <param name=""timeout"">超时</param>
+		/// <param name=""timeout"">超时，未执行完将自动提交</param>
 		public static void Transaction(AnonymousHandler handler, TimeSpan timeout) {{
 			try {{
 				Instance.BeginTransaction(timeout);
