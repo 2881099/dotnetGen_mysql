@@ -61,10 +61,10 @@ namespace MySql.Data.MySqlClient {
 					} else if (parms[a] is DateTime?) {
 						DateTime? dt = parms[a] as DateTime?;
 						nparms[a] = string.Concat("'", dt.Value.ToString("yyyy-MM-dd HH:mm:ss"), "'");
-					} else if (parms[a] is IEnumerator) {
+					} else if (parms[a] is IEnumerable) {
 						string sb = "";
-						var ie = parms[a] as IEnumerator;
-						while (ie.MoveNext()) sb += ie.Current == null ? string.Concat(",NULL") : string.Concat(",'", ie.Current.ToString().Replace("'", "''"), "'");
+						var ie = parms[a] as IEnumerable;
+						foreach (var z in ie) sb += z == null ? string.Concat(",NULL") : string.Concat(",'", z.ToString().Replace("'", "''"), "'");
 						nparms[a] = string.Concat("(", string.IsNullOrEmpty(sb) ? sb : sb.Substring(1), ")");
 					} else {
 						nparms[a] = string.Concat("'", parms[a].ToString().Replace("'", "''"), "'");

@@ -122,7 +122,7 @@ namespace {0}.DAL {{
 
 		public static string Addslashes(string filter, params object[] parms) {{ return Executer.Addslashes(filter, parms); }}
 
-		public static void ExecuteReader(Action<MySqlDataReader> readerHander, string cmdText, params MySqlParameter[] cmdParms) =>Instance.ExecuteReader(readerHander, CommandType.Text, cmdText, cmdParms);
+		public static void ExecuteReader(Action<MySqlDataReader> readerHander, string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteReader(readerHander, CommandType.Text, cmdText, cmdParms);
 		public static object[][] ExeucteArray(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExeucteArray(CommandType.Text, cmdText, cmdParms);
 		public static int ExecuteNonQuery(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteNonQuery(CommandType.Text, cmdText, cmdParms);
 		public static object ExecuteScalar(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalar(CommandType.Text, cmdText, cmdParms);
