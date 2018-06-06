@@ -96,7 +96,7 @@ namespace MySql.Data.MySqlClient {
 			await _exec.ExecuteReaderAsync(async dr => {
 				int dataIndex = -1;
 				var read = await this.AggregateReadTupleAsync(type, dr, dataIndex);
-				ret.Add((T) read.result);
+				ret.Add(read.result == null ? default(T) : (T)read.result);
 				dataIndex = read.dataIndex;
 			}, CommandType.Text, sql);
 			return ret;

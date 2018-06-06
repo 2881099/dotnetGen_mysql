@@ -956,7 +956,7 @@ namespace {0}.Model {{
 						sb6.Insert(0, string.Format(@"
 		public {1}Info Save() {{{2}
 			if (this.{4} != null) {{
-				BLL.{1}.Update(this);
+				if (BLL.{1}.Update(this) == 0) return BLL.{1}.Insert(this);
 				return this;
 			}}{5}{3}
 			return BLL.{1}.Insert(this);
@@ -966,7 +966,7 @@ namespace {0}.Model {{
 						sb17.Insert(0, string.Format(@"
 		async public Task<{1}Info> SaveAsync() {{{2}
 			if (this.{4} != null) {{
-				await BLL.{1}.UpdateAsync(this);
+				if (await BLL.{1}.UpdateAsync(this) == 0) return await BLL.{1}.InsertAsync(this);
 				return this;
 			}}{5}{3}
 			return await BLL.{1}.InsertAsync(this);
@@ -1071,6 +1071,8 @@ namespace {0}.Model {{
 				string sqlDelete = string.Format("DELETE FROM {0} ", nTable_Name);
 				string sqlUpdate = string.Format("UPDATE {0} SET ", nTable_Name);
 				string sqlInsert = string.Format("INSERT INTO {0}(", nTable_Name);
+				string insertField = string.Empty;
+				string insertParms = string.Empty;
 				string temp1 = string.Empty;
 				string temp2 = string.Empty;
 				string temp3 = string.Empty;
@@ -1097,6 +1099,8 @@ namespace {0}.Model {{
 				sqlDelete += "WHERE ";
 				sqlUpdate += temp1 + string.Format(" WHERE {0}", pkSqlParam);
 				sqlInsert += string.Format("{0}) VALUES({1})", temp2, temp3);
+				insertField = temp2;
+				insertParms = temp3;
 				if (identityColumn != null) sqlInsert += "; SELECT LAST_INSERT_ID();";
 
 				temp1 = "";
@@ -1124,8 +1128,12 @@ namespace {0}.DAL {{
 			internal static readonly string Table = ""{3}"";
 			internal static readonly string Field = ""{5}"";
 			internal static readonly string Sort = ""{6}"";
-			public static readonly string Delete = ""DELETE FROM {3} WHERE "";
-			public static readonly string Insert = ""{2}{4}"";
+			internal static readonly string Returning = ""{8}"";
+			internal static readonly string Delete = ""DELETE FROM {3} WHERE "";
+			internal static readonly string InsertField = @""{2}"";
+			internal static readonly string InsertValues = @""{4}"";
+			internal static readonly string InsertMultiFormat = @""INSERT INTO {3}("" + InsertField + "") VALUES{{0}}"";
+			internal static readonly string Insert = string.Format(InsertMultiFormat, $""({{InsertValues}}){{Returning}}"");
 		}}
 		#endregion
 
@@ -1139,7 +1147,8 @@ namespace {0}.DAL {{
 		protected static MySqlParameter[] GetParameters({1}Info item) {{
 			return new MySqlParameter[] {{
 {7}}};
-		}}", solutionName, uClass_Name, string.Empty, nTable_Name, sqlInsert, sqlFields, orderBy, CodeBuild.AppendParameters(table, "				"));
+		}}", solutionName, uClass_Name, insertField, nTable_Name, insertParms, sqlFields, orderBy, CodeBuild.AppendParameters(table, "				"),
+			identityColumn != null ? "; SELECT LAST_INSERT_ID();" : "");
 
 				sb1.AppendFormat(@"
 		public {0}Info GetItem(IDataReader dr) {{
@@ -1368,20 +1377,47 @@ namespace {0}.DAL {{
 					}
 
 					string dal_insert_code = string.Format(@"
+		public {0}Info Insert({0}Info item) {{
 			SqlHelper.ExecuteNonQuery(TSQL.Insert, GetParameters(item));
-			return item;", uClass_Name);
+			return item;
+		}}", uClass_Name);
 					if (identityColumn != null) {
 						dal_insert_code = string.Format(@"
-			{1} loc1;
-			if ({1}.TryParse(string.Concat(SqlHelper.ExecuteScalar(TSQL.Insert, GetParameters(item))), out loc1)) item.{0} = loc1;
-			return item;", CodeBuild.UFString(identityColumn.Name), CodeBuild.GetCSType(identityColumn.Type, uClass_Name + identityColumn.Name.ToUpper(), identityColumn.SqlType).Replace("?", ""));
+		public {0}Info Insert({0}Info item) {{
+			if ({2}.TryParse(string.Concat(SqlHelper.ExecuteScalar(TSQL.Insert, GetParameters(item))), out var loc1)) item.{1} = loc1;
+			return item;
+		}}", uClass_Name, CodeBuild.UFString(identityColumn.Name), CodeBuild.GetCSType(identityColumn.Type, uClass_Name + identityColumn.Name.ToUpper(), identityColumn.SqlType).Replace("?", ""));
+					}
+
+					if (identityColumn == null) {
+						dal_insert_code += string.Format(@"
+		public int Insert(IEnumerable<{0}Info> items) {{
+			var mp = InsertMakeParam(items);
+			if (string.IsNullOrEmpty(mp.sql)) return 0;
+			return SqlHelper.ExecuteNonQuery(mp.sql, mp.parms);
+		}}
+		public (string sql, MySqlParameter[] parms) InsertMakeParam(IEnumerable<{0}Info> items) {{
+			var itemsArr = items?.Where(a => a != null).ToArray();
+			if (itemsArr == null || itemsArr.Any() == false) return (null, null);
+			var values = """";
+			var parms = new MySqlParameter[itemsArr.Length * {1}];
+			for (var a = 0; a < itemsArr.Length; a++) {{
+				var item = itemsArr[a];
+				values += $"",({{TSQL.InsertValues.Replace("", "", a + "", "")}}{{a}})"";
+				var tmparms = GetParameters(item);
+				for (var b = 0; b < tmparms.Length; b++) {{
+					tmparms[b].ParameterName += a;
+					parms[a * {1} + b] = tmparms[b];
+				}}
+			}}
+			return (string.Format(TSQL.InsertMultiFormat, values.Substring(1)), parms);
+		}}", uClass_Name, insertParms.Split(new[] { ", " }, StringSplitOptions.None).Length);
 					}
 
 					if (identityColumn != null)
 						dal_async_code += string.Format(@"
 		async public Task<{0}Info> InsertAsync({0}Info item) {{
-			{2} loc1;
-			if ({2}.TryParse(string.Concat(await SqlHelper.ExecuteScalarAsync(TSQL.Insert, GetParameters(item))), out loc1)) item.{1} = loc1;
+			if ({2}.TryParse(string.Concat(await SqlHelper.ExecuteScalarAsync(TSQL.Insert, GetParameters(item))), out var loc1)) item.{1} = loc1;
 			return item;
 		}}", uClass_Name, CodeBuild.UFString(identityColumn.Name), CodeBuild.GetCSType(identityColumn.Type, uClass_Name + identityColumn.Name.ToUpper(), identityColumn.SqlType).Replace("?", ""));
 					else
@@ -1391,9 +1427,18 @@ namespace {0}.DAL {{
 			return item;
 		}}", uClass_Name);
 
+					if (identityColumn == null) {
+						dal_async_code += string.Format(@"
+		async public Task<int> InsertAsync(IEnumerable<{0}Info> items) {{
+			var mp = InsertMakeParam(items);
+			if (string.IsNullOrEmpty(mp.sql)) return 0;
+			return await SqlHelper.ExecuteNonQueryAsync(mp.sql, mp.parms);
+		}}", uClass_Name);
+					}
+
 					string strdalpkwherein = "";
 					foreach (ColumnInfo dalpkcol001 in table.PrimaryKeys) strdalpkwherein += string.Format(@"
-						.Where(@""`{0}` IN {{0}}"", _dataSource.Select(a => a.{1}))", dalpkcol001.Name, UFString(dalpkcol001.Name));
+						.Where(@""`{0}` IN {{0}}"", _dataSource.Select(a => a.{1}).Distinct())", dalpkcol001.Name, UFString(dalpkcol001.Name));
 					if (!string.IsNullOrEmpty(strdalpkwherein)) strdalpkwherein = strdalpkwherein.Substring(strdalpkwherein.IndexOf("						") + 6);
 					sb1.AppendFormat(@"
 {1}
@@ -1454,9 +1499,7 @@ namespace {0}.DAL {{
 			}}{6}
 		}}
 		#endregion
-
-		public {0}Info Insert({0}Info item) {{{10}
-		}}
+{10}
 {2}
 		#region async{11}
 		#endregion
@@ -1666,18 +1709,40 @@ namespace {0}.BLL {{
 		public static Task<{0}Info> InsertAsync({1}) {{
 			return InsertAsync(new {0}Info {{{2}}});
 		}}", uClass_Name, CsParam2, CsParamNoType2);
-
+					
 					var redisRemove = sb4.ToString();
+					var bll_synccode_insertMulti = identityColumn == null ? string.Format(@"
+		/// <summary>
+		/// 批量插入
+		/// </summary>
+		/// <param name=""items"">集合</param>
+		/// <returns>影响的行数</returns>
+		public static int Insert(IEnumerable<{0}Info> items) {{
+			var affrows = dal.Insert(items);
+			if (itemCacheTimeout > 0) RemoveCache(items);
+			return affrows;
+		}}", uClass_Name) : "";
+					var bll_asynccode_insertMulti = identityColumn == null ? string.Format(@"
+		/// <summary>
+		/// 批量插入
+		/// </summary>
+		/// <param name=""items"">集合</param>
+		/// <returns>影响的行数</returns>
+		async public static Task<int> InsertAsync(IEnumerable<{0}Info> items) {{
+			var affrows = await dal.InsertAsync(items);
+			if (itemCacheTimeout > 0) await RemoveCacheAsync(items);
+			return affrows;
+		}}", uClass_Name) : "";
 					sb1.AppendFormat(@"
 		public static {0}Info Insert({0}Info item) {{
 			item = dal.Insert(item);
 			if (itemCacheTimeout > 0) RemoveCache(item);
 			return item;
-		}}
+		}}{6}
 		internal static void RemoveCache({0}Info item) => RemoveCache(item == null ? null : new [] {{ item }});
 		internal static void RemoveCache(IEnumerable<{0}Info> items) {{
 			if (itemCacheTimeout <= 0 || items == null || items.Any() == false) return;
-			var keys = new string[items.Count()];
+			var keys = new string[items.Count() * {5}];
 			var keysIdx = 0;
 			foreach (var item in items) {{{2}
 			}}
@@ -1685,23 +1750,23 @@ namespace {0}.BLL {{
 		}}
 		#endregion
 {1}
-", uClass_Name, sb3.ToString(), redisRemove);
+", uClass_Name, sb3.ToString(), redisRemove, "", "", table.Uniques.Count, bll_synccode_insertMulti);
 					bll_async_code += string.Format(@"
 		async public static Task<{0}Info> InsertAsync({0}Info item) {{
 			item = await dal.InsertAsync(item);
 			if (itemCacheTimeout > 0) await RemoveCacheAsync(item);
 			return item;
-		}}
+		}}{6}
 		async internal static Task RemoveCacheAsync({0}Info item) => await RemoveCacheAsync(item == null ? null : new [] {{ item }});
 		async internal static Task RemoveCacheAsync(IEnumerable<{0}Info> items) {{
 			if (itemCacheTimeout <= 0 || items == null || items.Any() == false) return;
-			var keys = new string[items.Count()];
+			var keys = new string[items.Count() * {5}];
 			var keysIdx = 0;
 			foreach (var item in items) {{{2}
 			}}
 			await RedisHelper.RemoveAsync(keys.Distinct().ToArray());
 		}}
-", uClass_Name, "", redisRemove.Replace("RedisHelper.Remove", "await RedisHelper.RemoveAsync"));
+", uClass_Name, "", redisRemove.Replace("RedisHelper.Remove", "await RedisHelper.RemoveAsync"), "", "", table.Uniques.Count, bll_asynccode_insertMulti);
 					#endregion
 				}
 

@@ -1446,7 +1446,7 @@ namespace {0}.WebHost {{
 			Console.InputEncoding = Encoding.GetEncoding(""GB2312"");
 
 			loggerFactory.AddConsole(Configuration.GetSection(""Logging""));
-			//loggerFactory.AddNLog().AddDebug().ConfigureNLog(""nlog.config"");
+			loggerFactory.AddNLog().AddDebug();
 			NLog.LogManager.LoadConfiguration(""nlog.config"");
 
 			if (env.IsDevelopment())

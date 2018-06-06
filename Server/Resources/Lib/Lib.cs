@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Net;
-using System.Threading;
-using System.Runtime.Serialization.Json;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PList;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Runtime.Serialization.Json;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
 
 public delegate void AnonymousHandler();
 
@@ -17,16 +20,31 @@ public delegate void AnonymousHandler();
 /// </summary>
 public class Lib {
 
-	/// <summary>
-	/// 当前程序类型是否为 Web Application
-	/// </summary>
+	public static long Ip2Long(string ip) {
+		char[] separator = new char[] { '.' };
+		string[] items = ip.Split(separator);
+		return long.Parse(items[0]) << 24
+				| long.Parse(items[1]) << 16
+				| long.Parse(items[2]) << 8
+				| long.Parse(items[3]);
+	}
+	public static string Long2Ip(long ipInt) {
+		StringBuilder sb = new StringBuilder();
+		sb.Append((ipInt >> 24) & 0xFF).Append(".");
+		sb.Append((ipInt >> 16) & 0xFF).Append(".");
+		sb.Append((ipInt >> 8) & 0xFF).Append(".");
+		sb.Append(ipInt & 0xFF);
+		return sb.ToString();
+	}
 
+	#region WebUtility
 	public static string HtmlEncode(object input) { return WebUtility.HtmlEncode(string.Concat(input)); }
 	public static string HtmlDecode(object input) { return WebUtility.HtmlDecode(string.Concat(input)); }
 	public static string UrlEncode(object input) { return WebUtility.UrlEncode(string.Concat(input)); }
 	public static string UrlDecode(object input) { return WebUtility.UrlDecode(string.Concat(input)); }
 
 	public static string JSDecode(string input) { return JSDecoder.Decode(input); }
+	#endregion
 
 	#region 弥补 String.PadRight 和 String.PadLeft 对中文的 Bug
 	public static string PadRight(object text, int length) { return PadRightLeft(text, length, ' ', true); }
@@ -103,16 +121,6 @@ public class Lib {
 		}, null, milliSecond, milliSecond);
 	}
 
-	/// <summary>
-	/// 将服务器端数据转换成安全的JS字符串
-	/// </summary>
-	/// <param name="input">一个服务器端变量或字符串</param>
-	/// <returns>安全的JS字符串</returns>
-	public static string GetJsString(object input) {
-		if (input == null) return string.Empty;
-		return string.Concat(input).Replace("\\", "\\\\").Replace("\r", "\\r").Replace("\n", "\\n").Replace("'", "\\'");
-	}
-
 	static Dictionary<string, Type> _InvokeMethod_cache_type = new Dictionary<string, Type>();
 	static object _InvokeMethod_cache_type_lock = new object();
 	public static object InvokeMethod(string typeName, string method, params object[] parms) {
@@ -168,56 +176,119 @@ public class Lib {
 		return ret;
 	}
 
-	/// <summary>
-	/// (安全转换)对象/值转换类型
-	/// </summary>
-	/// <typeparam name="T">转换后的类型</typeparam>
-	/// <param name="input">转换的对象</param>
-	/// <returns>转换后的对象/值</returns>
-	public static T ConvertTo<T>(object input) {
-		return ConvertTo<T>(input, default(T));
+	static HttpClientHandler clientsslHandler;
+	static HttpClient clientssl;
+	static HttpClient client;
+	static Lib() {
+		clientsslHandler = new HttpClientHandler { ClientCertificateOptions = ClientCertificateOption.Automatic };
+		clientsslHandler.ServerCertificateCustomValidationCallback = (a, b, c, d) => true;
+		clientssl = new HttpClient(clientsslHandler);
+		client = new HttpClient();
 	}
-	public static T ConvertTo<T>(object input, T defaultValue) {
-		if (input == null) return defaultValue;
-		object obj = null;
 
-		if (defaultValue is System.Byte ||
-			defaultValue is System.Decimal ||
+	public static JToken HttpsPost(string url, object postData) {
+		StringContent data = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(postData));
+		data.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+		return Newtonsoft.Json.JsonConvert.DeserializeObject(clientssl.PostAsync(url, data).GetAwaiter().GetResult().Content.ReadAsStringAsync().GetAwaiter().GetResult()) as JToken;
+	}
+	public static JToken HttpPost(string url, object postData) {
+		StringContent data = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(postData));
+		data.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+		return Newtonsoft.Json.JsonConvert.DeserializeObject(client.PostAsync(url, data).GetAwaiter().GetResult().Content.ReadAsStringAsync().GetAwaiter().GetResult()) as JToken;
+	}
+	public static JToken HttpsGet(string url) {
+		return Newtonsoft.Json.JsonConvert.DeserializeObject(clientssl.GetAsync(url).GetAwaiter().GetResult().Content.ReadAsStringAsync().GetAwaiter().GetResult()) as JToken;
+	}
+	public static JToken HttpGet(string url) {
+		return Newtonsoft.Json.JsonConvert.DeserializeObject(client.GetAsync(url).GetAwaiter().GetResult().Content.ReadAsStringAsync().GetAwaiter().GetResult()) as JToken;
+	}
+	public static byte[] HttpsGetBytes(string url) {
+		return clientssl.GetAsync(url).GetAwaiter().GetResult().Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+	}
+	public static byte[] HttpGetBytes(string url) {
+		return client.GetAsync(url).GetAwaiter().GetResult().Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+	}
+	public static byte[] HttpsPostBytes(string url, object postData) {
+		StringContent data = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(postData));
+		data.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+		return clientssl.PostAsync(url, data).GetAwaiter().GetResult().Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+	}
+	public static byte[] HttpPostBytes(string url, object postData) {
+		StringContent data = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(postData));
+		data.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+		return client.PostAsync(url, data).GetAwaiter().GetResult().Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+	}
 
-			defaultValue is System.Int16 ||
-			defaultValue is System.Int32 ||
-			defaultValue is System.Int64 ||
-			defaultValue is System.SByte ||
-			defaultValue is System.Single ||
+	public static string GenerateNumberCode(int size) {
+		string ret = "";
+		for (int a = 0; a < size; a++) ret += new Random().Next(0, 10);
+		return ret;
+	}
 
-			defaultValue is System.UInt16 ||
-			defaultValue is System.UInt32 ||
-			defaultValue is System.UInt64) {
-			decimal trydec = 0;
-			if (decimal.TryParse(string.Concat(input), out trydec)) obj = trydec;
-		} else {
-			if (defaultValue is System.DateTime) {
-				DateTime trydt = DateTime.Now;
-				if (DateTime.TryParse(string.Concat(input), out trydt)) obj = trydt;
-			} else {
-				if (defaultValue is System.Boolean) {
-					bool trybool = false;
-					if (bool.TryParse(string.Concat(input), out trybool)) obj = trybool;
-				} else {
-					if (defaultValue is System.Double) {
-						double trydb = 0;
-						if (double.TryParse(string.Concat(input), out trydb)) obj = trydb;
-					} else {
-						obj = input;
-					}
-				}
-			}
-		}
+	public static object Hash_HMAC(string signatureString, string secretKey, bool raw_output = false) {
+		HMACSHA1 hmac = new HMACSHA1(Encoding.UTF8.GetBytes(secretKey));
+		hmac.Initialize();
+		byte[] buffer = Encoding.UTF8.GetBytes(signatureString);
+		if (raw_output) return hmac.ComputeHash(buffer);
+		return BitConverter.ToString(hmac.ComputeHash(buffer)).Replace("-", "").ToLower();
+	}
 
+	public static string SHA1(string text, Encoding encode) {
 		try {
-			if (obj != null) return (T)Convert.ChangeType(obj, typeof(T));
-		} catch { }
+			SHA1 sha1 = new SHA1CryptoServiceProvider();
+			byte[] bytes_in = encode.GetBytes(text);
+			byte[] bytes_out = sha1.ComputeHash(bytes_in);
+			sha1.Dispose();
+			string result = BitConverter.ToString(bytes_out);
+			result = result.Replace("-", "");
+			return result.ToLower();
+		} catch (Exception ex) {
+			throw new Exception("SHA1加密出错：" + ex.Message);
+		}
+	}
 
-		return defaultValue;
+	public static string MD5(string source) {
+		byte[] sor = Encoding.UTF8.GetBytes(source);
+		MD5 md5 = System.Security.Cryptography.MD5.Create();
+		byte[] result = md5.ComputeHash(sor);
+		StringBuilder strbul = new StringBuilder(40);
+		for (int i = 0; i < result.Length; i++)
+			strbul.Append(result[i].ToString("x2"));//加密结果"x2"结果为32位,"x3"结果为48位,"x4"结果为64位
+		return strbul.ToString();
+	}
+
+	public static string AESEncrypt(string text, byte[] key, byte[] iv) {
+		RijndaelManaged rijndaelCipher = new RijndaelManaged();
+		rijndaelCipher.Mode = CipherMode.CBC;
+		rijndaelCipher.Padding = PaddingMode.PKCS7;
+		rijndaelCipher.KeySize = 128;
+		rijndaelCipher.BlockSize = 128;
+		byte[] keyBytes = new byte[16];
+		Array.Copy(key, keyBytes, Math.Min(keyBytes.Length, key.Length));
+		rijndaelCipher.Key = keyBytes;
+		byte[] ivBytes = new byte[16];
+		Array.Copy(iv, ivBytes, Math.Min(ivBytes.Length, iv.Length));
+		rijndaelCipher.IV = ivBytes;
+		ICryptoTransform transform = rijndaelCipher.CreateEncryptor();
+		byte[] plainText = Encoding.UTF8.GetBytes(text);
+		byte[] cipherBytes = transform.TransformFinalBlock(plainText, 0, plainText.Length);
+		return Convert.ToBase64String(cipherBytes);
+	}
+	public static string AESDecrypt(string base64_text, byte[] key, byte[] iv) {
+		RijndaelManaged rijndaelCipher = new RijndaelManaged();
+		rijndaelCipher.Mode = CipherMode.CBC;
+		rijndaelCipher.Padding = PaddingMode.PKCS7;
+		rijndaelCipher.KeySize = 128;
+		rijndaelCipher.BlockSize = 128;
+		byte[] encryptedData = Convert.FromBase64String(base64_text);
+		byte[] keyBytes = new byte[16];
+		Array.Copy(key, keyBytes, Math.Min(keyBytes.Length, key.Length));
+		rijndaelCipher.Key = keyBytes;
+		byte[] ivBytes = new byte[16];
+		Array.Copy(iv, ivBytes, Math.Min(ivBytes.Length, iv.Length));
+		rijndaelCipher.IV = ivBytes;
+		ICryptoTransform transform = rijndaelCipher.CreateDecryptor();
+		byte[] plainText = transform.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+		return Encoding.UTF8.GetString(plainText);
 	}
 }

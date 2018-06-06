@@ -144,7 +144,8 @@ namespace MySql.Data.MySqlClient {
 
 			_exec.ExecuteReader(dr => {
 				int dataIndex = -1;
-				ret.Add((T)this.AggregateReadTuple(type, dr, ref dataIndex));
+				var read = this.AggregateReadTuple(type, dr, ref dataIndex);
+				ret.Add(read == null ? default(T) : (T)read);
 			}, CommandType.Text, sql);
 			return ret;
 		}
