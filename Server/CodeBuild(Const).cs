@@ -374,6 +374,7 @@ public static partial class {0}BLLExtensionMethods {{
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using {0}.Model;
 
@@ -1326,7 +1327,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 		<logger name=""*"" minlevel=""Error"" writeTo=""allfile"" />
 		<logger name=""Microsoft.*"" minlevel=""Error"" writeTo=""blackhole"" final=""true"" />
 		<logger name=""*"" minlevel=""Error"" writeTo=""ownFile-web"" />
-		<logger name=""{0}_DAL_psqlhelper"" minlevel=""Warn"" writeTo=""SQLExecuter"" />
+		<logger name=""{0}_DAL_sqlhelper"" minlevel=""Warn"" writeTo=""SQLExecuter"" />
 	</rules>
 </nlog>
 ";
@@ -1533,6 +1534,8 @@ namespace {0}.Module.Admin.Controllers {{
 			return new {{
 				FreeConnections = SqlHelper.Instance.Pool.FreeConnections.Count,
 				AllConnections = SqlHelper.Instance.Pool.AllConnections.Count,
+				GetConnectionQueue = SqlHelper.Instance.Pool.GetConnectionQueue.Count,
+				GetConnectionAsyncQueue = SqlHelper.Instance.Pool.GetConnectionAsyncQueue.Count,
 				List = ret
 			}};
 		}}
@@ -1548,6 +1551,8 @@ namespace {0}.Module.Admin.Controllers {{
 			return new {{
 				FreeConnections = RedisHelper.Instance.FreeConnections.Count,
 				AllConnections = RedisHelper.Instance.AllConnections.Count,
+				GetConnectionQueue = RedisHelper.Instance.GetConnectionQueue.Count,
+				GetConnectionAsyncQueue = RedisHelper.Instance.GetConnectionAsyncQueue.Count,
 				List = ret
 			}};
 		}}

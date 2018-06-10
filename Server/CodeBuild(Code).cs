@@ -834,13 +834,13 @@ namespace {0}.Model {{
 						sb6.AppendFormat(@"
 		public {0}Info Add{1}({2}) => Add{1}(new {0}Info {{{3}}});
 		public {0}Info Add{1}({0}Info item) {{{5}
-			return item.Save();
+			return BLL.{0}.Insert(item);
 		}}
 ", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms2_add, parmsNoneType2_add, solutionName, parmsNoneType5);
 						sb17.AppendFormat(@"
 		async public Task<{0}Info> Add{1}Async({2}) => await Add{1}Async(new {0}Info {{{3}}});
 		async public Task<{0}Info> Add{1}Async({0}Info item) {{{5}
-			return await item.SaveAsync();
+			return await BLL.{0}.InsertAsync(item);
 		}}
 ", CodeBuild.UFString(t2.ClassName), CodeBuild.UFString(addname_schema), parms2_add, parmsNoneType2_add, solutionName, parmsNoneType5);
 					}
@@ -1055,7 +1055,7 @@ namespace {0}.Model {{
 				clearSb();
 
 				Model_Build_ExtensionMethods_cs.AppendFormat(@"
-	public static string ToJson(this {0}Info item) => GetJson(new [] {{ item }});
+	public static string ToJson(this {0}Info item) => string.Concat(item);
 	public static string ToJson(this {0}Info[] items) => GetJson(items);
 	public static string ToJson(this IEnumerable<{0}Info> items) => GetJson(items);
 	public static IDictionary[] ToBson(this {0}Info[] items, Func<{0}Info, object> func = null) => GetBson(items, func);
@@ -1711,30 +1711,44 @@ namespace {0}.BLL {{
 		}}", uClass_Name, CsParam2, CsParamNoType2);
 					
 					var redisRemove = sb4.ToString();
+					string cspk2GuidSetValue = "";
+					string cspk2GuidSetValuesss = "";
+					foreach (ColumnInfo cspk2 in table.Columns) {
+						string getcstype = CodeBuild.GetCSType(cspk2.Type, uClass_Name + cspk2.Name.ToUpper(), cspk2.SqlType);
+						if (getcstype == "Guid?" && cspk2.IsPrimaryKey) {
+							cspk2GuidSetValue += string.Format("\r\n			if (item.{0} == null) item.{0} = RedisHelper.NewMongodbId();", UFString(cspk2.Name));
+							cspk2GuidSetValuesss += string.Format("\r\n			foreach (var item in items) if (item != null && item.{0} == null) item.{0} = RedisHelper.NewMongodbId();", UFString(cspk2.Name));
+						}
+						if (getcstype == "DateTime?" && cspk2.Name == "create_time" ||
+							getcstype == "DateTime?" && cspk2.Name == "update_time") {
+							cspk2GuidSetValue += string.Format("\r\n			if (item.{0} == null) item.{0} = DateTime.Now;", UFString(cspk2.Name));
+							cspk2GuidSetValuesss += string.Format("\r\n			foreach (var item in items) if (item != null && item.{0} == null) item.{0} = DateTime.Now;", UFString(cspk2.Name));
+						}
+					}
 					var bll_synccode_insertMulti = identityColumn == null ? string.Format(@"
 		/// <summary>
 		/// 批量插入
 		/// </summary>
 		/// <param name=""items"">集合</param>
 		/// <returns>影响的行数</returns>
-		public static int Insert(IEnumerable<{0}Info> items) {{
+		public static int Insert(IEnumerable<{0}Info> items) {{{1}
 			var affrows = dal.Insert(items);
 			if (itemCacheTimeout > 0) RemoveCache(items);
 			return affrows;
-		}}", uClass_Name) : "";
+		}}", uClass_Name, cspk2GuidSetValuesss) : "";
 					var bll_asynccode_insertMulti = identityColumn == null ? string.Format(@"
 		/// <summary>
 		/// 批量插入
 		/// </summary>
 		/// <param name=""items"">集合</param>
 		/// <returns>影响的行数</returns>
-		async public static Task<int> InsertAsync(IEnumerable<{0}Info> items) {{
+		async public static Task<int> InsertAsync(IEnumerable<{0}Info> items) {{{1}
 			var affrows = await dal.InsertAsync(items);
 			if (itemCacheTimeout > 0) await RemoveCacheAsync(items);
 			return affrows;
-		}}", uClass_Name) : "";
+		}}", uClass_Name, cspk2GuidSetValuesss) : "";
 					sb1.AppendFormat(@"
-		public static {0}Info Insert({0}Info item) {{
+		public static {0}Info Insert({0}Info item) {{{7}
 			item = dal.Insert(item);
 			if (itemCacheTimeout > 0) RemoveCache(item);
 			return item;
@@ -1750,9 +1764,9 @@ namespace {0}.BLL {{
 		}}
 		#endregion
 {1}
-", uClass_Name, sb3.ToString(), redisRemove, "", "", table.Uniques.Count, bll_synccode_insertMulti);
+", uClass_Name, sb3.ToString(), redisRemove, "", "", table.Uniques.Count, bll_synccode_insertMulti, cspk2GuidSetValue);
 					bll_async_code += string.Format(@"
-		async public static Task<{0}Info> InsertAsync({0}Info item) {{
+		async public static Task<{0}Info> InsertAsync({0}Info item) {{{7}
 			item = await dal.InsertAsync(item);
 			if (itemCacheTimeout > 0) await RemoveCacheAsync(item);
 			return item;
@@ -1766,7 +1780,7 @@ namespace {0}.BLL {{
 			}}
 			await RedisHelper.RemoveAsync(keys.Distinct().ToArray());
 		}}
-", uClass_Name, "", redisRemove.Replace("RedisHelper.Remove", "await RedisHelper.RemoveAsync"), "", "", table.Uniques.Count, bll_asynccode_insertMulti);
+", uClass_Name, "", redisRemove.Replace("RedisHelper.Remove", "await RedisHelper.RemoveAsync"), "", "", table.Uniques.Count, bll_asynccode_insertMulti, cspk2GuidSetValue);
 					#endregion
 				}
 

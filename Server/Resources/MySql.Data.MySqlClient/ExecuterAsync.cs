@@ -67,6 +67,7 @@ namespace MySql.Data.MySqlClient {
 			DateTime dt = DateTime.Now;
 			MySqlCommand cmd = new MySqlCommand();
 			var pc = await PrepareCommandAsync(cmd, cmdType, cmdText, cmdParms);
+			DateTime logtxt_dt = DateTime.Now;
 			int val = 0;
 			Exception ex = null;
 			try {
@@ -76,7 +77,9 @@ namespace MySql.Data.MySqlClient {
 				ex = ex2;
 			}
 
+			if (IsTracePerformance) logtxt_dt = DateTime.Now;
 			this.Pool.ReleaseConnection(pc.conn);
+			if (IsTracePerformance) pc.logtxt += $"ReleaseConnection: {DateTime.Now.Subtract(logtxt_dt).TotalMilliseconds}ms Total: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms";
 			LoggerException(cmd, ex, dt, pc.logtxt);
 			cmd.Parameters.Clear();
 			return val;
@@ -85,6 +88,7 @@ namespace MySql.Data.MySqlClient {
 			DateTime dt = DateTime.Now;
 			MySqlCommand cmd = new MySqlCommand();
 			var pc = await PrepareCommandAsync(cmd, cmdType, cmdText, cmdParms);
+			DateTime logtxt_dt = DateTime.Now;
 			object val = null;
 			Exception ex = null;
 			try {
@@ -94,7 +98,9 @@ namespace MySql.Data.MySqlClient {
 				ex = ex2;
 			}
 
+			if (IsTracePerformance) logtxt_dt = DateTime.Now;
 			this.Pool.ReleaseConnection(pc.conn);
+			if (IsTracePerformance) pc.logtxt += $"ReleaseConnection: {DateTime.Now.Subtract(logtxt_dt).TotalMilliseconds}ms Total: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms";
 			LoggerException(cmd, ex, dt, pc.logtxt);
 			cmd.Parameters.Clear();
 			return val;

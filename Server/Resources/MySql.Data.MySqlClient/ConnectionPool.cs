@@ -27,6 +27,9 @@ namespace MySql.Data.MySqlClient {
 				if (m.Success) int.TryParse(m.Groups[1].Value, out MaxPoolSize);
 				else MaxPoolSize = 32;
 				if (MaxPoolSize <= 0) MaxPoolSize = 32;
+				var initConns = new SqlConnection2[MaxPoolSize];
+				for (var a = 0; a < MaxPoolSize; a++) initConns[a] = GetFreeConnection();
+				foreach (var conn in initConns) ReleaseConnection(conn);
 			}
 		}
 
@@ -75,7 +78,7 @@ namespace MySql.Data.MySqlClient {
 				TaskCompletionSource<SqlConnection2> tcs = new TaskCompletionSource<SqlConnection2>();
 				lock (_lock_GetConnectionQueue)
 					GetConnectionAsyncQueue.Enqueue(tcs);
-				conn = await tcs.Task;
+				return await tcs.Task;
 			}
 			conn.ThreadId = Thread.CurrentThread.ManagedThreadId;
 			conn.LastActive = DateTime.Now;
@@ -84,7 +87,7 @@ namespace MySql.Data.MySqlClient {
 		}
 
 		public void ReleaseConnection(SqlConnection2 conn) {
-			//conn.SqlConnection.Close();
+			//try { conn.SqlConnection.Close(); } catch { }
 			lock (_lock)
 				FreeConnections.Enqueue(conn);
 
@@ -94,7 +97,7 @@ namespace MySql.Data.MySqlClient {
 				lock (_lock_GetConnectionQueue)
 					if (GetConnectionAsyncQueue.Count > 0)
 						tcs = GetConnectionAsyncQueue.Dequeue();
-				if (isAsync = (tcs != null)) tcs.SetResult(GetConnectionAsync().Result);
+				if (isAsync = (tcs != null)) tcs.TrySetResult(GetConnectionAsync().Result);
 			}
 			if (isAsync == false && GetConnectionQueue.Count > 0) {
 				ManualResetEventSlim wait = null;

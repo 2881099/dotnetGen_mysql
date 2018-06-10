@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -11,7 +12,8 @@ namespace MySql.Data.MySqlClient {
 	public partial class Executer : IDisposable {
 
 		public bool IsTracePerformance { get; set; } = string.Compare(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), "Development", true) == 0;
-		public ILogger Log { get; set; }
+		public static ILogger LogStatic;
+		public ILogger Log { get { return LogStatic; } set { LogStatic = value; } }
 		public ConnectionPool Pool { get; }
 		public Executer() { }
 		public Executer(ILogger log, string connectionString) {
@@ -118,9 +120,11 @@ namespace MySql.Data.MySqlClient {
 				ex = ex2;
 			}
 
-			if (IsTracePerformance) logtxt_dt = DateTime.Now;
-			if (pc.Tran == null) this.Pool.ReleaseConnection(pc.Conn);
-			if (IsTracePerformance) logtxt += $"ReleaseConnection: {DateTime.Now.Subtract(logtxt_dt).TotalMilliseconds}ms Total: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms";
+			if (pc.Tran == null) {
+				if (IsTracePerformance) logtxt_dt = DateTime.Now;
+				this.Pool.ReleaseConnection(pc.Conn);
+				if (IsTracePerformance) logtxt += $"ReleaseConnection: {DateTime.Now.Subtract(logtxt_dt).TotalMilliseconds}ms Total: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms";
+			}
 			LoggerException(cmd, ex, dt, logtxt);
 		}
 		public object[][] ExeucteArray(CommandType cmdType, string cmdText, params MySqlParameter[] cmdParms) {
@@ -136,6 +140,7 @@ namespace MySql.Data.MySqlClient {
 			DateTime dt = DateTime.Now;
 			MySqlCommand cmd = new MySqlCommand();
 			string logtxt = "";
+			DateTime logtxt_dt = DateTime.Now;
 			var pc = PrepareCommand(cmd, cmdType, cmdText, cmdParms, ref logtxt);
 			int val = 0;
 			Exception ex = null;
@@ -146,7 +151,11 @@ namespace MySql.Data.MySqlClient {
 				ex = ex2;
 			}
 
-			if (pc.Tran == null) this.Pool.ReleaseConnection(pc.Conn);
+			if (pc.Tran == null) {
+				if (IsTracePerformance) logtxt_dt = DateTime.Now;
+				this.Pool.ReleaseConnection(pc.Conn);
+				if (IsTracePerformance) logtxt += $"ReleaseConnection: {DateTime.Now.Subtract(logtxt_dt).TotalMilliseconds}ms Total: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms";
+			}
 			LoggerException(cmd, ex, dt, logtxt);
 			cmd.Parameters.Clear();
 			return val;
@@ -155,6 +164,7 @@ namespace MySql.Data.MySqlClient {
 			DateTime dt = DateTime.Now;
 			MySqlCommand cmd = new MySqlCommand();
 			string logtxt = "";
+			DateTime logtxt_dt = DateTime.Now;
 			var pc = PrepareCommand(cmd, cmdType, cmdText, cmdParms, ref logtxt);
 			object val = null;
 			Exception ex = null;
@@ -165,7 +175,11 @@ namespace MySql.Data.MySqlClient {
 				ex = ex2;
 			}
 
-			if (pc.Tran == null) this.Pool.ReleaseConnection(pc.Conn);
+			if (pc.Tran == null) {
+				if (IsTracePerformance) logtxt_dt = DateTime.Now;
+				this.Pool.ReleaseConnection(pc.Conn);
+				if (IsTracePerformance) logtxt += $"ReleaseConnection: {DateTime.Now.Subtract(logtxt_dt).TotalMilliseconds}ms Total: {DateTime.Now.Subtract(dt).TotalMilliseconds}ms";
+			}
 			LoggerException(cmd, ex, dt, logtxt);
 			cmd.Parameters.Clear();
 			return val;
@@ -229,7 +243,6 @@ namespace MySql.Data.MySqlClient {
 		}
 
 		private Dictionary<int, SqlTransaction2> _trans = new Dictionary<int, SqlTransaction2>();
-		private List<SqlTransaction2> _trans_tmp = new List<SqlTransaction2>();
 		private object _trans_lock = new object();
 
 		private MySqlTransaction CurrentThreadTransaction {
@@ -256,74 +269,59 @@ namespace MySql.Data.MySqlClient {
 				if (conn.SqlConnection.Ping() == false) conn.SqlConnection.Open();
 				tran = new SqlTransaction2(conn, conn.SqlConnection.BeginTransaction(), timeout);
 			}, 1);
-
 			if (ex != null) {
-				Log.LogError(new EventId(9999, "数据库出错（开启事务）"), ex, "数据库出错（开启事务）");
+				Log.LogError($"数据库出错（开启事务）{ex.Message} \r\n{ex.StackTrace}");
 				throw ex;
 			}
+			if (_trans.ContainsKey(tid)) CommitTransaction();
 
-			if (_trans.ContainsKey(tid))
-				CommitTransaction();
-
-			lock (_trans_lock) {
+			lock (_trans_lock)
 				_trans.Add(tid, tran);
-				_trans_tmp.Add(tran);
-			}
 		}
 
 		/// <summary>
 		/// 自动提交事务
 		/// </summary>
 		private void AutoCommitTransaction() {
-			if (_trans_tmp.Count > 0) {
-				List<SqlTransaction2> trans = null;
+			if (_trans.Count > 0) {
+				SqlTransaction2[] trans = null;
 				lock (_trans_lock)
-					trans = _trans_tmp.FindAll(st2 => DateTime.Now.Subtract(st2.RunTime) > st2.Timeout);
-				foreach (SqlTransaction2 tran in trans)
-					CommitTransaction(true, tran);
+					trans = _trans.Values.Where(st2 => DateTime.Now.Subtract(st2.RunTime) > st2.Timeout).ToArray();
+				foreach (SqlTransaction2 tran in trans) CommitTransaction(true, tran);
 			}
 		}
 		private void CommitTransaction(bool isCommit, SqlTransaction2 tran) {
 			if (tran == null || tran.Transaction == null || tran.Transaction.Connection == null) return;
 
-			lock (_trans_lock) {
+			lock (_trans_lock)
 				_trans.Remove(tran.Conn.ThreadId);
-				_trans_tmp.Remove(tran);
-			}
 
 			try {
-				if (isCommit)
-					tran.Transaction.Commit();
-				else
-					tran.Transaction.Rollback();
+				if (isCommit) tran.Transaction.Commit();
+				else tran.Transaction.Rollback();
 				this.Pool.ReleaseConnection(tran.Conn);
-			} catch { }
+			} catch (Exception ex) {
+				var f001 = isCommit ? "提交" : "回滚";
+				Executer.LogStatic.LogError($"数据库出错（{f001}事务）：{ex.Message} {ex.StackTrace}");
+			}
 		}
 		private void CommitTransaction(bool isCommit) {
-			int tid = Thread.CurrentThread.ManagedThreadId;
-
-			if (_trans.ContainsKey(tid))
-				CommitTransaction(isCommit, _trans[tid]);
+			if (_trans.TryGetValue(Thread.CurrentThread.ManagedThreadId, out var tran)) CommitTransaction(isCommit, tran);
 		}
 		/// <summary>
 		/// 提交事务
 		/// </summary>
-		public void CommitTransaction() {
-			CommitTransaction(true);
-		}
+		public void CommitTransaction() => CommitTransaction(true);
 		/// <summary>
 		/// 回滚事务
 		/// </summary>
-		public void RollbackTransaction() {
-			CommitTransaction(false);
-		}
+		public void RollbackTransaction() => CommitTransaction(false);
 
 		public void Dispose() {
 			SqlTransaction2[] trans = null;
 			lock (_trans_lock)
-				trans = _trans_tmp.ToArray();
-			foreach (SqlTransaction2 tran in trans)
-				CommitTransaction(false, tran);
+				trans = _trans.Values.ToArray();
+			foreach (SqlTransaction2 tran in trans) CommitTransaction(false, tran);
 		}
 		#endregion
 	}
