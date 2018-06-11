@@ -2929,7 +2929,153 @@ namespace {0}.BLL {{
 				#endregion
 				#region readme.md
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\readme.md"), Deflate.Compress(string.Format(@"# {0}
-.net core模块化开发框架", solutionName))));
+.net core模块化开发框架
+
+# 项目结构介绍
+
+## Module
+
+	所有业务接口约定在 Module 划分开发
+
+	Module/Admin
+	生成的后台管理模块，http://localhost:5001/module/Admin 可访问
+
+	Module/Test
+	生成的测试模块
+
+## WebHost
+
+	WebHost 编译的时候，会将 Module/* 所需文件复制到当前目录
+	WebHost 只当做主引擎运行时按需加载相应的 Module
+
+## Common
+
+	框架最基层依赖（为了持续更新，建议开发者不用动）
+	好用：WorkQueue.cs(线程级消息队列)、Socket/*(服务端与客户端封装)、Robot.cs(定时器)
+
+## Infrastructure
+
+	Module 里面每个子模块的依赖所需
+
+#### {0}.db
+
+	包含一切数据库操作的封装
+	{0}.Model(实体映射 命名：表名Info)
+	{0}.BLL(静态方法封装 命名：表名)
+	{0}.DAL(数据访问 命名：表名)
+	生成名特征取数据库名首字母大写(如: 表 test 对应 {0}.Model.TestInfo、{0}.BLL.Test、{0}.DAL.Test)
+
+	数据库设计命名习惯：所有命名(小写加下划线)、外键字段(对应主表名_主表PK名)
+	外键不支持组合字段，仅支持主键作为外键(ps: 不支持唯一键作为外键)
+	修改数据库后，双击“./GenMy只更新db.bat”可快速覆盖，所有类都使用 partial，方便代码扩展亦不会被二次生成覆盖
+
+# 数据库相关方法
+
+	假设下面的代码都使用了 using {0}.BLL; using {0}.Model;
+
+## 添加记录
+
+```csharp
+	// 如有 create_time 字段并且类型为日期，内部会初始化
+	表名Info newitem1 = 表名.Insert(Title: ""添加的标题"", Content: ""这是一段添加的内容"");
+	表名Info newitem2 = 表名.Insert(new 表名Info {{ Title = ""添加的标题"", Content = ""这是一段添加的内容"" }});
+```
+
+## 添加记录(批量)
+
+```csharp
+	List<表名Info> newitems1 = 表名.Insert(new [] {{
+		new 表名Info {{ Title = ""添加的标题1"", Content = ""这是一段添加的内容1"" }},
+		new 表名Info {{ Title = ""添加的标题2"", Content = ""这是一段添加的内容2"" }}
+	}});
+```
+
+## 更新记录
+
+```csharp
+	// 更新 id = 1 所有字段
+	表名Info newitem1 = 表名.Update(Id: 1, Title: ""添加的标题"", Content: ""这是一段添加的内容"", Clicks: 1);
+	表名Info newitem2 = 表名.Insert(new 表名Info {{ Id: 1, Title = ""添加的标题"", Content = ""这是一段添加的内容"", Clicks = 1 }});
+	// 更新 id = 1 指定字段
+	表名.UpdateDiy(1).SetTitle(""修改后的标题"").SetContent(""修改后的内容"").SetClicks(1).ExecuteNonQuery();
+	// update 表名 set clicks = clicks + 1 where id = 1
+	表名.UpdateDiy(1).SetClicksIncrement(1).ExecuteNonQuery();
+	// {0}.Model 层也有 UpdateDiy，即 new 表名Info {{ Id = 1 }}.UpdateDiy.SetClicks(1).ExecuteNonQuery();
+```
+
+## 更新记录(批量)
+
+```csharp
+	//先查找 clicks 在 0 - 100 的记录
+	List<表名Info> newitems1 = 表名.Select.WhereClicksRange(0, 100).ToList();
+	// update 表名 set clicks = clicks + 1 where id in (newitems1所有id)
+	newitems1.UpdateDiy().SetClicksIncrement(1).ExecuteNonQuery();
+```
+
+## 删除记录
+
+```csharp
+	// 删除 id = 1 的记录
+	表名.Delete(1);
+```
+
+## 按主键/唯一键获取单条记录
+
+> appsettings可配置缓存时间，以上所有增、改、删都会删除缓存保障同步
+
+```csharp
+	//按主键获取
+	UserInfo user1 = BLL.User.GetItem(1);
+	//按唯一键
+	UserInfo user2 = BLL.User.GetItemByUsername(""2881099@qq.com"");
+	// 返回 null 或 UserInfo
+```
+
+## 查询(核心)
+
+```csharp
+	//BLL.表名.Select 是一个链式查询对象，几乎支持所有查询，包括 group by、inner join等等，最终 ToList ToOne 执行 sql
+	List<UserInfo> users1 = BLL.User.Select.WhereUsername(""2881099@qq.com"").WherePassword(""******"").WhereStatus(正常).ToList();
+	//返回 new List<UserInfo>() 或 有元素的 List，永不返回 null
+```
+
+## 事务
+
+```csharp
+//错误会回滚，事务内支持所有生成的同步方法（不支持生成对应的Async方法）
+SqlHelper.Transaction(() => {{
+	if (this.Balance.UpdateDiy.SetAmountIncrement(-num).ExecuteNonQuery() <= 0) throw new Exception(""余额不足"");
+	extdata[""amountNew""] = this.Balance.Amount.ToString();
+	extdata[""balanceChangelogId""] = RedisHelper.NewMongodbId();
+	order = this.AddBet_order(Amount: 1, Count: num, Count_off: num, Extdata: extdata, Status: Et_bet_order_statusENUM.NEW, Type: Et_bet_tradetypeENUM.拆分);
+}});
+```
+
+
+# 生成规则
+
+## 不会生成
+
+* 没有主键，不会生成 增、改、删 方法
+* 有自增字段，不会生成 批量 Insert 方法
+
+## 会生成
+
+* 有外键，会生成
+	> new 主键表Info().Addxxx、new 主键表Model().Obj_外键表s
+
+	> new 外键表Info().Obj_主键表、外键表.DeleteBy外键、外键表.Select.Where外键
+* 多对多，会生成
+	> new 表1Info().Flag表2、new 表1Info().UnFlag表2、new 表1Info().Obj_表2s、表1.Select.Where表2
+
+	> new 表2Info().Flag表1、new 表2Info().UnFlag表1、new 表2Info().Obj_表1s、表2.Select.Where表1
+* 字段类型 point，会生成
+	> 表.Select.Where字段MbrContains(查找地理位置多少米范围内的记录，距离由近到远排序)
+
+* 字段类型 string相关并且长度 <= 300，会生成
+	> 表.Select.Where字段Like
+* 90%的数据类型被支持
+", solutionName))));
 				clearSb();
 				#endregion
 
