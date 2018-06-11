@@ -3031,12 +3031,13 @@ namespace {0}.BLL {{
 	// 返回 null 或 UserInfo
 ```
 
-## 查询(核心)
-
 ```csharp
-	//BLL.表名.Select 是一个链式查询对象，几乎支持所有查询，包括 group by、inner join等等，最终 ToList ToOne 执行 sql
-	List<UserInfo> users1 = BLL.User.Select.WhereUsername(""2881099@qq.com"").WherePassword(""******"").WhereStatus(正常).ToList();
-	//返回 new List<UserInfo>() 或 有元素的 List，永不返回 null
+//BLL.表名.Select 是一个链式查询对象，几乎支持所有查询，包括 group by、inner join等等，最终 ToList ToOne Aggregate 执行 sql
+List<UserInfo> users1 = BLL.User.Select.WhereUsername(""2881099@qq.com"").WherePassword(""******"").WhereStatus(正常).ToList();
+//返回 new List<UserInfo>() 或 有元素的 List，永不返回 null
+
+//返回指定列，返回List<元组>
+var users2 = BLL.User.Select.WhereStatus(正常).Aggregate<(int id, string title)>(""id,title"");
 ```
 
 ## 事务
@@ -3051,6 +3052,21 @@ SqlHelper.Transaction(() => {{
 }});
 ```
 
+## 缓存
+
+1、{0}.BLL GetItem、GetItemBy唯一键，使用了默认缓存策略180秒，用来缓存一条记录，db 层能自动维护缓存同步，例如：
+
+```csharp
+//只有第一次查询了数据库，后面99次读取redis的缓存值
+UserInfo u;
+for (var a = 0; a < 100; a++)
+	u = BLL.User.GetItemByUsername(""2881099@qq.com"");
+
+//执行类似以下的数据变动方法，会删除redis对应的缓存
+u.UpdateDiy.SetLogin_time(DateTime.Now).ExecuteNonQuery();
+```
+
+2、BLL.Select.ToList(10, ""cache_key"")，将查询结果缓存10秒，需要手工删除redis对应的键
 
 # 生成规则
 

@@ -179,30 +179,30 @@ CREATE TABLE `topic` (
 ## 更新记录
 
 ```csharp
-	// 更新 id = 1 所有字段
-	表名Info newitem1 = 表名.Update(Id: 1, Title: "添加的标题", Content: "这是一段添加的内容", Clicks: 1);
-	表名Info newitem2 = 表名.Insert(new 表名Info { Id: 1, Title = "添加的标题", Content = "这是一段添加的内容", Clicks = 1 });
-	// 更新 id = 1 指定字段
-	表名.UpdateDiy(1).SetTitle("修改后的标题").SetContent("修改后的内容").SetClicks(1).ExecuteNonQuery();
-	// update 表名 set clicks = clicks + 1 where id = 1
-	表名.UpdateDiy(1).SetClicksIncrement(1).ExecuteNonQuery();
-	// xx.Model 层也有 UpdateDiy，即 new 表名Info { Id = 1 }.UpdateDiy.SetClicks(1).ExecuteNonQuery();
+// 更新 id = 1 所有字段
+表名Info newitem1 = 表名.Update(Id: 1, Title: "添加的标题", Content: "这是一段添加的内容", Clicks: 1);
+表名Info newitem2 = 表名.Insert(new 表名Info { Id: 1, Title = "添加的标题", Content = "这是一段添加的内容", Clicks = 1 });
+// 更新 id = 1 指定字段
+表名.UpdateDiy(1).SetTitle("修改后的标题").SetContent("修改后的内容").SetClicks(1).ExecuteNonQuery();
+// update 表名 set clicks = clicks + 1 where id = 1
+表名.UpdateDiy(1).SetClicksIncrement(1).ExecuteNonQuery();
+// xx.Model 层也有 UpdateDiy，即 new 表名Info { Id = 1 }.UpdateDiy.SetClicks(1).ExecuteNonQuery();
 ```
 
 ## 更新记录(批量)
 
 ```csharp
-	//先查找 clicks 在 0 - 100 的记录
-	List<表名Info> newitems1 = 表名.Select.WhereClicksRange(0, 100).ToList();
-	// update 表名 set clicks = clicks + 1 where id in (newitems1所有id)
-	newitems1.UpdateDiy().SetClicksIncrement(1).ExecuteNonQuery();
+//先查找 clicks 在 0 - 100 的记录
+List<表名Info> newitems1 = 表名.Select.WhereClicksRange(0, 100).ToList();
+// update 表名 set clicks = clicks + 1 where id in (newitems1所有id)
+newitems1.UpdateDiy().SetClicksIncrement(1).ExecuteNonQuery();
 ```
 
 ## 删除记录
 
 ```csharp
-	// 删除 id = 1 的记录
-	表名.Delete(1);
+// 删除 id = 1 的记录
+表名.Delete(1);
 ```
 
 ## 按主键/唯一键获取单条记录
@@ -210,19 +210,22 @@ CREATE TABLE `topic` (
 > appsettings可配置缓存时间，以上所有增、改、删都会删除缓存保障同步
 
 ```csharp
-	//按主键获取
-	UserInfo user1 = BLL.User.GetItem(1);
-	//按唯一键
-	UserInfo user2 = BLL.User.GetItemByUsername("2881099@qq.com");
-	// 返回 null 或 UserInfo
+//按主键获取
+UserInfo user1 = BLL.User.GetItem(1);
+//按唯一键
+UserInfo user2 = BLL.User.GetItemByUsername("2881099@qq.com");
+// 返回 null 或 UserInfo
 ```
 
 ## 查询(核心)
 
 ```csharp
-	//BLL.表名.Select 是一个链式查询对象，几乎支持所有查询，包括 group by、inner join等等，最终 ToList ToOne 执行 sql
-	List<UserInfo> users1 = BLL.User.Select.WhereUsername("2881099@qq.com").WherePassword("******").WhereStatus(正常).ToList();
-	//返回 new List<UserInfo>() 或 有元素的 List，永不返回 null
+//BLL.表名.Select 是一个链式查询对象，几乎支持所有查询，包括 group by、inner join等等，最终 ToList ToOne Aggregate 执行 sql
+List<UserInfo> users1 = BLL.User.Select.WhereUsername("2881099@qq.com").WherePassword("******").WhereStatus(正常).ToList();
+//返回 new List<UserInfo>() 或 有元素的 List，永不返回 null
+
+//返回指定列，返回List<元组>
+var users2 = BLL.User.Select.WhereStatus(正常).Aggregate<(int id, string title)>("id,title");
 ```
 
 ## 事务
@@ -236,6 +239,22 @@ SqlHelper.Transaction(() => {
 	order = this.AddBet_order(Amount: 1, Count: num, Count_off: num, Extdata: extdata, Status: Et_bet_order_statusENUM.NEW, Type: Et_bet_tradetypeENUM.拆分);
 });
 ```
+
+## 缓存
+
+1、xxx.BLL GetItem、GetItemBy唯一键，使用了默认缓存策略180秒，用来缓存一条记录，db 层能自动维护缓存同步，例如：
+
+```csharp
+//只有第一次查询了数据库，后面99次读取redis的缓存值
+UserInfo u;
+for (var a = 0; a < 100; a++)
+	u = BLL.User.GetItemByUsername("2881099@qq.com");
+
+//执行类似以下的数据变动方法，会删除redis对应的缓存
+u.UpdateDiy.SetLogin_time(DateTime.Now).ExecuteNonQuery();
+```
+
+2、BLL.Select.ToList(10, "cache_key")，将查询结果缓存10秒，需要手工删除redis对应的键
 
 
 # 生成规则
