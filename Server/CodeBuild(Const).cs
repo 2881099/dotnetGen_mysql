@@ -1120,7 +1120,7 @@ return rTn;"");
 		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""2.1.0"" />
-		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""2.4.0"" />
+		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""2.5.0"" />
 	</ItemGroup>
 </Project>
 ";
@@ -1497,7 +1497,6 @@ namespace {0}.WebHost {{
 		<PackageReference Include=""Microsoft.AspNetCore.App"" />
 		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.1.0"" />
 		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.5.4"" />
-		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""2.4.0"" />
 		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.5.0"" />
 	</ItemGroup>
 </Project>
