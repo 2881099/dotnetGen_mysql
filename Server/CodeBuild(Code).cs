@@ -666,6 +666,7 @@ namespace {0}.Model {{
 					ForeignKeyInfo fk = fks.Count > 1 ? fks.Find(delegate(ForeignKeyInfo ffk) {
 						return string.Compare(table.Name + "_" + table.PrimaryKeys[0].Name, ffk.Columns[0].Name, true) == 0;
 					}) : fks[0];
+					if (fk == null) fk = fks[0];
 					//if (fk.Table.FullName == table.FullName) return; //注释这行条件为了增加 parent_id 的 obj 对象
 					List<ForeignKeyInfo> fk2 = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk2) {
 						return ffk2.Columns[0].IsPrimaryKey && ffk2 != fk;
@@ -1872,6 +1873,7 @@ namespace {0}.BLL {{
 					ForeignKeyInfo fk = fks.Count > 1 ? fks.Find(delegate(ForeignKeyInfo ffk) {
 						return string.Compare(table.Name + "_" + table.PrimaryKeys[0].Name, ffk.Columns[0].Name, true) == 0;
 					}) : fks[0];
+					if (fk == null) fk = fks[0];
 					//if (fk.Table.FullName == table.FullName) return;
 					List<ForeignKeyInfo> fk2 = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk2) {
 						return ffk2.Columns[0].IsPrimaryKey && ffk2 != fk;
