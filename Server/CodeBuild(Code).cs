@@ -1761,7 +1761,8 @@ namespace {0}.BLL {{
 			var keysIdx = 0;
 			foreach (var item in items) {{{2}
 			}}
-			RedisHelper.Remove(keys.Distinct().ToArray());
+			if (SqlHelper.Instance.CurrentThreadTransaction != null) SqlHelper.Instance.PreRemove(keys.Distinct().ToArray());
+			else RedisHelper.Remove(keys.Distinct().ToArray());
 		}}
 		#endregion
 {1}
@@ -2224,7 +2225,7 @@ namespace {0}.BLL {{
 				.LeftJoin<{0}>(""{3}"", ""{3}.{1} = a.{2}"")", CodeBuild.UFString(fks[0].ReferencedTable.ClassName), fks[0].ReferencedColumns[0].Name, fks[0].Columns[0].Name, (char)++str_controller_list_join_alias);
 							if (str_listCms2FilterFK_fkitems.Contains("	var fk_" + CodeBuild.LFString(fks[0].ReferencedTable.ClassName) + "s = ") == false)
 								str_listCms2FilterFK_fkitems += string.Format(@"
-	var fk_{1}s = {0}.Select.ToList();", CodeBuild.UFString(fks[0].ReferencedTable.ClassName), CodeBuild.LFString(fks[0].ReferencedTable.ClassName));
+	var fk_{1}s = {2}{0}.Select.ToList();", CodeBuild.UFString(fks[0].ReferencedTable.ClassName), CodeBuild.LFString(fks[0].ReferencedTable.ClassName), CodeBuild.UFString(fks[0].ReferencedTable.ClassName) == "User" ? solutionName + ".BLL." : "");
 							str_listCms2FilterFK += string.Format(@"
 			{{ name: '{0}', field: '{4}', text: @Html.Json(fk_{1}s.Select(a => a.{2})), value: @Html.Json(fk_{1}s.Select(a => a.{3})) }},",
 				CodeBuild.UFString(fks[0].ReferencedTable.ClassName), CodeBuild.LFString(fks[0].ReferencedTable.ClassName),
@@ -2366,7 +2367,7 @@ namespace {0}.BLL {{
 			if ({0}_{1}.Length > 0) select.Where{0}_{1}({0}_{1});", CodeBuild.UFString(addname), table.PrimaryKeys[0].Name);
 						if (str_listCms2FilterFK_fkitems.Contains("	var fk_" + CodeBuild.LFString(fk2[0].ReferencedTable.ClassName) + "s = ") == false)
 							str_listCms2FilterFK_fkitems += string.Format(@"
-	var fk_{1}s = {0}.Select.ToList();", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName));
+	var fk_{1}s = {2}{0}.Select.ToList();", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName), CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) == "User" ? solutionName + ".BLL." : "");
 						str_listCms2FilterFK += string.Format(@"
 			{{ name: '{0}', field: '{4}', text: @Html.Json(fk_{1}s.Select(a => a.{2})), value: @Html.Json(fk_{1}s.Select(a => a.{3})) }},",
 			CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName),
@@ -2403,7 +2404,7 @@ namespace {0}.BLL {{
 							CodeBuild.UFString(addname), CodeBuild.LFString(addname), CodeBuild.UFString(fk2[0].ReferencedColumns[0].Name), strName);
 						if (str_fk_getlist.Contains("	var fk_" + CodeBuild.LFString(fk2[0].ReferencedTable.ClassName) + "s") == false)
 							str_fk_getlist += string.Format(@"
-	var fk_{1}s = {0}.Select.ToList();", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName));
+	var fk_{1}s = {2}{0}.Select.ToList();", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName), CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) == "User" ? solutionName + ".BLL." : "");
 						str_addjs_mn_initUI += string.Format(@"
 			item.mn_{0} = @Html.Json(item.Obj_{2}s);
 			for (var a = 0; a < item.mn_{0}.length; a++) $(form.mn_{0}).find('option[value=""{{0}}""]'.format(item.mn_{0}[a].{1})).attr('selected', 'selected');", CodeBuild.UFString(addname), CodeBuild.UFString(fk2[0].ReferencedColumns[0].Name), CodeBuild.LFString(addname));
@@ -2413,10 +2414,10 @@ namespace {0}.BLL {{
 		async public Task<APIReturn> _Del([FromForm] {2}[] ids) {{
 			int affrows = 0;
 			foreach ({2} id in ids)
-				affrows += await {1}.DeleteAsync(id);
+				affrows += await {3}{1}.DeleteAsync(id);
 			if (affrows > 0) return APIReturn.成功.SetMessage($""删除成功，影响行数：{{affrows}}"");
 			return APIReturn.失败;
-		}}", solutionName, uClass_Name, CodeBuild.GetCSType(table.PrimaryKeys[0].Type, CodeBuild.UFString(table.ClassName) + table.PrimaryKeys[0].Name.ToUpper(), table.PrimaryKeys[0].SqlType).Replace("?", ""));
+		}}", solutionName, uClass_Name, CodeBuild.GetCSType(table.PrimaryKeys[0].Type, CodeBuild.UFString(table.ClassName) + table.PrimaryKeys[0].Name.ToUpper(), table.PrimaryKeys[0].SqlType).Replace("?", ""), uClass_Name == "User" ? "BLL." : "");
 					if (table.PrimaryKeys.Count > 1) {
 						string pkParses = "";
 						int pk_idx = 0;
@@ -2429,18 +2430,18 @@ namespace {0}.BLL {{
 			int affrows = 0;
 			foreach (string id in ids) {{
 				string[] vs = id.Split(',');
-				affrows += await {1}.DeleteAsync({2});
+				affrows += await {3}{1}.DeleteAsync({2});
 			}}
 			if (affrows > 0) return APIReturn.成功.SetMessage($""删除成功，影响行数：{{affrows}}"");
 			return APIReturn.失败;
-		}}", solutionName, uClass_Name, pkParses);
+		}}", solutionName, uClass_Name, pkParses, uClass_Name == "User" ? "BLL." : "");
 					}
 
 					sb1.AppendFormat(CONST.Module_Admin_Controller, solutionName, uClass_Name, nClass_Name, pkMvcRoute,
 						"[FromQuery] " + pkCsParam.Replace("?", "").Replace(", ", ", [FromQuery] "), pkCsParamNoType, itemSetValuePK, itemSetValueNotPK,
 						sb2.ToString(), sb3.ToString(), itemCsParamInsertForm, itemCsParamUpdateForm, getListParamQuery, itemSetValuePKInsert,
 						str_controller_list_join, "",
-						str_controller_insert_mn, str_controller_update_mn, str_mvcdel);
+						str_controller_insert_mn, str_controller_update_mn, str_mvcdel, uClass_Name == "User" ? "BLL." : "");
 
 					loc1.Add(new BuildInfo(string.Concat(CONST.moduleAdminPath, @"\Controllers\", uClass_Name, @"Controller.cs"), Deflate.Compress(sb1.ToString())));
 					clearSb();
@@ -2686,7 +2687,7 @@ namespace {0}.BLL {{
 							}
 							if (str_fk_getlist.Contains("	var fk_" + FK_uClass_Name + "s") == false)
 								str_fk_getlist += string.Format(@"
-	var fk_{0}s = {0}.Select.ToList();", FK_uClass_Name);
+	var fk_{0}s = {1}{0}.Select.ToList();", FK_uClass_Name, FK_uClass_Name == "User" ? solutionName + ".BLL." : "");
 						} else if ((col.Type == MySqlDbType.UInt32 || col.Type == MySqlDbType.UInt64) && (lname == "status" || lname.StartsWith("status_") || lname.EndsWith("_status"))) {
 							//加载 multi 多状态字段
 							sb4.AppendFormat(@"

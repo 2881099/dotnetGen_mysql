@@ -245,13 +245,23 @@ namespace MySql.Data.MySqlClient {
 		private Dictionary<int, SqlTransaction2> _trans = new Dictionary<int, SqlTransaction2>();
 		private object _trans_lock = new object();
 
-		private MySqlTransaction CurrentThreadTransaction {
-			get {
-				int tid = Thread.CurrentThread.ManagedThreadId;
-				if (_trans.ContainsKey(tid) && _trans[tid].Transaction.Connection != null)
-					return _trans[tid].Transaction;
-				return null;
-			}
+		public MySqlTransaction CurrentThreadTransaction => _trans.TryGetValue(Thread.CurrentThread.ManagedThreadId, out var conn) && conn.Transaction?.Connection != null ? conn.Transaction : null;
+
+		private Dictionary<int, List<string>> _preRemoveKeys = new Dictionary<int, List<string>>();
+		private object _preRemoveKeys_lock = new object();
+		public string[] PreRemove(params string[] key) {
+			var tid = Thread.CurrentThread.ManagedThreadId;
+			List<string> keys = null;
+			if (key == null || key.Any() == false) return _preRemoveKeys.TryGetValue(tid, out keys) ? keys.ToArray() : new string[0];
+			this.Log.LogDebug($"线程{tid}事务预删除Redis {Newtonsoft.Json.JsonConvert.SerializeObject(key)}");
+			if (_preRemoveKeys.TryGetValue(tid, out keys) == false)
+				lock (_preRemoveKeys_lock)
+					if (_preRemoveKeys.TryGetValue(tid, out keys) == false) {
+						_preRemoveKeys.Add(tid, keys = new List<string>(key));
+						return key;
+					}
+			keys.AddRange(key);
+			return keys.ToArray();
 		}
 
 		/// <summary>
@@ -293,16 +303,26 @@ namespace MySql.Data.MySqlClient {
 		private void CommitTransaction(bool isCommit, SqlTransaction2 tran) {
 			if (tran == null || tran.Transaction == null || tran.Transaction.Connection == null) return;
 
-			lock (_trans_lock)
-				_trans.Remove(tran.Conn.ThreadId);
+			if (_trans.ContainsKey(tran.Conn.ThreadId))
+				lock (_trans_lock)
+					if (_trans.ContainsKey(tran.Conn.ThreadId))
+						_trans.Remove(tran.Conn.ThreadId);
 
+			var removeKeys = PreRemove().Distinct().ToArray();
+			if (_preRemoveKeys.ContainsKey(tran.Conn.ThreadId))
+				lock (_preRemoveKeys_lock)
+					if (_preRemoveKeys.ContainsKey(tran.Conn.ThreadId))
+						_preRemoveKeys.Remove(tran.Conn.ThreadId);
+
+			var f001 = isCommit ? "提交" : "回滚";
 			try {
+				this.Log.LogDebug($"线程{tran.Conn.ThreadId}事务{f001}，批量删除Redis {Newtonsoft.Json.JsonConvert.SerializeObject(removeKeys)}");
 				if (isCommit) tran.Transaction.Commit();
 				else tran.Transaction.Rollback();
-				this.Pool.ReleaseConnection(tran.Conn);
 			} catch (Exception ex) {
-				var f001 = isCommit ? "提交" : "回滚";
 				Executer.LogStatic.LogError($"数据库出错（{f001}事务）：{ex.Message} {ex.StackTrace}");
+			} finally {
+				this.Pool.ReleaseConnection(tran.Conn);
 			}
 		}
 		private void CommitTransaction(bool isCommit) {

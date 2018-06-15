@@ -1742,7 +1742,7 @@ namespace {0}.Module.Admin.Controllers {{
 
 		[HttpGet]
 		async public Task<ActionResult> List([FromServices]IConfigurationRoot cfg, {12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
-			var select = {1}.Select{8};{9}
+			var select = {19}{1}.Select{8};{9}
 			long count;
 			var items = await select.Count(out count){14}.Page(page, limit).ToListAsync();
 			ViewBag.items = items;
@@ -1756,7 +1756,7 @@ namespace {0}.Module.Admin.Controllers {{
 		}}
 		[HttpGet(@""edit"")]
 		async public Task<ActionResult> Edit({4}) {{
-			{1}Info item = await {1}.GetItemAsync({5});
+			{1}Info item = await {19}{1}.GetItemAsync({5});
 			if (item == null) return APIReturn.记录不存在_或者没有权限;
 			ViewBag.item = item;
 			return View();
@@ -1767,15 +1767,15 @@ namespace {0}.Module.Admin.Controllers {{
 		[ValidateAntiForgeryToken]
 		async public Task<APIReturn> _Add({10}) {{
 			{1}Info item = new {1}Info();{13}{7}
-			item = await {1}.InsertAsync(item);{16}
+			item = await {19}{1}.InsertAsync(item);{16}
 			return APIReturn.成功.SetData(""item"", item.ToBson());
 		}}
 		[HttpPost(@""edit"")]
 		[ValidateAntiForgeryToken]
 		async public Task<APIReturn> _Edit({4}{11}) {{
-			{1}Info item = await {1}.GetItemAsync({5});
+			{1}Info item = await {19}{1}.GetItemAsync({5});
 			if (item == null) return APIReturn.记录不存在_或者没有权限;{6}{7}
-			int affrows = await {1}.UpdateAsync(item);{17}
+			int affrows = await {19}{1}.UpdateAsync(item);{17}
 			if (affrows > 0) return APIReturn.成功.SetMessage($""更新成功，影响行数：{{affrows}}"");
 			return APIReturn.失败;
 		}}
