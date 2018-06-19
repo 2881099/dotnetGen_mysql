@@ -67,7 +67,7 @@ namespace MySql.Data.MySqlClient {
 						string sb = "";
 						var ie = parms[a] as IEnumerable;
 						foreach (var z in ie) sb += z == null ? string.Concat(",NULL") : string.Concat(",'", z.ToString().Replace("'", "''"), "'");
-						nparms[a] = string.Concat("(", string.IsNullOrEmpty(sb) ? sb : sb.Substring(1), ")");
+						nparms[a] = string.IsNullOrEmpty(sb) ? sb : sb.Substring(1);
 					} else {
 						nparms[a] = string.Concat("'", parms[a].ToString().Replace("'", "''"), "'");
 						//if (parms[a] is string) nparms[a] = string.Concat('N', nparms[a]);
@@ -317,6 +317,7 @@ namespace MySql.Data.MySqlClient {
 			var f001 = isCommit ? "提交" : "回滚";
 			try {
 				this.Log.LogDebug($"线程{tran.Conn.ThreadId}事务{f001}，批量删除Redis {Newtonsoft.Json.JsonConvert.SerializeObject(removeKeys)}");
+				CSRedis.QuickHelperBase.Remove(removeKeys);
 				if (isCommit) tran.Transaction.Commit();
 				else tran.Transaction.Rollback();
 			} catch (Exception ex) {

@@ -1439,7 +1439,7 @@ namespace {0}.DAL {{
 
 					string strdalpkwherein = "";
 					foreach (ColumnInfo dalpkcol001 in table.PrimaryKeys) strdalpkwherein += string.Format(@"
-						.Where(@""`{0}` IN {{0}}"", _dataSource.Select(a => a.{1}).Distinct())", dalpkcol001.Name, UFString(dalpkcol001.Name));
+						.Where(@""`{0}` IN ({{0}})"", _dataSource.Select(a => a.{1}).Distinct())", dalpkcol001.Name, UFString(dalpkcol001.Name));
 					if (!string.IsNullOrEmpty(strdalpkwherein)) strdalpkwherein = strdalpkwherein.Substring(strdalpkwherein.IndexOf("						") + 6);
 					sb1.AppendFormat(@"
 {1}
