@@ -922,7 +922,10 @@ namespace {0}.Model {{
 						if (fk.Columns[0].IsPrimaryKey && fk.Table.PrimaryKeys.Count == 1) { //1对1关系，不应该生成 obj_xxxs
 							string obj_value = string.Format(@"
 		private {0}Info _obj_{1};
-		public {0}Info Obj_{1} => _obj_{1} ?? (_{4} == null ? null : (_obj_{1} = BLL.{0}.GetItem(_{5})));", CodeBuild.UFString(t2.ClassName), f2, solutionName, CodeBuild.UFString(fk.Columns[0].Name), CodeBuild.UFString(table.PrimaryKeys[0].Name), string.Format(GetCSTypeValue(table.PrimaryKeys[0].Type), UFString(table.PrimaryKeys[0].Name)));
+		public {0}Info Obj_{1} {{
+			get {{ return _obj_{1} ?? (_{4} == null ? null : (_obj_{1} = BLL.{0}.GetItem(_{5}))); }}
+			internal set {{ _obj_{1} = value; }}
+		}}", CodeBuild.UFString(t2.ClassName), CodeBuild.LFString(t2.ClassName), solutionName, CodeBuild.UFString(fk.Columns[0].Name), CodeBuild.UFString(table.PrimaryKeys[0].Name), string.Format(GetCSTypeValue(table.PrimaryKeys[0].Type), UFString(table.PrimaryKeys[0].Name)));
 							string objs_key = string.Format("Obj_{0}s", f2);
 							if (!dic_objs.ContainsKey(objs_key))
 								dic_objs.Add(objs_key, obj_value);
@@ -1005,8 +1008,9 @@ namespace {0}.Model {{
 			return string.Concat({7});
 		}}
 		public static {0}Info Parse(string stringify) {{
+			if (string.IsNullOrEmpty(stringify) || stringify == ""null"") return null;
 			string[] ret = stringify.Split(new char[] {{ '|' }}, {6}, StringSplitOptions.None);
-			if (ret.Length != {6}) throw new Exception(""格式不正确，{0}Info："" + stringify);
+			if (ret.Length != {6}) throw new Exception($""格式不正确，{0}Info：{{stringify}}"");
 			{0}Info item = new {0}Info();{8}
 			return item;
 		}}
@@ -1618,31 +1622,11 @@ namespace {0}.BLL {{
 		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy, uClass_Name, parmsNewItem);
 
 					sb3.AppendFormat(@"
-		public static {1}Info GetItem{2}({4}) {{
-			if (itemCacheTimeout <= 0) return Select{7}.ToOne();
-			string key = string.Concat(""{0}_BLL_{1}{2}_"", {3});
-			string value = RedisHelper.Get(key);
-			if (!string.IsNullOrEmpty(value))
-				try {{ return {1}Info.Parse(value); }} catch {{ SqlHelper.Instance.Log.LogWarning(""性能警告：{1}.GetItem{2}从缓存中反序列化失败""); }}
-			{1}Info item = Select{7}.ToOne();
-			if (item == null) return null;
-			RedisHelper.Set(key, item.Stringify(), itemCacheTimeout);
-			return item;
-		}}", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
+		public static {1}Info GetItem{2}({4}) => RedisHelper.Cache(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, () => Select{7}.ToOne(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
 		parms, parmsNoneType, cacheCond, whereCondi);
 
 					bll_async_code += string.Format(@"
-		async public static Task<{1}Info> GetItem{2}Async({4}) {{
-			if (itemCacheTimeout <= 0) return await Select{7}.ToOneAsync();
-			string key = string.Concat(""{0}_BLL_{1}{2}_"", {3});
-			string value = await RedisHelper.GetAsync(key);
-			if (!string.IsNullOrEmpty(value))
-				try {{ return {1}Info.Parse(value); }} catch {{ SqlHelper.Instance.Log.LogWarning(""性能警告：{1}.GetItem{2}Async从缓存中反序列化失败""); }}
-			{1}Info item = await Select{7}.ToOneAsync();
-			if (item == null) return null;
-			await RedisHelper.SetAsync(key, item.Stringify(), itemCacheTimeout);
-			return item;
-		}}", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
+		async public static Task<{1}Info> GetItem{2}Async({4}) => await RedisHelper.CacheAsync(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, async () => await Select{7}.ToOneAsync(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
 		parms, parmsNoneType, cacheCond, whereCondi);
 
 					sb4.AppendFormat(@"

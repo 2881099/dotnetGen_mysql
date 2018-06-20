@@ -8,6 +8,63 @@ using System.Threading.Tasks;
 namespace CSRedis {
 	partial class QuickHelperBase {
 		/// <summary>
+		/// 缓存壳
+		/// </summary>
+		/// <typeparam name="T">缓存类型</typeparam>
+		/// <param name="key">不含prefix前辍RedisHelper.Name</param>
+		/// <param name="timeoutSeconds">缓存秒数</param>
+		/// <param name="getData">获取源数据的函数</param>
+		/// <param name="serialize">序列化函数，默认：Newtonsoft.Json.JsonConvert.SerializeObject</param>
+		/// <param name="deserialize">反序列化函数，默认：Newtonsoft.Json.JsonConvert.DeserializeObject&lt;<typeparamref name="T"/>&gt;</param>
+		/// <returns></returns>
+		async public static Task<T> CacheAsync<T>(string key, int timeoutSeconds, Func<Task<T>> getDataAsync, Func<T, string> serialize = null, Func<string, T> deserialize = null) {
+			if (timeoutSeconds <= 0) return await getDataAsync();
+			var cacheValue = await GetAsync(key);
+			if (!string.IsNullOrEmpty(cacheValue)) {
+				try {
+					return deserialize == null ? Newtonsoft.Json.JsonConvert.DeserializeObject<T>(cacheValue) : deserialize(cacheValue);
+				} catch {
+					await RemoveAsync(key);
+					throw;
+				}
+			}
+			var ret = await getDataAsync();
+			await SetAsync(key, serialize == null ? Newtonsoft.Json.JsonConvert.SerializeObject(ret) : serialize(ret), timeoutSeconds);
+			return ret;
+		}
+		/// <summary>
+		/// 缓存壳(哈希表)
+		/// </summary>
+		/// <typeparam name="T">缓存类型</typeparam>
+		/// <param name="key">不含prefix前辍RedisHelper.Name</param>
+		/// <param name="field">字段</param>
+		/// <param name="timeoutSeconds">缓存秒数</param>
+		/// <param name="getDataAsync">获取源数据的函数</param>
+		/// <param name="serialize">序列化函数，默认：Newtonsoft.Json.JsonConvert.SerializeObject</param>
+		/// <param name="deserialize">反序列化函数，默认：Newtonsoft.Json.JsonConvert.DeserializeObject&lt;<typeparamref name="T"/>&gt;</param>
+		/// <returns></returns>
+		async public static Task<T> CacheAsync<T>(string key, string field, long timeoutSeconds, Func<Task<T>> getDataAsync, Func<T, string> serialize = null, Func<string, T> deserialize = null) {
+			if (timeoutSeconds <= 0) return await getDataAsync();
+			var cacheValue = await HashGetAsync(key, field);
+			if (!string.IsNullOrEmpty(cacheValue)) {
+				try {
+					if (deserialize == null) {
+						var value = Newtonsoft.Json.JsonConvert.DeserializeObject<(T, DateTime)>(cacheValue);
+						if (DateTime.Now.Subtract(value.Item2).TotalSeconds <= timeoutSeconds) return value.Item1;
+					} else {
+						var value = Newtonsoft.Json.JsonConvert.DeserializeObject<(string, DateTime)>(cacheValue);
+						if (DateTime.Now.Subtract(value.Item2).TotalSeconds <= timeoutSeconds) return deserialize(value.Item1);
+					}
+				} catch {
+					await HashDeleteAsync(key, field);
+					throw;
+				}
+			}
+			var ret = await getDataAsync();
+			await HashSetAsync(key, field, serialize == null ? Newtonsoft.Json.JsonConvert.SerializeObject((ret, DateTime.Now)) : Newtonsoft.Json.JsonConvert.SerializeObject((serialize(ret), DateTime.Now)));
+			return ret;
+		}
+		/// <summary>
 		/// 设置指定 key 的值
 		/// </summary>
 		/// <param name="key">不含prefix前辍RedisHelper.Name</param>

@@ -363,8 +363,7 @@ namespace {0}.BLL {{
 }}
 
 public static partial class {0}BLLExtensionMethods {{
-	public static List<TReturnInfo> ToList<TReturnInfo>(this SelectBuild<TReturnInfo> select, int expireSeconds, string cacheKey = null) {{ return select.ToList({0}.BLL.RedisHelper.Get, {0}.BLL.RedisHelper.Set, TimeSpan.FromSeconds(expireSeconds), cacheKey); }}
-	public static Task<List<TReturnInfo>> ToListAsync<TReturnInfo>(this SelectBuild<TReturnInfo> select, int expireSeconds, string cacheKey = null) {{ return select.ToListAsync({0}.BLL.RedisHelper.GetAsync, {0}.BLL.RedisHelper.SetAsync, TimeSpan.FromSeconds(expireSeconds), cacheKey); }}
+	
 }}
 ";
 			#endregion

@@ -7,71 +7,44 @@ using System.Threading.Tasks;
 
 namespace MySql.Data.MySqlClient {
 	partial class SelectBuild<TReturnInfo> {
-		async public Task<List<TReturnInfo>> ToListAsync(Func<string, Task<string>> cache_get, Func<string, string, int, Task<bool>> cache_set, TimeSpan expire, string cacheKey = null) {
-			bool isCache = expire > TimeSpan.Zero && cache_get != null && cache_set != null;
-			List<TReturnInfo> ret = new List<TReturnInfo>();
-			string sql = this.ToString();
+		async public Task<List<TReturnInfo>> ToListAsync(int expireSeconds, string cacheKey = null) {
+			string sql = null;
 			string[] objNames = new string[_dals.Count - 1];
 			for (int b = 1; b < _dals.Count; b++) {
 				string name = _dals[b].GetType().Name;
 				objNames[b - 1] = string.Concat("Obj_", name[0].ToString().ToLower(), name.Substring(1));
 			}
-			if (isCache) {
-				if (string.IsNullOrEmpty(cacheKey)) cacheKey = sql.Substring(sql.IndexOf(" \r\nFROM ") + 8);
-				MethodInfo[] parses = new MethodInfo[_dals.Count];
-				for (int b = 0; b < _dals.Count; b++) {
-					string modelTypeName = string.Concat(_dals[b].GetType().FullName.Replace(".DAL.", ".Model."), "Info");
-					parses[b] = this.GetType().GetTypeInfo().Assembly.GetType(modelTypeName).GetMethod("Parse", new Type[] { typeof(string) });
-				}
-				string cacheValue = await cache_get(cacheKey);
-				if (!string.IsNullOrEmpty(cacheValue)) {
-					try {
-						string[] vs = JsonConvert.DeserializeObject<string[]>(cacheValue);
-						for (int a = 0, skip = objNames.Length + 1; a < vs.Length; a += skip) {
-							TReturnInfo info = (TReturnInfo) parses[0].Invoke(null, new object[] { vs[a] });
-							Type type = info.GetType();
-							for (int b = 1; b < parses.Length; b++) {
-								object item = parses[b].Invoke(null, new object[] { vs[a + b] });
-								PropertyInfo prop = type.GetProperty(objNames[b - 1]);
-								if (prop != null) prop.SetValue(info, item, null);
-							}
-							ret.Add(info);
-						}
-						return ret;
-					} catch {
-						// 转换列表的时候出错
+			if (string.IsNullOrEmpty(cacheKey)) {
+				sql = this.ToString();
+				cacheKey = sql.Substring(sql.IndexOf(" \r\nFROM ") + 8);
+			}
+			List<object> cacheList = expireSeconds > 0 ? new List<object>() : null;
+			return await CSRedis.QuickHelperBase.CacheAsync(cacheKey, expireSeconds, async () => {
+				List<TReturnInfo> ret = new List<TReturnInfo>();
+				if (string.IsNullOrEmpty(sql)) sql = this.ToString();
+				await _exec.ExecuteReaderAsync(async dr => {
+					int dataIndex = -1;
+					var read = await _dals[0].GetItemAsync(dr, dataIndex);
+					TReturnInfo info = (TReturnInfo)read.result;
+					dataIndex = read.dataIndex;
+					Type type = info.GetType();
+					ret.Add(info);
+					if (cacheList != null) cacheList.Add(type.GetMethod("Stringify").Invoke(info, null));
+					for (int b = 0; b < objNames.Length; b++) {
+						var read2 = await _dals[b + 1].GetItemAsync(dr, dataIndex);
+						object obj = read2.result;
+						dataIndex = read2.dataIndex;
+						PropertyInfo prop = type.GetProperty(objNames[b]);
+						if (prop == null) throw new Exception(string.Concat(type.FullName, " 没有定义属性 ", objNames[b]));
+						if (obj == null) prop.SetValue(info, obj, null);
+						if (cacheList != null) cacheList.Add(obj?.GetType().GetMethod("Stringify").Invoke(obj, null));
 					}
-					ret.Clear();
-				}
-			}
-			List<object> cacheList = null;
-			if (isCache) cacheList = new List<object>();
-			await _exec.ExecuteReaderAsync(async dr => {
-				int dataIndex = -1;
-				var read = await _dals[0].GetItemAsync(dr, dataIndex);
-				TReturnInfo info = (TReturnInfo) read.result;
-				dataIndex = read.dataIndex;
-				Type type = info.GetType();
-				ret.Add(info);
-				if (isCache) cacheList.Add(type.GetMethod("Stringify").Invoke(info, null));
-				for (int b = 0; b < objNames.Length; b++) {
-					var read2 = await _dals[b + 1].GetItemAsync(dr, dataIndex);
-					object obj = read2.result;
-					dataIndex = read2.dataIndex;
-					PropertyInfo prop = type.GetProperty(objNames[b]);
-					if (prop == null) throw new Exception(string.Concat(type.FullName, " 没有定义属性 ", objNames[b]));
-					prop.SetValue(info, obj, null);
-					if (isCache) cacheList.Add(obj.GetType().GetMethod("Stringify").Invoke(obj, null));
-				}
-			}, CommandType.Text, sql);
-			if (isCache) {
-				string json = JsonConvert.SerializeObject(cacheList);
-				await cache_set(cacheKey, json, (int) expire.TotalSeconds);
-			}
-			return ret;
+				}, CommandType.Text, sql);
+				return ret;
+			}, list => JsonConvert.SerializeObject(cacheList), cacheValue => ToListDeserialize(cacheValue, objNames));
 		}
 		async public Task<List<TReturnInfo>> ToListAsync() {
-			return await this.ToListAsync(null, null, TimeSpan.Zero);
+			return await this.ToListAsync(0);
 		}
 		async public Task<TReturnInfo> ToOneAsync() {
 			List<TReturnInfo> ret = await this.Limit(1).ToListAsync();
