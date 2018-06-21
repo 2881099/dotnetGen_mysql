@@ -88,64 +88,19 @@ EndGlobal
  @"using System;
 using System.Data;
 using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MySql.Data.MySqlClient;
 
 namespace {0}.BLL {{
 	/// <summary>
 	/// 数据库操作代理类，全部支持走事务
 	/// </summary>
-	public abstract partial class SqlHelper : {0}.DAL.SqlHelper {{
-	}}
-}}
-namespace {0}.DAL {{
-	public abstract partial class SqlHelper {{
-		private static string _connectionString;
-		public static string ConnectionString {{
-			get {{
-				if (string.IsNullOrEmpty(_connectionString)) _connectionString = BLL.RedisHelper.Configuration[""ConnectionStrings:MySql""];
-				return _connectionString;
-			}}
-			set {{
-				_connectionString = value;
-				Instance.Pool.ConnectionString = value;
-			}}
-		}}
-		public static Executer Instance {{ get; }} = new Executer(new LoggerFactory().CreateLogger(""{0}_DAL_sqlhelper""), ConnectionString);
+	public abstract partial class SqlHelper : MySql.Data.MySqlClient.SqlHelper {{
 
-		public static string Addslashes(string filter, params object[] parms) {{ return Executer.Addslashes(filter, parms); }}
-
-		public static void ExecuteReader(Action<MySqlDataReader> readerHander, string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteReader(readerHander, CommandType.Text, cmdText, cmdParms);
-		public static object[][] ExeucteArray(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExeucteArray(CommandType.Text, cmdText, cmdParms);
-		public static int ExecuteNonQuery(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteNonQuery(CommandType.Text, cmdText, cmdParms);
-		public static object ExecuteScalar(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalar(CommandType.Text, cmdText, cmdParms);
-
-		public static Task ExecuteReaderAsync(Func<MySqlDataReader, Task> readerHander, string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteReaderAsync(readerHander, CommandType.Text, cmdText, cmdParms);
-		public static Task<object[][]> ExeucteArrayAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExeucteArrayAsync(CommandType.Text, cmdText, cmdParms);
-		public static Task<int> ExecuteNonQueryAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteNonQueryAsync(CommandType.Text, cmdText, cmdParms);
-		public static Task<object> ExecuteScalarAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalarAsync(CommandType.Text, cmdText, cmdParms);
-
-		/// <summary>
-		/// 开启事务（不支持异步），60秒未执行完将自动提交
-		/// </summary>
-		/// <param name=""handler"">事务体 () => {{}}</param>
-		public static void Transaction(Action handler) {{
-			Transaction(handler, TimeSpan.FromSeconds(60));
-		}}
-		/// <summary>
-		/// 开启事务（不支持异步）
-		/// </summary>
-		/// <param name=""handler"">事务体 () => {{}}</param>
-		/// <param name=""timeout"">超时，未执行完将自动提交</param>
-		public static void Transaction(Action handler, TimeSpan timeout) {{
-			try {{
-				Instance.BeginTransaction(timeout);
-				handler();
-				Instance.CommitTransaction();
-			}} catch (Exception ex) {{
-				Instance.RollbackTransaction();
-				throw ex;
-			}}
+		new public static void Initialization(IDistributedCache cache, IConfiguration cacheStrategy, string connectionString, ILogger log) {{
+			MySql.Data.MySqlClient.SqlHelper.Initialization(cache, cacheStrategy, connectionString, log);
 		}}
 	}}
 }}";
@@ -306,93 +261,62 @@ namespace {0}.BLL {{
 	}}
 }}";
 			#endregion
-			public static readonly string BLL_Build_RedisHelper_cs =
+			public static readonly string BLL_Build_CSRedisClient_cs =
 			#region 内容太长已被收起
  @"using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
 
 namespace {0}.BLL {{
 
-	public partial class RedisHelper : CSRedis.QuickHelperBase {{
-		public static IConfiguration Configuration {{ get; internal set; }}
-		public static void InitializeConfiguration(IConfiguration cfg) {{
-			Configuration = cfg;
-			int port, poolsize, database;
-			string ip, pass;
-			if (!int.TryParse(cfg[""ConnectionStrings:redis:port""], out port)) port = 6379;
-			if (!int.TryParse(cfg[""ConnectionStrings:redis:poolsize""], out poolsize)) poolsize = 50;
-			if (!int.TryParse(cfg[""ConnectionStrings:redis:database""], out database)) database = 0;
-			ip = cfg[""ConnectionStrings:redis:ip""];
-			pass = cfg[""ConnectionStrings:redis:pass""];
-			Name = cfg[""ConnectionStrings:redis:name""];
-			Instance = new CSRedis.ConnectionPool(ip, port, poolsize);
-			Instance.Connected += (s, o) => {{
-				CSRedis.RedisClient rc = s as CSRedis.RedisClient;
-				if (!string.IsNullOrEmpty(pass)) rc.Auth(pass);
-				if (database > 0) rc.Select(database);
-			}};
-		}}
+	public partial class CSRedisClient : CSRedis.CSRedisClient {{
+		
+		public static CSRedisClient Default {{ get; set; }}
+		public CSRedisClient(string ip, int port = 6379, string pass = """", int poolsize = 50, int database = 0, string name = """")
+			: base(ip, port, pass, poolsize, database, name) {{}}
+
 		#region 缓存壳
 		/// <summary>
 		/// 缓存壳
 		/// </summary>
 		/// <typeparam name=""T"">缓存类型</typeparam>
-		/// <param name=""key"">不含prefix前辍RedisHelper.Name</param>
+		/// <param name=""key"">不含prefix前辍</param>
 		/// <param name=""timeoutSeconds"">缓存秒数</param>
 		/// <param name=""getData"">获取源数据的函数</param>
 		/// <returns></returns>
-		public static T Cache<T>(string key, int timeoutSeconds, Func<T> getData) => Cache(key, timeoutSeconds, getData, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<T>(cacheValue));
+		public T CacheShell<T>(string key, int timeoutSeconds, Func<T> getData) => CacheShell(key, timeoutSeconds, getData, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<T>(cacheValue));
 		/// <summary>
 		/// 缓存壳(哈希表)
 		/// </summary>
 		/// <typeparam name=""T"">缓存类型</typeparam>
-		/// <param name=""key"">不含prefix前辍RedisHelper.Name</param>
+		/// <param name=""key"">不含prefix前辍</param>
 		/// <param name=""field"">字段</param>
 		/// <param name=""timeoutSeconds"">缓存秒数</param>
 		/// <param name=""getData"">获取源数据的函数</param>
 		/// <returns></returns>
-		public static T Cache<T>(string key, string field, int timeoutSeconds, Func<T> getData) => Cache(key, field, timeoutSeconds, getData, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<(T, DateTime)>(cacheValue));
+		public T CacheShell<T>(string key, string field, int timeoutSeconds, Func<T> getData) => CacheShell(key, field, timeoutSeconds, getData, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<(T, long)>(cacheValue));
 		/// <summary>
 		/// 缓存壳
 		/// </summary>
 		/// <typeparam name=""T"">缓存类型</typeparam>
-		/// <param name=""key"">不含prefix前辍RedisHelper.Name</param>
+		/// <param name=""key"">不含prefix前辍</param>
 		/// <param name=""timeoutSeconds"">缓存秒数</param>
 		/// <param name=""getDataAsync"">获取源数据的函数</param>
 		/// <returns></returns>
-		async public static Task<T> CacheAsync<T>(string key, int timeoutSeconds, Func<Task<T>> getDataAsync) => await CacheAsync(key, timeoutSeconds, getDataAsync, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<T>(cacheValue));
+		async public Task<T> CacheShellAsync<T>(string key, int timeoutSeconds, Func<Task<T>> getDataAsync) => await CacheShellAsync(key, timeoutSeconds, getDataAsync, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<T>(cacheValue));
 		/// <summary>
 		/// 缓存壳(哈希表)
 		/// </summary>
 		/// <typeparam name=""T"">缓存类型</typeparam>
-		/// <param name=""key"">不含prefix前辍RedisHelper.Name</param>
+		/// <param name=""key"">不含prefix前辍</param>
 		/// <param name=""field"">字段</param>
 		/// <param name=""timeoutSeconds"">缓存秒数</param>
 		/// <param name=""getDataAsync"">获取源数据的函数</param>
 		/// <returns></returns>
-		async public static Task<T> CacheAsync<T>(string key, string field, int timeoutSeconds, Func<Task<T>> getDataAsync) => await CacheAsync(key, field, timeoutSeconds, getDataAsync, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<(T, DateTime)>(cacheValue));
+		async public Task<T> CacheShellAsync<T>(string key, string field, int timeoutSeconds, Func<Task<T>> getDataAsync) => await CacheShellAsync(key, field, timeoutSeconds, getDataAsync, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<(T, long)>(cacheValue));
 		#endregion
 	}}
-
-	//截至 1.2.6 版本仍然有 Timeout bug
-	//public partial class RedisHelper : StackExchange.Redis.QuickHelperBase {{
-	//	public static IConfiguration Configuration {{ get; internal set; }}
-	//	public static void InitializeConfiguration(IConfiguration cfg) {{
-	//		Configuration = cfg;
-	//		int port, poolsize, database;
-	//		string ip, pass;
-	//		if (!int.TryParse(cfg[""ConnectionStrings:redis:port""], out port)) port = 6379;
-	//		if (!int.TryParse(cfg[""ConnectionStrings:redis:poolsize""], out poolsize)) poolsize = 50;
-	//		if (!int.TryParse(cfg[""ConnectionStrings:redis:database""], out database)) database = 0;
-	//		ip = cfg[""ConnectionStrings:redis:ip""];
-	//		pass = cfg[""ConnectionStrings:redis:pass""];
-	//		Name = cfg[""ConnectionStrings:redis:name""];
-	//		Instance = new StackExchange.Redis.ConnectionMultiplexerPool($""{{ip}}:{{port}},password={{pass}},name={{Name}},defaultdatabase={{database}}"", poolsize);
-	//	}}
-	//}}
 }}
 
 public static partial class {0}BLLExtensionMethods {{
@@ -456,7 +380,8 @@ public static partial class {0}ExtensionMethods {{
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""dng.Mysql"" Version=""1.0.4"" />
+		<PackageReference Include=""dng.Mysql"" Version=""1.1.1"" />
+		<PackageReference Include=""CSRedisCore"" Version=""2.3.0"" />
 	</ItemGroup>
 </Project>
 ";
@@ -473,7 +398,7 @@ public static partial class {0}ExtensionMethods {{
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Caching.CSRedis"" Version=""2.1.3"" />
+		<PackageReference Include=""Caching.CSRedis"" Version=""2.3.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.0"" />
@@ -707,7 +632,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 		}}
 	}},
 	""ConnectionStrings"": {{
-		""MySql"": ""{{connectionString}};Encrypt=False;Max pool size=32"",
+		""{0}_mysql"": ""{{connectionString}};Encrypt=False;Max pool size=100"",
 		""redis"": {{
 			""ip"": ""127.0.0.1"",
 			""port"": 6379,
@@ -779,6 +704,10 @@ namespace {0}.WebHost {{
 				st.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
 				return st;
 			}};
+			{0}.BLL.CSRedisClient.Default = new {0}.BLL.CSRedisClient(Configuration[""ConnectionStrings:redis:ip""],
+				int.TryParse(Configuration[""ConnectionStrings:redis:port""], out var port) ? port : 6379, Configuration[""ConnectionStrings:redis:pass""], 
+				int.TryParse(Configuration[""ConnectionStrings:redis:poolsize""], out var poolsize) ? poolsize : 50,
+				int.TryParse(Configuration[""ConnectionStrings:redis:database""], out var database) ? database : 0, Configuration[""ConnectionStrings:redis:name""]);
 		}}
 
 		public static IList<ModuleInfo> Modules = new List<ModuleInfo>();
@@ -786,7 +715,7 @@ namespace {0}.WebHost {{
 		public IHostingEnvironment env {{ get; }}
 
 		public void ConfigureServices(IServiceCollection services) {{
-			services.AddSingleton<IDistributedCache>(new Microsoft.Extensions.Caching.CSRedisCache());
+			services.AddSingleton<IDistributedCache>(new Microsoft.Extensions.Caching.Redis.CSRedisCache({0}.BLL.CSRedisClient.Default));
 			services.AddSingleton<IConfiguration>(Configuration);
 			services.AddSingleton<IHostingEnvironment>(env);
 			services.AddScoped<CustomExceptionFilter>();
@@ -815,8 +744,8 @@ namespace {0}.WebHost {{
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
 
-			{0}.BLL.RedisHelper.InitializeConfiguration(Configuration);
-			{0}.DAL.SqlHelper.Instance.Log = loggerFactory.CreateLogger(""{0}_DAL_sqlhelper"");
+			{0}.BLL.SqlHelper.Initialization(app.ApplicationServices.GetService<IDistributedCache>(), Configuration.GetSection(""{0}_BLL_ITEM_CACHE""),
+				Configuration[""ConnectionStrings:{0}_mysql""], loggerFactory.CreateLogger(""{0}_DAL_sqlhelper""));
 
 			app.UseSession();
 			app.UseCors(""cors_all"");
@@ -900,17 +829,17 @@ namespace {0}.Module.Admin.Controllers {{
 		[HttpGet(@""connection/redis"")]
 		public object Get_connection_redis() {{
 			List<Hashtable> ret = new List<Hashtable>();
-			foreach (var conn in RedisHelper.Instance.AllConnections) {{
+			foreach (var conn in CSRedisClient.Default.Pool.AllConnections) {{
 				ret.Add(new Hashtable() {{
 						{{ ""最后活动"", conn.LastActive }},
 						{{ ""获取次数"", conn.UseSum }}
 					}});
 			}}
 			return new {{
-				FreeConnections = RedisHelper.Instance.FreeConnections.Count,
-				AllConnections = RedisHelper.Instance.AllConnections.Count,
-				GetConnectionQueue = RedisHelper.Instance.GetConnectionQueue.Count,
-				GetConnectionAsyncQueue = RedisHelper.Instance.GetConnectionAsyncQueue.Count,
+				FreeConnections = CSRedisClient.Default.Pool.FreeConnections.Count,
+				AllConnections = CSRedisClient.Default.Pool.AllConnections.Count,
+				GetConnectionQueue = CSRedisClient.Default.Pool.GetConnectionQueue.Count,
+				GetConnectionAsyncQueue = CSRedisClient.Default.Pool.GetConnectionAsyncQueue.Count,
 				List = ret
 			}};
 		}}

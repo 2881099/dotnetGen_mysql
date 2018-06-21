@@ -1378,8 +1378,8 @@ namespace {0}.BLL {{
 		protected static readonly int itemCacheTimeout;
 
 		static {1}() {{
-			if (!int.TryParse(RedisHelper.Configuration[""{0}_BLL_ITEM_CACHE:Timeout_{1}""], out itemCacheTimeout))
-				int.TryParse(RedisHelper.Configuration[""{0}_BLL_ITEM_CACHE:Timeout""], out itemCacheTimeout);
+			if (!int.TryParse(SqlHelper.CacheStrategy[""Timeout_{1}""], out itemCacheTimeout))
+				int.TryParse(SqlHelper.CacheStrategy[""Timeout""], out itemCacheTimeout);
 		}}", solutionName, uClass_Name);
 
 				Dictionary<string, bool> uniques_dic = new Dictionary<string, bool>();
@@ -1456,11 +1456,11 @@ namespace {0}.BLL {{
 		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy, uClass_Name, parmsNewItem);
 
 					sb3.AppendFormat(@"
-		public static {1}Info GetItem{2}({4}) => RedisHelper.Cache(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, () => Select{7}.ToOne(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
+		public static {1}Info GetItem{2}({4}) => SqlHelper.CacheShell(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, () => Select{7}.ToOne(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
 		parms, parmsNoneType, cacheCond, whereCondi);
 
 					bll_async_code += string.Format(@"
-		async public static Task<{1}Info> GetItem{2}Async({4}) => await RedisHelper.CacheAsync(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, async () => await Select{7}.ToOneAsync(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
+		async public static Task<{1}Info> GetItem{2}Async({4}) => await SqlHelper.CacheShellAsync(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, async () => await Select{7}.ToOneAsync(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
 		parms, parmsNoneType, cacheCond, whereCondi);
 
 					sb4.AppendFormat(@"
@@ -1535,8 +1535,8 @@ namespace {0}.BLL {{
 					foreach (ColumnInfo cspk2 in table.Columns) {
 						string getcstype = CodeBuild.GetCSType(cspk2.Type, uClass_Name + cspk2.Name.ToUpper(), cspk2.SqlType);
 						if (getcstype == "Guid?" && cspk2.IsPrimaryKey) {
-							cspk2GuidSetValue += string.Format("\r\n			if (item.{0} == null) item.{0} = RedisHelper.NewMongodbId();", UFString(cspk2.Name));
-							cspk2GuidSetValuesss += string.Format("\r\n			foreach (var item in items) if (item != null && item.{0} == null) item.{0} = RedisHelper.NewMongodbId();", UFString(cspk2.Name));
+							cspk2GuidSetValue += string.Format("\r\n			if (item.{0} == null) item.{0} = SqlHelper.NewMongodbId();", UFString(cspk2.Name));
+							cspk2GuidSetValuesss += string.Format("\r\n			foreach (var item in items) if (item != null && item.{0} == null) item.{0} = SqlHelper.NewMongodbId();", UFString(cspk2.Name));
 						}
 						if (getcstype == "DateTime?" && cspk2.Name == "create_time" ||
 							getcstype == "DateTime?" && cspk2.Name == "update_time") {
@@ -1580,7 +1580,7 @@ namespace {0}.BLL {{
 			foreach (var item in items) {{{2}
 			}}
 			if (SqlHelper.Instance.CurrentThreadTransaction != null) SqlHelper.Instance.PreRemove(keys.Distinct().ToArray());
-			else RedisHelper.Remove(keys.Distinct().ToArray());
+			else SqlHelper.CacheRemove(keys.Distinct().ToArray());
 		}}
 		#endregion
 {1}
@@ -1598,9 +1598,9 @@ namespace {0}.BLL {{
 			var keysIdx = 0;
 			foreach (var item in items) {{{2}
 			}}
-			await RedisHelper.RemoveAsync(keys.Distinct().ToArray());
+			await SqlHelper.CacheRemoveAsync(keys.Distinct().ToArray());
 		}}
-", uClass_Name, "", redisRemove.Replace("RedisHelper.Remove", "await RedisHelper.RemoveAsync"), "", "", table.Uniques.Count, bll_asynccode_insertMulti, cspk2GuidSetValue);
+", uClass_Name, "", redisRemove, "", "", table.Uniques.Count, bll_asynccode_insertMulti, cspk2GuidSetValue);
 					#endregion
 				}
 
@@ -2655,9 +2655,9 @@ namespace {0}.BLL {{
 			//loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\BLL\", basicName, @"\ItemCache.cs"), Deflate.Compress(sb1.ToString())));
 			clearSb();
 			#endregion
-			#region BLL RedisHelper.cs
-			sb1.AppendFormat(CONST.BLL_Build_RedisHelper_cs, solutionName);
-			loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\BLL\", basicName, @"\RedisHelper.cs"), Deflate.Compress(sb1.ToString())));
+			#region BLL CSRedisClient.cs
+			sb1.AppendFormat(CONST.BLL_Build_CSRedisClient_cs, solutionName);
+			loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\BLL\", basicName, @"\CSRedisClient.cs"), Deflate.Compress(sb1.ToString())));
 			clearSb();
 			#endregion
 			#region Model ExtensionMethods.cs 扩展方法
@@ -2863,7 +2863,7 @@ var users2 = BLL.User.Select.WhereStatus(正常).Aggregate<(int id, string title)>
 SqlHelper.Transaction(() => {{
 	if (this.Balance.UpdateDiy.SetAmountIncrement(-num).ExecuteNonQuery() <= 0) throw new Exception(""余额不足"");
 	extdata[""amountNew""] = this.Balance.Amount.ToString();
-	extdata[""balanceChangelogId""] = RedisHelper.NewMongodbId();
+	extdata[""balanceChangelogId""] = SqlHelper.NewMongodbId();
 	order = this.AddBet_order(Amount: 1, Count: num, Count_off: num, Extdata: extdata, Status: Et_bet_order_statusENUM.NEW, Type: Et_bet_tradetypeENUM.拆分);
 }});
 ```
