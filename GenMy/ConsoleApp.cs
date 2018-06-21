@@ -1,11 +1,14 @@
 ﻿using Model;
 using MySql.Data.MySqlClient;
 using MySql.Data.Types;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace GenMy {
@@ -241,6 +244,40 @@ Github: https://github.com/2881099/dotnetgen_mysql
 					using (StreamWriter sw = new StreamWriter(path, false, encode)) {
 						sw.Write(content);
 						sw.Close();
+					}
+				}
+				var appsettingsPath = Path.Combine(OutputPath, "appsettings.json");
+				var appsettingsPathWebHost = Path.Combine(OutputPath, @"src\WebHost\appsettings.json");
+				//如果三个选项为false，并且 src\WebHost\appsettings.json 不存在，则在当前目录使用 appsettings.json
+				if (this.IsDownloadRes == false && this.IsMakeSolution == false && this.IsMakeWebAdmin == false && File.Exists(appsettingsPathWebHost) == false) {
+					var appsettings = Newtonsoft.Json.JsonConvert.DeserializeObject(File.Exists(appsettingsPath) ? File.ReadAllText(appsettingsPath) : "{}") as JToken;
+					var oldtxt = appsettings.ToString();
+					if (appsettings["ConnectionStrings"] == null) appsettings["ConnectionStrings"] = new JObject();
+					if (appsettings["ConnectionStrings"]["MySql"] == null) appsettings["ConnectionStrings"]["MySql"] = this.ConnectionString + ";Encrypt=False;Max pool size=100";
+					if (appsettings["ConnectionStrings"]["redis"] == null) appsettings["ConnectionStrings"]["redis"] = JToken.FromObject(new {
+						ip = "127.0.0.1", port = 6379, pass = "", database = 13, poolsize = 50, name = this.SolutionName
+					});
+					if (appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] == null) appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] = JToken.FromObject(new {
+						Timeout = 180
+					});
+					if (appsettings["Logging"] == null) appsettings["Logging"] = new JObject();
+					if (appsettings["Logging"]["IncludeScopes"] == null) appsettings["Logging"]["IncludeScopes"] = false;
+					if (appsettings["Logging"]["LogLevel"] == null) appsettings["Logging"]["LogLevel"] = new JObject();
+					if (appsettings["Logging"]["LogLevel"]["Default"] == null) appsettings["Logging"]["LogLevel"]["Default"] = "Debug";
+					if (appsettings["Logging"]["LogLevel"]["System"] == null) appsettings["Logging"]["LogLevel"]["System"] = "Information";
+					if (appsettings["Logging"]["LogLevel"]["Microsoft"] == null) appsettings["Logging"]["LogLevel"]["Microsoft"] = "Information";
+					var newtxt = appsettings.ToString();
+					if (newtxt != oldtxt) File.WriteAllText(appsettingsPath, newtxt, Encoding.UTF8);
+					//增加当前目录 .csproj nuguet 引用 <PackageReference Include="dng.Mysql" Version="1.0.3" />
+					string csprojPath = Directory.GetFiles(OutputPath, "*.csproj").FirstOrDefault();
+					if (!string.IsNullOrEmpty(csprojPath) && File.Exists(csprojPath)) {
+						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"dng\.Mysql""\s+Version=""1\.0\.3", RegexOptions.IgnoreCase) == false) {
+							System.Diagnostics.Process pro = new System.Diagnostics.Process();
+							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package dng.Mysql --version 1.0.3") {
+								WorkingDirectory = OutputPath
+							};
+							pro.Start();
+						}
 					}
 				}
 			}

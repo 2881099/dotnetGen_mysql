@@ -185,8 +185,8 @@ namespace Server.Properties {
         ///
         ///public class CustomExceptionFilter : Attribute, IExceptionFilter {
         ///	private ILogger _logger = null;
-        ///	private IConfigurationRoot _cfg = null;
-        ///	pr [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///	private IConfiguration _cfg = null;
+        ///	privat [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string Infrastructure_Controllers_CustomExceptionFilter_cs {
             get {

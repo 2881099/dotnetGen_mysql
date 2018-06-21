@@ -1,8 +1,8 @@
 {
-  "profiles": {
-    "GenMy": {
-      "commandName": "Project",
-      "commandLineArgs": "t.com:3306 -U root -P 123456 -D wsj,test -N genmy21 -O \"C:\\Users\\Administrator\\Desktop\\新建文件夹 (2)\" -R -S -A"
-    }
-  }
+	"profiles": {
+		"GenMy": {
+			"commandName": "Project",
+			"commandLineArgs": "t.com:3306 -U root -P 123456 -D wsj,test -N genmy21 -O \"C:\\Users\\Administrator\\Desktop\\testnew\""
+		}
+	}
 }

@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 public class CustomExceptionFilter : Attribute, IExceptionFilter {
 	private ILogger _logger = null;
-	private IConfigurationRoot _cfg = null;
+	private IConfiguration _cfg = null;
 	private IHostingEnvironment _env = null;
 
-	public CustomExceptionFilter (ILogger<CustomExceptionFilter> logger, IConfigurationRoot cfg, IHostingEnvironment env) {
+	public CustomExceptionFilter (ILogger<CustomExceptionFilter> logger, IConfiguration cfg, IHostingEnvironment env) {
 		_logger = logger;
 		_cfg = cfg;
 		_env = env;

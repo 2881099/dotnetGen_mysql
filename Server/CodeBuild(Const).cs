@@ -317,8 +317,8 @@ using MySql.Data.MySqlClient;
 namespace {0}.BLL {{
 
 	public partial class RedisHelper : CSRedis.QuickHelperBase {{
-		public static IConfigurationRoot Configuration {{ get; internal set; }}
-		public static void InitializeConfiguration(IConfigurationRoot cfg) {{
+		public static IConfiguration Configuration {{ get; internal set; }}
+		public static void InitializeConfiguration(IConfiguration cfg) {{
 			Configuration = cfg;
 			int port, poolsize, database;
 			string ip, pass;
@@ -379,8 +379,8 @@ namespace {0}.BLL {{
 
 	//截至 1.2.6 版本仍然有 Timeout bug
 	//public partial class RedisHelper : StackExchange.Redis.QuickHelperBase {{
-	//	public static IConfigurationRoot Configuration {{ get; internal set; }}
-	//	public static void InitializeConfiguration(IConfigurationRoot cfg) {{
+	//	public static IConfiguration Configuration {{ get; internal set; }}
+	//	public static void InitializeConfiguration(IConfiguration cfg) {{
 	//		Configuration = cfg;
 	//		int port, poolsize, database;
 	//		string ip, pass;
@@ -789,12 +789,12 @@ namespace {0}.WebHost {{
 		}}
 
 		public static IList<ModuleInfo> Modules = new List<ModuleInfo>();
-		public IConfigurationRoot Configuration {{ get; }}
+		public IConfiguration Configuration {{ get; }}
 		public IHostingEnvironment env {{ get; }}
 
 		public void ConfigureServices(IServiceCollection services) {{
 			services.AddSingleton<IDistributedCache>(new Microsoft.Extensions.Caching.CSRedisCache());
-			services.AddSingleton<IConfigurationRoot>(Configuration);
+			services.AddSingleton<IConfiguration>(Configuration);
 			services.AddSingleton<IHostingEnvironment>(env);
 			services.AddScoped<CustomExceptionFilter>();
 
@@ -1107,7 +1107,7 @@ namespace {0}.Module.Admin.Controllers {{
 		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
 
 		[HttpGet]
-		async public Task<ActionResult> List([FromServices]IConfigurationRoot cfg, {12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
+		async public Task<ActionResult> List([FromServices]IConfiguration cfg, {12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
 			var select = {19}{1}.Select{8};{9}
 			long count;
 			var items = await select.Count(out count){14}.Page(page, limit).ToListAsync();
@@ -1412,7 +1412,7 @@ namespace {0}.Module.Admin.Controllers {{
 		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
 
 		[HttpGet]
-		public APIReturn List([FromServices]IConfigurationRoot cfg) {{
+		public APIReturn List([FromServices]IConfiguration cfg) {{
 			return APIReturn.成功;
 		}}
 	}}
