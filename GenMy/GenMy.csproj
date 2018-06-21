@@ -12,7 +12,7 @@
     <Description>用于快速创建和更新 .NETCore 2.1 + MySQL 项目，非常合适敏捷开发；</Description>
     <PackageProjectUrl>https://github.com/2881099/dotnetgen_mysql</PackageProjectUrl>
     <RepositoryUrl>https://github.com/2881099/dotnetgen_mysql</RepositoryUrl>
-    <Version>1.0.10</Version>
+    <Version>1.0.11</Version>
     <PackageTags>生成器 mysql core mariadb</PackageTags>
   </PropertyGroup>
 

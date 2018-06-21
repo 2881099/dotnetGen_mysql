@@ -277,8 +277,14 @@ Github: https://github.com/2881099/dotnetgen_mysql
 								WorkingDirectory = OutputPath
 							};
 							pro.Start();
+							pro.WaitForExit();
 						}
 					}
+				}
+				if (File.Exists(Path.Combine(OutputPath, "GenMy只更新db.bat")) == false) {
+					var batPath = Path.Combine(OutputPath, $"GenMy_{this.SolutionName}_{this.Server}_{this.Database}.bat");
+					if (File.Exists(batPath) == false) File.WriteAllText(batPath, $@"
+GenMy {this.Server}:{this.Port} -U {this.Username} -P {this.Password} -D {this.Database} -N {this.SolutionName}");
 				}
 			}
 			this._socket.Close();
