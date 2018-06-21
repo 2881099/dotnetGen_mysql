@@ -369,3 +369,4 @@ GenMy {this.Server}:{this.Port} -U {this.Username} -P {this.Password} -D {this.D
 		}
 	}
 }
+

@@ -1429,3 +1429,4 @@ namespace {0}.Module.Admin.Controllers {{
 		}
 	}
 }
+
