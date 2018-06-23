@@ -254,8 +254,8 @@ Github: https://github.com/2881099/dotnetgen_mysql
 					var oldtxt = appsettings.ToString();
 					if (appsettings["ConnectionStrings"] == null) appsettings["ConnectionStrings"] = new JObject();
 					if (appsettings["ConnectionStrings"][$"{this.SolutionName}_mysql"] == null) appsettings["ConnectionStrings"][$"{this.SolutionName}_mysql"] = this.ConnectionString + ";Encrypt=False;Max pool size=100";
-					if (appsettings["ConnectionStrings"]["redis1"] == null) appsettings["ConnectionStrings"]["redis1"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,prefix={this.SolutionName}";
-					if (appsettings["ConnectionStrings"]["redis2"] == null) appsettings["ConnectionStrings"]["redis2"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,prefix={this.SolutionName}";
+					if (appsettings["ConnectionStrings"]["redis1"] == null) appsettings["ConnectionStrings"]["redis1"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,ssl=false,writeBuffer=20480,prefix={this.SolutionName}";
+					if (appsettings["ConnectionStrings"]["redis2"] == null) appsettings["ConnectionStrings"]["redis2"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,ssl=false,writeBuffer=20480,prefix={this.SolutionName}";
 					if (appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] == null) appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] = JToken.FromObject(new {
 						Timeout = 180
 					});
@@ -278,9 +278,9 @@ Github: https://github.com/2881099/dotnetgen_mysql
 							pro.Start();
 							pro.WaitForExit();
 						}
-						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"CSRedisCore""\s+Version=""2\.3\.3", RegexOptions.IgnoreCase) == false) {
+						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"CSRedisCore""\s+Version=""2\.3\.4", RegexOptions.IgnoreCase) == false) {
 							System.Diagnostics.Process pro = new System.Diagnostics.Process();
-							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package CSRedisCore --version 2.3.3") {
+							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package CSRedisCore --version 2.3.4") {
 								WorkingDirectory = OutputPath
 							};
 							pro.Start();
@@ -293,9 +293,9 @@ Github: https://github.com/2881099/dotnetgen_mysql
 					if (!string.IsNullOrEmpty(startupPath) && File.Exists(startupPath)) {
 
 						//web项目才需要 Caching.CSRedis
-						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"Caching.CSRedis""\s+Version=""2\.3\.3", RegexOptions.IgnoreCase) == false) {
+						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"Caching.CSRedis""\s+Version=""2\.3\.4", RegexOptions.IgnoreCase) == false) {
 							System.Diagnostics.Process pro = new System.Diagnostics.Process();
-							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package Caching.CSRedis --version 2.3.3") {
+							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package Caching.CSRedis --version 2.3.4") {
 								WorkingDirectory = OutputPath
 							};
 							pro.Start();
@@ -325,8 +325,8 @@ Github: https://github.com/2881099/dotnetgen_mysql
 								var connStr1 = @"Configuration[""ConnectionStrings:redis2""]";
 								var connStr2 = @"Configuration[""ConnectionStrings:redis1""]";
 								if (File.Exists(appsettingsPath) == false) {
-									connStr1 = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,prefix={this.SolutionName}";
-									connStr2 = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,prefix={this.SolutionName}";
+									connStr1 = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,ssl=false,writeBuffer=20480,prefix={this.SolutionName}";
+									connStr2 = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,ssl=false,writeBuffer=20480,prefix={this.SolutionName}";
 								}
 
 								return m.Groups[0].Value + $@"
