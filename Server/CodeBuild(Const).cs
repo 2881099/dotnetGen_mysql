@@ -95,13 +95,117 @@ using MySql.Data.MySqlClient;
 
 namespace {0}.BLL {{
 	/// <summary>
-	/// 数据库操作代理类，全部支持走事务
+	/// dng.Mysql代理类
 	/// </summary>
-	public abstract partial class SqlHelper : MySql.Data.MySqlClient.SqlHelper {{
+	public abstract partial class SqlHelper : {0}.DAL.SqlHelper {{
+	}}
+}}
 
-		new public static void Initialization(IDistributedCache cache, IConfiguration cacheStrategy, string connectionString, ILogger log) {{
-			MySql.Data.MySqlClient.SqlHelper.Initialization(cache, cacheStrategy, connectionString, log);
+namespace {0}.DAL {{
+	/// <summary>
+	/// dng.Mysql代理类
+	/// </summary>
+	public abstract partial class SqlHelper {{
+		internal static Executer Instance {{ get; set; }}
+		public static ConnectionPool Pool => Instance.Pool;
+		public static void Initialization(IDistributedCache cache, IConfiguration cacheStrategy, string connectionString, ILogger log) {{
+			CacheStrategy = cacheStrategy;
+			Instance = new Executer(cache, connectionString, log);
 		}}
+	
+		public static string Addslashes(string filter, params object[] parms) {{ return Executer.Addslashes(filter, parms); }}
+
+		public static void ExecuteReader(Action<MySqlDataReader> readerHander, string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteReader(readerHander, CommandType.Text, cmdText, cmdParms);
+		public static object[][] ExecuteArray(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteArray(CommandType.Text, cmdText, cmdParms);
+		public static int ExecuteNonQuery(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteNonQuery(CommandType.Text, cmdText, cmdParms);
+		public static object ExecuteScalar(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalar(CommandType.Text, cmdText, cmdParms);
+
+		public static Task ExecuteReaderAsync(Func<MySqlDataReader, Task> readerHander, string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteReaderAsync(readerHander, CommandType.Text, cmdText, cmdParms);
+		public static Task<object[][]> ExecuteArrayAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteArrayAsync(CommandType.Text, cmdText, cmdParms);
+		public static Task<int> ExecuteNonQueryAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteNonQueryAsync(CommandType.Text, cmdText, cmdParms);
+		public static Task<object> ExecuteScalarAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalarAsync(CommandType.Text, cmdText, cmdParms);
+
+		/// <summary>
+		/// 开启事务（不支持异步），60秒未执行完将自动提交
+		/// </summary>
+		/// <param name=""handler"">事务体 () => {{}}</param>
+		public static void Transaction(Action handler) => Instance.Transaction(handler);
+		/// <summary>
+		/// 开启事务（不支持异步）
+		/// </summary>
+		/// <param name=""handler"">事务体 () => {{}}</param>
+		/// <param name=""timeout"">超时，未执行完将自动提交</param>
+		public static void Transaction(Action handler, TimeSpan timeout) => Instance.Transaction(handler, timeout);
+
+		/// <summary>
+		/// 生成类似Mongodb的ObjectId有序、不重复Guid
+		/// </summary>
+		/// <returns></returns>
+		public static Guid NewMongodbId() => Executer.NewMongodbId();
+
+		/// <summary>
+		/// 循环或批量删除缓存键，项目启动时检测：Cache.Remove(""key1|key2"") 若成功删除 key1、key2，说明支持批量删除
+		/// </summary>
+		/// <param name=""keys"">缓存键[数组]</param>
+		public static void CacheRemove(params string[] keys) => Instance.CacheRemove(keys);
+		/// <summary>
+		/// 循环或批量删除缓存键，项目启动时检测：Cache.Remove(""key1|key2"") 若成功删除 key1、key2，说明支持批量删除
+		/// </summary>
+		/// <param name=""keys"">缓存键[数组]</param>
+		async static public Task CacheRemoveAsync(params string[] keys) => await Instance.CacheRemoveAsync(keys);
+		public static IDistributedCache Cache => Instance.Cache;
+		internal static IConfiguration CacheStrategy {{ get; private set; }}
+
+		/// <summary>
+		/// 缓存壳
+		/// </summary>
+		/// <typeparam name=""T"">缓存类型</typeparam>
+		/// <param name=""key"">缓存键</param>
+		/// <param name=""timeoutSeconds"">缓存秒数</param>
+		/// <param name=""getData"">获取源数据的函数</param>
+		/// <param name=""serialize"">序列化函数</param>
+		/// <param name=""deserialize"">反序列化函数</param>
+		/// <returns></returns>
+		public static T CacheShell<T>(string key, int timeoutSeconds, Func<T> getData, Func<T, string> serialize = null, Func<string, T> deserialize = null) => 
+			Instance.CacheShell(key, timeoutSeconds, getData, serialize, deserialize);
+		/// <summary>
+		/// 缓存壳(哈希表)
+		/// </summary>
+		/// <typeparam name=""T"">缓存类型</typeparam>
+		/// <param name=""key"">缓存键</param>
+		/// <param name=""field"">字段</param>
+		/// <param name=""timeoutSeconds"">缓存秒数</param>
+		/// <param name=""getData"">获取源数据的函数</param>
+		/// <param name=""serialize"">序列化函数</param>
+		/// <param name=""deserialize"">反序列化函数</param>
+		/// <returns></returns>
+		public static T CacheShell<T>(string key, string field, int timeoutSeconds, Func<T> getData, Func<(T, long), string> serialize = null, Func<string, (T, long)> deserialize = null) =>
+			Instance.CacheShell(key, field, timeoutSeconds, getData, serialize, deserialize);
+		/// <summary>
+		/// 缓存壳
+		/// </summary>
+		/// <typeparam name=""T"">缓存类型</typeparam>
+		/// <param name=""key"">缓存键</param>
+		/// <param name=""timeoutSeconds"">缓存秒数</param>
+		/// <param name=""getDataAsync"">获取源数据的函数</param>
+		/// <param name=""serialize"">序列化函数</param>
+		/// <param name=""deserialize"">反序列化函数</param>
+		/// <returns></returns>
+		async public static Task<T> CacheShellAsync<T>(string key, int timeoutSeconds, Func<Task<T>> getDataAsync, Func<T, string> serialize = null, Func<string, T> deserialize = null) =>
+			await Instance.CacheShellAsync(key, timeoutSeconds, getDataAsync, serialize, deserialize);
+		/// <summary>
+		/// 缓存壳(哈希表)
+		/// </summary>
+		/// <typeparam name=""T"">缓存类型</typeparam>
+		/// <param name=""key"">缓存键</param>
+		/// <param name=""field"">字段</param>
+		/// <param name=""timeoutSeconds"">缓存秒数</param>
+		/// <param name=""getDataAsync"">获取源数据的函数</param>
+		/// <param name=""serialize"">序列化函数</param>
+		/// <param name=""deserialize"">反序列化函数</param>
+		/// <returns></returns>
+		async public static Task<T> CacheShellAsync<T>(string key, string field, int timeoutSeconds, Func<Task<T>> getDataAsync, Func<(T, long), string> serialize = null, Func<string, (T, long)> deserialize = null) =>
+			await Instance.CacheShellAsync(key, field, timeoutSeconds, getDataAsync, serialize, deserialize);
 	}}
 }}";
 			#endregion
@@ -261,69 +365,6 @@ namespace {0}.BLL {{
 	}}
 }}";
 			#endregion
-			public static readonly string BLL_Build_CSRedisClient_cs =
-			#region 内容太长已被收起
- @"using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-
-namespace {0}.BLL {{
-
-	public partial class CSRedisClient : CSRedis.CSRedisClient {{
-		
-		public static CSRedisClient Default {{ get; set; }}
-		public CSRedisClient(string ip, int port = 6379, string pass = """", int poolsize = 50, int database = 0, string name = """")
-			: base(ip, port, pass, poolsize, database, name) {{}}
-
-		#region 缓存壳
-		/// <summary>
-		/// 缓存壳
-		/// </summary>
-		/// <typeparam name=""T"">缓存类型</typeparam>
-		/// <param name=""key"">不含prefix前辍</param>
-		/// <param name=""timeoutSeconds"">缓存秒数</param>
-		/// <param name=""getData"">获取源数据的函数</param>
-		/// <returns></returns>
-		public T CacheShell<T>(string key, int timeoutSeconds, Func<T> getData) => CacheShell(key, timeoutSeconds, getData, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<T>(cacheValue));
-		/// <summary>
-		/// 缓存壳(哈希表)
-		/// </summary>
-		/// <typeparam name=""T"">缓存类型</typeparam>
-		/// <param name=""key"">不含prefix前辍</param>
-		/// <param name=""field"">字段</param>
-		/// <param name=""timeoutSeconds"">缓存秒数</param>
-		/// <param name=""getData"">获取源数据的函数</param>
-		/// <returns></returns>
-		public T CacheShell<T>(string key, string field, int timeoutSeconds, Func<T> getData) => CacheShell(key, field, timeoutSeconds, getData, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<(T, long)>(cacheValue));
-		/// <summary>
-		/// 缓存壳
-		/// </summary>
-		/// <typeparam name=""T"">缓存类型</typeparam>
-		/// <param name=""key"">不含prefix前辍</param>
-		/// <param name=""timeoutSeconds"">缓存秒数</param>
-		/// <param name=""getDataAsync"">获取源数据的函数</param>
-		/// <returns></returns>
-		async public Task<T> CacheShellAsync<T>(string key, int timeoutSeconds, Func<Task<T>> getDataAsync) => await CacheShellAsync(key, timeoutSeconds, getDataAsync, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<T>(cacheValue));
-		/// <summary>
-		/// 缓存壳(哈希表)
-		/// </summary>
-		/// <typeparam name=""T"">缓存类型</typeparam>
-		/// <param name=""key"">不含prefix前辍</param>
-		/// <param name=""field"">字段</param>
-		/// <param name=""timeoutSeconds"">缓存秒数</param>
-		/// <param name=""getDataAsync"">获取源数据的函数</param>
-		/// <returns></returns>
-		async public Task<T> CacheShellAsync<T>(string key, string field, int timeoutSeconds, Func<Task<T>> getDataAsync) => await CacheShellAsync(key, field, timeoutSeconds, getDataAsync, data => Newtonsoft.Json.JsonConvert.SerializeObject(data), cacheValue => Newtonsoft.Json.JsonConvert.DeserializeObject<(T, long)>(cacheValue));
-		#endregion
-	}}
-}}
-
-public static partial class {0}BLLExtensionMethods {{
-	
-}}
-";
-			#endregion
 			public static readonly string Model_Build_ExtensionMethods_cs =
 			#region 内容太长已被收起
  @"using System;
@@ -380,8 +421,8 @@ public static partial class {0}ExtensionMethods {{
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""dng.Mysql"" Version=""1.1.1"" />
-		<PackageReference Include=""CSRedisCore"" Version=""2.3.0"" />
+		<PackageReference Include=""dng.Mysql"" Version=""1.1.3"" />
+		<PackageReference Include=""CSRedisCore"" Version=""2.3.3"" />
 	</ItemGroup>
 </Project>
 ";
@@ -398,7 +439,7 @@ public static partial class {0}ExtensionMethods {{
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Caching.CSRedis"" Version=""2.3.0"" />
+		<PackageReference Include=""Caching.CSRedis"" Version=""2.3.3"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.0"" />
@@ -633,14 +674,8 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 	}},
 	""ConnectionStrings"": {{
 		""{0}_mysql"": ""{{connectionString}};Encrypt=False;Max pool size=100"",
-		""redis"": {{
-			""ip"": ""127.0.0.1"",
-			""port"": 6379,
-			""pass"": """",
-			""database"": 13,
-			""poolsize"": 50,
-			""name"": ""{0}""
-		}}
+		""redis1"": ""127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,prefix={0}"",
+		""redis2"": ""127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,prefix={0}""
 	}},
 	""{0}_BLL_ITEM_CACHE"": {{
 		""Timeout"": 180
@@ -704,10 +739,13 @@ namespace {0}.WebHost {{
 				st.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
 				return st;
 			}};
-			{0}.BLL.CSRedisClient.Default = new {0}.BLL.CSRedisClient(Configuration[""ConnectionStrings:redis:ip""],
-				int.TryParse(Configuration[""ConnectionStrings:redis:port""], out var port) ? port : 6379, Configuration[""ConnectionStrings:redis:pass""], 
-				int.TryParse(Configuration[""ConnectionStrings:redis:poolsize""], out var poolsize) ? poolsize : 50,
-				int.TryParse(Configuration[""ConnectionStrings:redis:database""], out var database) ? database : 0, Configuration[""ConnectionStrings:redis:name""]);
+			//单redis节点模式，如需开启集群负载，请将注释去掉并做相应配置
+			RedisHelper.Initialization(
+				csredis: new CSRedis.CSRedisClient(//null,
+					//Configuration[""ConnectionStrings:redis2""],
+					Configuration[""ConnectionStrings:redis1""]),
+				serialize: value => Newtonsoft.Json.JsonConvert.SerializeObject(value),
+				deserialize: (data, type) => Newtonsoft.Json.JsonConvert.DeserializeObject(data, type));
 		}}
 
 		public static IList<ModuleInfo> Modules = new List<ModuleInfo>();
@@ -715,7 +753,7 @@ namespace {0}.WebHost {{
 		public IHostingEnvironment env {{ get; }}
 
 		public void ConfigureServices(IServiceCollection services) {{
-			services.AddSingleton<IDistributedCache>(new Microsoft.Extensions.Caching.Redis.CSRedisCache({0}.BLL.CSRedisClient.Default));
+			services.AddSingleton<IDistributedCache>(new Microsoft.Extensions.Caching.Redis.CSRedisCache(RedisHelper.Instance));
 			services.AddSingleton<IConfiguration>(Configuration);
 			services.AddSingleton<IHostingEnvironment>(env);
 			services.AddScoped<CustomExceptionFilter>();
@@ -810,7 +848,7 @@ namespace {0}.Module.Admin.Controllers {{
 		[HttpGet(@""connection"")]
 		public object Get_connection() {{
 			List<Hashtable> ret = new List<Hashtable>();
-			foreach (var conn in SqlHelper.Instance.Pool.AllConnections) {{
+			foreach (var conn in SqlHelper.Pool.AllConnections) {{
 				ret.Add(new Hashtable() {{
 						{{ ""数据库"", conn.SqlConnection.Database }},
 						{{ ""状态"", conn.SqlConnection.State }},
@@ -819,29 +857,33 @@ namespace {0}.Module.Admin.Controllers {{
 					}});
 			}}
 			return new {{
-				FreeConnections = SqlHelper.Instance.Pool.FreeConnections.Count,
-				AllConnections = SqlHelper.Instance.Pool.AllConnections.Count,
-				GetConnectionQueue = SqlHelper.Instance.Pool.GetConnectionQueue.Count,
-				GetConnectionAsyncQueue = SqlHelper.Instance.Pool.GetConnectionAsyncQueue.Count,
+				FreeConnections = SqlHelper.Pool.FreeConnections.Count,
+				AllConnections = SqlHelper.Pool.AllConnections.Count,
+				GetConnectionQueue = SqlHelper.Pool.GetConnectionQueue.Count,
+				GetConnectionAsyncQueue = SqlHelper.Pool.GetConnectionAsyncQueue.Count,
 				List = ret
 			}};
 		}}
 		[HttpGet(@""connection/redis"")]
 		public object Get_connection_redis() {{
-			List<Hashtable> ret = new List<Hashtable>();
-			foreach (var conn in CSRedisClient.Default.Pool.AllConnections) {{
-				ret.Add(new Hashtable() {{
+			var ret = new Hashtable();
+			foreach(var pool in RedisHelper.ClusterNodes) {{
+				List<Hashtable> list = new List<Hashtable>();
+				foreach (var conn in pool.Value.AllConnections) {{
+					list.Add(new Hashtable() {{
 						{{ ""最后活动"", conn.LastActive }},
 						{{ ""获取次数"", conn.UseSum }}
 					}});
+				}}
+				ret.Add(pool.Key, new {{
+					FreeConnections = pool.Value.FreeConnections.Count,
+					AllConnections = pool.Value.AllConnections.Count,
+					GetConnectionQueue = pool.Value.GetConnectionQueue.Count,
+					GetConnectionAsyncQueue = pool.Value.GetConnectionAsyncQueue.Count,
+					List = list
+				}});
 			}}
-			return new {{
-				FreeConnections = CSRedisClient.Default.Pool.FreeConnections.Count,
-				AllConnections = CSRedisClient.Default.Pool.AllConnections.Count,
-				GetConnectionQueue = CSRedisClient.Default.Pool.GetConnectionQueue.Count,
-				GetConnectionAsyncQueue = CSRedisClient.Default.Pool.GetConnectionAsyncQueue.Count,
-				List = ret
-			}};
+			return ret;
 		}}
 
 		[HttpGet(@""init_sysdir"")]

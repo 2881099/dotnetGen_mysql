@@ -254,9 +254,8 @@ Github: https://github.com/2881099/dotnetgen_mysql
 					var oldtxt = appsettings.ToString();
 					if (appsettings["ConnectionStrings"] == null) appsettings["ConnectionStrings"] = new JObject();
 					if (appsettings["ConnectionStrings"][$"{this.SolutionName}_mysql"] == null) appsettings["ConnectionStrings"][$"{this.SolutionName}_mysql"] = this.ConnectionString + ";Encrypt=False;Max pool size=100";
-					if (appsettings["ConnectionStrings"]["redis"] == null) appsettings["ConnectionStrings"]["redis"] = JToken.FromObject(new {
-						ip = "127.0.0.1", port = 6379, pass = "", database = 13, poolsize = 50, name = this.SolutionName
-					});
+					if (appsettings["ConnectionStrings"]["redis1"] == null) appsettings["ConnectionStrings"]["redis1"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,prefix={this.SolutionName}";
+					if (appsettings["ConnectionStrings"]["redis2"] == null) appsettings["ConnectionStrings"]["redis2"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,prefix={this.SolutionName}";
 					if (appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] == null) appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] = JToken.FromObject(new {
 						Timeout = 180
 					});
@@ -268,25 +267,122 @@ Github: https://github.com/2881099/dotnetgen_mysql
 					if (appsettings["Logging"]["LogLevel"]["Microsoft"] == null) appsettings["Logging"]["LogLevel"]["Microsoft"] = "Information";
 					var newtxt = appsettings.ToString();
 					if (newtxt != oldtxt) File.WriteAllText(appsettingsPath, newtxt, Encoding.UTF8);
-					//增加当前目录 .csproj nuguet 引用 <PackageReference Include="dng.Mysql" Version="1.1.1" />
+					//增加当前目录 .csproj nuguet 引用 <PackageReference Include="dng.Mysql" Version="1.1.3" />
 					string csprojPath = Directory.GetFiles(OutputPath, "*.csproj").FirstOrDefault();
 					if (!string.IsNullOrEmpty(csprojPath) && File.Exists(csprojPath)) {
-						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"dng\.Mysql""\s+Version=""1\.1\.1", RegexOptions.IgnoreCase) == false) {
+						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"dng\.Mysql""\s+Version=""1\.1\.3", RegexOptions.IgnoreCase) == false) {
 							System.Diagnostics.Process pro = new System.Diagnostics.Process();
-							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package dng.Mysql --version 1.1.1") {
+							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package dng.Mysql --version 1.1.3") {
 								WorkingDirectory = OutputPath
 							};
 							pro.Start();
 							pro.WaitForExit();
 						}
-						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"CSRedisCore""\s+Version=""2\.3\.0", RegexOptions.IgnoreCase) == false) {
+						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"CSRedisCore""\s+Version=""2\.3\.3", RegexOptions.IgnoreCase) == false) {
 							System.Diagnostics.Process pro = new System.Diagnostics.Process();
-							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package CSRedisCore --version 2.3.0") {
+							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package CSRedisCore --version 2.3.3") {
 								WorkingDirectory = OutputPath
 							};
 							pro.Start();
 							pro.WaitForExit();
 						}
+					}
+
+					//向startup.cs注入代码
+					string startupPath = Path.Combine(OutputPath, "Startup.cs");
+					if (!string.IsNullOrEmpty(startupPath) && File.Exists(startupPath)) {
+
+						//web项目才需要 Caching.CSRedis
+						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"Caching.CSRedis""\s+Version=""2\.3\.3", RegexOptions.IgnoreCase) == false) {
+							System.Diagnostics.Process pro = new System.Diagnostics.Process();
+							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package Caching.CSRedis --version 2.3.3") {
+								WorkingDirectory = OutputPath
+							};
+							pro.Start();
+							pro.WaitForExit();
+						}
+
+						bool isChanged = false;
+						var startupCode = File.ReadAllText(startupPath);
+						if (Regex.IsMatch(startupCode, @"using\s+Microsoft\.Extensions\.Caching\.Distributed;") == false) {
+							isChanged = true;
+							startupCode = "using Microsoft.Extensions.Caching.Distributed;\r\n" + startupCode;
+						}
+						if (Regex.IsMatch(startupCode, @"using\s+Microsoft\.Extensions\.Logging;") == false) {
+							isChanged = true;
+							startupCode = "using Microsoft.Extensions.Logging;\r\n" + startupCode;
+						}
+						if (Regex.IsMatch(startupCode, @"using\s+Microsoft\.Extensions\.Configuration;") == false) {
+							isChanged = true;
+							startupCode = "using Microsoft.Extensions.Configuration;\r\n" + startupCode;
+						}
+
+						var servicesName = "services";
+						if (startupCode.IndexOf("RedisHelper.Initialization") == -1) {
+							startupCode = Regex.Replace(startupCode, @"[\t ]+public\s+void\s+ConfigureServices\s*\(\s*IServiceCollection\s+(\w+)[^\{]+\{", m => {
+								isChanged = true;
+
+								var connStr1 = @"Configuration[""ConnectionStrings:redis2""]";
+								var connStr2 = @"Configuration[""ConnectionStrings:redis1""]";
+								if (File.Exists(appsettingsPath) == false) {
+									connStr1 = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,prefix={this.SolutionName}";
+									connStr2 = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,prefix={this.SolutionName}";
+								}
+
+								return m.Groups[0].Value + $@"
+
+
+			//单redis节点模式，如需开启集群负载，请将注释去掉并做相应配置
+			RedisHelper.Initialization(
+				csredis: new CSRedis.CSRedisClient(//null,
+					//{connStr1},
+					{connStr2}),
+				serialize: value => Newtonsoft.Json.JsonConvert.SerializeObject(value),
+				deserialize: (data, type) => Newtonsoft.Json.JsonConvert.DeserializeObject(data, type));
+			{servicesName = m.Groups[1].Value}.AddSingleton<IDistributedCache>(new Microsoft.Extensions.Caching.Redis.CSRedisCache(RedisHelper.Instance));
+
+
+";
+							}, RegexOptions.Multiline);
+						}
+						if (Regex.IsMatch(startupCode, @"\s+IConfiguration(Root)?\s+Configuration(;|\s+\{)") == false) {
+							startupCode = Regex.Replace(startupCode, @"[\t ]+public\s+void\s+ConfigureServices\s*\(\s*IServiceCollection\s+(\w+)[^\{]+\{", m => {
+								isChanged = true;
+								return $@"
+		public IConfiguration Configuration {{ get; set; }}
+{m.Groups[0].Value}
+
+			Configuration = {servicesName = m.Groups[1].Value}.BuildServiceProvider().GetService<IConfiguration>();";
+							}, RegexOptions.Multiline);
+						}
+						if (startupCode.IndexOf(this.SolutionName + ".BLL.SqlHelper.Initialization") == -1) {
+							startupCode = Regex.Replace(startupCode, @"([\t ]+public\s+void\s+Configure\s*\()([^\{]+)\{", m => {
+								isChanged = true;
+								var str1 = m.Groups[1].Value;
+								var str2 = m.Groups[2].Value;
+								var loggerFactory = Regex.Match(str2, @"\bILoggerFactory\s+(\w+)");
+								if (loggerFactory.Success == false) str2 = "ILoggerFactory loggerFactory, " + str2;
+								loggerFactory = Regex.Match(str2, @"\bILoggerFactory\s+(\w+)");
+								var appName = Regex.Match(str2, @"\bIApplicationBuilder\s+(\w+)");
+								if (appName.Success == false) str2 = "IApplicationBuilder app, " + str2;
+								appName = Regex.Match(str2, @"\bIApplicationBuilder\s+(\w+)");
+
+								var connStr = $@"Configuration[""ConnectionStrings:{this.SolutionName}_mysql""]";
+								if (File.Exists(appsettingsPath) == false) {
+									connStr = $"{this.ConnectionString};Encrypt=False;Max pool size=100";
+								}
+
+								return str1 + str2 + $@"{{
+
+			
+			{this.SolutionName}.BLL.SqlHelper.Initialization({appName.Groups[1].Value}.ApplicationServices.GetService<IDistributedCache>(), Configuration.GetSection(""{this.SolutionName}_BLL_ITEM_CACHE""),
+				{connStr}, {loggerFactory.Groups[1].Value}.CreateLogger(""{this.SolutionName}_DAL_sqlhelper""));
+
+
+";
+							}, RegexOptions.Multiline);
+						}
+						if (isChanged) File.WriteAllText(startupPath, startupCode);
 					}
 				}
 				if (File.Exists(Path.Combine(OutputPath, "GenMy只更新db.bat")) == false) {
