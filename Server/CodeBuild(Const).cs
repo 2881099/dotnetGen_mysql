@@ -13,7 +13,7 @@ namespace Server {
 			public static readonly string moduleAdminPath = @"src\Module\Admin\";
 			public static readonly string webHostPath = @"src\WebHost\";
 			public static readonly string sln =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
@@ -84,7 +84,7 @@ EndGlobal
 			#endregion
 
 			public static readonly string DAL_DBUtility_SqlHelper_cs =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"using System;
 using System.Data;
 using System.Threading.Tasks;
@@ -95,7 +95,7 @@ using MySql.Data.MySqlClient;
 
 namespace {0}.BLL {{
 	/// <summary>
-	/// dng.Mysql´úÀíÀà
+	/// dng.Mysqlï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	/// </summary>
 	public abstract partial class SqlHelper : {0}.DAL.SqlHelper {{
 	}}
@@ -103,7 +103,7 @@ namespace {0}.BLL {{
 
 namespace {0}.DAL {{
 	/// <summary>
-	/// dng.Mysql´úÀíÀà
+	/// dng.Mysqlï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	/// </summary>
 	public abstract partial class SqlHelper {{
 		internal static Executer Instance {{ get; set; }}
@@ -126,83 +126,83 @@ namespace {0}.DAL {{
 		public static Task<object> ExecuteScalarAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalarAsync(CommandType.Text, cmdText, cmdParms);
 
 		/// <summary>
-		/// ¿ªÆôÊÂÎñ£¨²»Ö§³ÖÒì²½£©£¬60ÃëÎ´Ö´ÐÐÍê½«×Ô¶¯Ìá½»
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ñ£¨²ï¿½Ö§ï¿½ï¿½ï¿½ì²½ï¿½ï¿½ï¿½ï¿½60ï¿½ï¿½Î´Ö´ï¿½ï¿½ï¿½ê½«ï¿½Ô¶ï¿½ï¿½á½»
 		/// </summary>
-		/// <param name=""handler"">ÊÂÎñÌå () => {{}}</param>
+		/// <param name=""handler"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ () => {{}}</param>
 		public static void Transaction(Action handler) => Instance.Transaction(handler);
 		/// <summary>
-		/// ¿ªÆôÊÂÎñ£¨²»Ö§³ÖÒì²½£©
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ñ£¨²ï¿½Ö§ï¿½ï¿½ï¿½ì²½ï¿½ï¿½
 		/// </summary>
-		/// <param name=""handler"">ÊÂÎñÌå () => {{}}</param>
-		/// <param name=""timeout"">³¬Ê±£¬Î´Ö´ÐÐÍê½«×Ô¶¯Ìá½»</param>
+		/// <param name=""handler"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ () => {{}}</param>
+		/// <param name=""timeout"">ï¿½ï¿½Ê±ï¿½ï¿½Î´Ö´ï¿½ï¿½ï¿½ê½«ï¿½Ô¶ï¿½ï¿½á½»</param>
 		public static void Transaction(Action handler, TimeSpan timeout) => Instance.Transaction(handler, timeout);
 
 		/// <summary>
-		/// Éú³ÉÀàËÆMongodbµÄObjectIdÓÐÐò¡¢²»ÖØ¸´Guid
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Mongodbï¿½ï¿½ObjectIdï¿½ï¿½ï¿½ò¡¢²ï¿½ï¿½Ø¸ï¿½Guid
 		/// </summary>
 		/// <returns></returns>
 		public static Guid NewMongodbId() => Executer.NewMongodbId();
 
 		/// <summary>
-		/// Ñ­»·»òÅúÁ¿É¾³ý»º´æ¼ü£¬ÏîÄ¿Æô¶¯Ê±¼ì²â£ºCache.Remove(""key1|key2"") Èô³É¹¦É¾³ý key1¡¢key2£¬ËµÃ÷Ö§³ÖÅúÁ¿É¾³ý
+		/// Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Ê±ï¿½ï¿½â£ºCache.Remove(""key1|key2"") ï¿½ï¿½É¹ï¿½É¾ï¿½ï¿½ key1ï¿½ï¿½key2ï¿½ï¿½Ëµï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½
 		/// </summary>
-		/// <param name=""keys"">»º´æ¼ü[Êý×é]</param>
+		/// <param name=""keys"">ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½]</param>
 		public static void CacheRemove(params string[] keys) => Instance.CacheRemove(keys);
 		/// <summary>
-		/// Ñ­»·»òÅúÁ¿É¾³ý»º´æ¼ü£¬ÏîÄ¿Æô¶¯Ê±¼ì²â£ºCache.Remove(""key1|key2"") Èô³É¹¦É¾³ý key1¡¢key2£¬ËµÃ÷Ö§³ÖÅúÁ¿É¾³ý
+		/// Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Ê±ï¿½ï¿½â£ºCache.Remove(""key1|key2"") ï¿½ï¿½É¹ï¿½É¾ï¿½ï¿½ key1ï¿½ï¿½key2ï¿½ï¿½Ëµï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½
 		/// </summary>
-		/// <param name=""keys"">»º´æ¼ü[Êý×é]</param>
+		/// <param name=""keys"">ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½]</param>
 		async static public Task CacheRemoveAsync(params string[] keys) => await Instance.CacheRemoveAsync(keys);
 		public static IDistributedCache Cache => Instance.Cache;
 		internal static IConfiguration CacheStrategy {{ get; private set; }}
 
 		/// <summary>
-		/// »º´æ¿Ç
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½
 		/// </summary>
-		/// <typeparam name=""T"">»º´æÀàÐÍ</typeparam>
-		/// <param name=""key"">»º´æ¼ü</param>
-		/// <param name=""timeoutSeconds"">»º´æÃëÊý</param>
-		/// <param name=""getData"">»ñÈ¡Ô´Êý¾ÝµÄº¯Êý</param>
-		/// <param name=""serialize"">ÐòÁÐ»¯º¯Êý</param>
-		/// <param name=""deserialize"">·´ÐòÁÐ»¯º¯Êý</param>
+		/// <typeparam name=""T"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</typeparam>
+		/// <param name=""key"">ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""timeoutSeconds"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""getData"">ï¿½ï¿½È¡Ô´ï¿½ï¿½ï¿½ÝµÄºï¿½ï¿½ï¿½</param>
+		/// <param name=""serialize"">ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""deserialize"">ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½</param>
 		/// <returns></returns>
 		public static T CacheShell<T>(string key, int timeoutSeconds, Func<T> getData, Func<T, string> serialize = null, Func<string, T> deserialize = null) => 
 			Instance.CacheShell(key, timeoutSeconds, getData, serialize, deserialize);
 		/// <summary>
-		/// »º´æ¿Ç(¹þÏ£±í)
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½Ï£ï¿½ï¿½)
 		/// </summary>
-		/// <typeparam name=""T"">»º´æÀàÐÍ</typeparam>
-		/// <param name=""key"">»º´æ¼ü</param>
-		/// <param name=""field"">×Ö¶Î</param>
-		/// <param name=""timeoutSeconds"">»º´æÃëÊý</param>
-		/// <param name=""getData"">»ñÈ¡Ô´Êý¾ÝµÄº¯Êý</param>
-		/// <param name=""serialize"">ÐòÁÐ»¯º¯Êý</param>
-		/// <param name=""deserialize"">·´ÐòÁÐ»¯º¯Êý</param>
+		/// <typeparam name=""T"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</typeparam>
+		/// <param name=""key"">ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""field"">ï¿½Ö¶ï¿½</param>
+		/// <param name=""timeoutSeconds"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""getData"">ï¿½ï¿½È¡Ô´ï¿½ï¿½ï¿½ÝµÄºï¿½ï¿½ï¿½</param>
+		/// <param name=""serialize"">ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""deserialize"">ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½</param>
 		/// <returns></returns>
 		public static T CacheShell<T>(string key, string field, int timeoutSeconds, Func<T> getData, Func<(T, long), string> serialize = null, Func<string, (T, long)> deserialize = null) =>
 			Instance.CacheShell(key, field, timeoutSeconds, getData, serialize, deserialize);
 		/// <summary>
-		/// »º´æ¿Ç
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½
 		/// </summary>
-		/// <typeparam name=""T"">»º´æÀàÐÍ</typeparam>
-		/// <param name=""key"">»º´æ¼ü</param>
-		/// <param name=""timeoutSeconds"">»º´æÃëÊý</param>
-		/// <param name=""getDataAsync"">»ñÈ¡Ô´Êý¾ÝµÄº¯Êý</param>
-		/// <param name=""serialize"">ÐòÁÐ»¯º¯Êý</param>
-		/// <param name=""deserialize"">·´ÐòÁÐ»¯º¯Êý</param>
+		/// <typeparam name=""T"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</typeparam>
+		/// <param name=""key"">ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""timeoutSeconds"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""getDataAsync"">ï¿½ï¿½È¡Ô´ï¿½ï¿½ï¿½ÝµÄºï¿½ï¿½ï¿½</param>
+		/// <param name=""serialize"">ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""deserialize"">ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½</param>
 		/// <returns></returns>
 		async public static Task<T> CacheShellAsync<T>(string key, int timeoutSeconds, Func<Task<T>> getDataAsync, Func<T, string> serialize = null, Func<string, T> deserialize = null) =>
 			await Instance.CacheShellAsync(key, timeoutSeconds, getDataAsync, serialize, deserialize);
 		/// <summary>
-		/// »º´æ¿Ç(¹þÏ£±í)
+		/// ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½Ï£ï¿½ï¿½)
 		/// </summary>
-		/// <typeparam name=""T"">»º´æÀàÐÍ</typeparam>
-		/// <param name=""key"">»º´æ¼ü</param>
-		/// <param name=""field"">×Ö¶Î</param>
-		/// <param name=""timeoutSeconds"">»º´æÃëÊý</param>
-		/// <param name=""getDataAsync"">»ñÈ¡Ô´Êý¾ÝµÄº¯Êý</param>
-		/// <param name=""serialize"">ÐòÁÐ»¯º¯Êý</param>
-		/// <param name=""deserialize"">·´ÐòÁÐ»¯º¯Êý</param>
+		/// <typeparam name=""T"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</typeparam>
+		/// <param name=""key"">ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""field"">ï¿½Ö¶ï¿½</param>
+		/// <param name=""timeoutSeconds"">ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""getDataAsync"">ï¿½ï¿½È¡Ô´ï¿½ï¿½ï¿½ÝµÄºï¿½ï¿½ï¿½</param>
+		/// <param name=""serialize"">ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½</param>
+		/// <param name=""deserialize"">ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½</param>
 		/// <returns></returns>
 		async public static Task<T> CacheShellAsync<T>(string key, string field, int timeoutSeconds, Func<Task<T>> getDataAsync, Func<(T, long), string> serialize = null, Func<string, (T, long)> deserialize = null) =>
 			await Instance.CacheShellAsync(key, field, timeoutSeconds, getDataAsync, serialize, deserialize);
@@ -211,7 +211,7 @@ namespace {0}.DAL {{
 			#endregion
 
 			public static readonly string BLL_Build_ItemCache_cs =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"using System;
 using System.Collections.Generic;
 
@@ -366,7 +366,7 @@ namespace {0}.BLL {{
 }}";
 			#endregion
 			public static readonly string Model_Build_ExtensionMethods_cs =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"using System;
 using System.Text;
 using System.Collections;
@@ -414,7 +414,7 @@ public static partial class {0}ExtensionMethods {{
 			#endregion
 
 			public static readonly string Db_csproj =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -422,14 +422,14 @@ public static partial class {0}ExtensionMethods {{
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include=""dng.Mysql"" Version=""1.1.3"" />
-		<PackageReference Include=""CSRedisCore"" Version=""2.3.5"" />
+		<PackageReference Include=""CSRedisCore"" Version=""2.3.6"" />
 	</ItemGroup>
 </Project>
 ";
 			#endregion
 
             public static readonly string Infrastructure_csproj =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -439,7 +439,7 @@ public static partial class {0}ExtensionMethods {{
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Caching.CSRedis"" Version=""2.3.5"" />
+		<PackageReference Include=""Caching.CSRedis"" Version=""2.3.6"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.0"" />
@@ -456,7 +456,7 @@ public static partial class {0}ExtensionMethods {{
 			#endregion
 
 			public static readonly string WebHost_Extensions_StarupExtensions_cs =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -564,7 +564,7 @@ public static class StarupExtensions {{
 ";
 			#endregion
 			public static readonly string WebHost_Extensions_SwaggerExtensions_cs =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -592,11 +592,11 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 					var versions = apiDesc.ControllerAttributes()
 						.OfType<ApiExplorerSettingsAttribute>()
 						.Select(attr => attr.GroupName);
-					if (docName == ""Î´·ÖÀà"" && versions.Count() == 0) return true;
+					if (docName == ""Î´ï¿½ï¿½ï¿½ï¿½"" && versions.Count() == 0) return true;
 					return versions.Any(v => v == docName);
 				}});
 				options.IgnoreObsoleteActions();
-				//options.IgnoreObsoleteControllers(); // Àà¡¢·½·¨±ê¼Ç [Obsolete]£¬¿ÉÒÔ×èÖ¹¡¾SwaggerÎÄµµ¡¿Éú³É
+				//options.IgnoreObsoleteControllers(); // ï¿½à¡¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ [Obsolete]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½ï¿½Swaggerï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				options.DescribeAllEnumsAsStrings();
 				options.CustomSchemaIds(a => a.FullName);
 				options.OperationFilter<FormDataOperationFilter>();
@@ -607,7 +607,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 				foreach (var d in dirs) {{
 					xmlFile = Path.Combine(d, $""{{new DirectoryInfo(d).Name}}.xml"");
 					if (File.Exists(xmlFile))
-						options.IncludeXmlComments(xmlFile); // Ê¹ÓÃÇ°Ðè¿ªÆôÏîÄ¿×¢ÊÍ xmldoc
+						options.IncludeXmlComments(xmlFile); // Ê¹ï¿½ï¿½Ç°ï¿½è¿ªï¿½ï¿½ï¿½ï¿½Ä¿×¢ï¿½ï¿½ xmldoc
 				}}
 				var InfrastructureXml = Directory.GetFiles(Directory.GetCurrentDirectory(), ""Infrastructure.xml"", SearchOption.AllDirectories);
 				if (InfrastructureXml.Any())
@@ -615,7 +615,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 			}});
 			return services;
 		}}
-		static string[] _docs = new[] {{ ""Î´·ÖÀà"", ""´úÀíºóÌ¨"", ""³¬¼¶¹ÜÀíÔ±ºóÌ¨"", ""APPºóÌ¨"", ""²ÍÒû"", ""APPºóÌ¨_²ÍÒû"", ""¿³¼Û"", ""APPºóÌ¨_¿³¼Û"" }};
+		static string[] _docs = new[] {{ ""Î´ï¿½ï¿½ï¿½ï¿½"", ""ï¿½ï¿½ï¿½ï¿½ï¿½Ì¨"", ""ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±ï¿½ï¿½Ì¨"", ""APPï¿½ï¿½Ì¨"", ""ï¿½ï¿½ï¿½ï¿½"", ""APPï¿½ï¿½Ì¨_ï¿½ï¿½ï¿½ï¿½"", ""ï¿½ï¿½ï¿½ï¿½"", ""APPï¿½ï¿½Ì¨_ï¿½ï¿½ï¿½ï¿½"" }};
 		public static IApplicationBuilder UseCustomizedSwagger(this IApplicationBuilder app, IHostingEnvironment env) {{
 			return app.UseSwagger().UseSwaggerUI(options => {{
 				foreach (var doc in _docs) options.SwaggerEndpoint($""/swagger/{{doc}}/swagger.json"", doc);
@@ -626,7 +626,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 ";
 			#endregion
 			public static readonly string WebHost_nlog_config =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"<?xml version=""1.0"" encoding=""utf-8"" ?>
 <nlog xmlns=""http://www.nlog-project.org/schemas/NLog.xsd"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
 	autoReload=""true""
@@ -662,7 +662,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 ";
 			#endregion
 			public static readonly string WebHost_appsettings_json =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"{{
 	""Logging"": {{
 		""IncludeScopes"": false,
@@ -684,7 +684,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 ";
 			#endregion
 			public static readonly string WebHost_Program_cs =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
@@ -708,7 +708,7 @@ namespace {0}.WebHost {{
 			#endregion
 
 			public static readonly string WebHost_Startup_cs =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -739,7 +739,7 @@ namespace {0}.WebHost {{
 				st.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
 				return st;
 			}};
-			//µ¥redis½ÚµãÄ£Ê½£¬ÈçÐè¿ªÆô¼¯Èº¸ºÔØ£¬Çë½«×¢ÊÍÈ¥µô²¢×öÏàÓ¦ÅäÖÃ
+			//ï¿½ï¿½redisï¿½Úµï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½è¿ªï¿½ï¿½Èºï¿½ï¿½ï¿½Ø£ï¿½ï¿½ë½«×¢ï¿½ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½
 			RedisHelper.Initialization(
 				csredis: new CSRedis.CSRedisClient(//null,
 					//Configuration[""ConnectionStrings:redis2""],
@@ -798,7 +798,7 @@ namespace {0}.WebHost {{
 ";
 			#endregion
 			public static readonly string WebHost_csproj =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"<Project Sdk=""Microsoft.NET.Sdk.Web"">
 	<PropertyGroup>
 		<TargetFramework>netcoreapp2.1</TargetFramework>
@@ -830,7 +830,7 @@ namespace {0}.WebHost {{
 			#endregion
 
 			public static readonly string Module_Admin_Controllers_SysController =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -850,10 +850,10 @@ namespace {0}.Module.Admin.Controllers {{
 			List<Hashtable> ret = new List<Hashtable>();
 			foreach (var conn in SqlHelper.Pool.AllConnections) {{
 				ret.Add(new Hashtable() {{
-						{{ ""Êý¾Ý¿â"", conn.SqlConnection.Database }},
+						{{ ""ï¿½ï¿½ï¿½Ý¿ï¿½"", conn.SqlConnection.Database }},
 						{{ ""×´Ì¬"", conn.SqlConnection.State }},
-						{{ ""×îºó»î¶¯"", conn.LastActive }},
-						{{ ""»ñÈ¡´ÎÊý"", conn.UseSum }}
+						{{ ""ï¿½ï¿½ï¿½î¶¯"", conn.LastActive }},
+						{{ ""ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½"", conn.UseSum }}
 					}});
 			}}
 			return new {{
@@ -871,8 +871,8 @@ namespace {0}.Module.Admin.Controllers {{
 				List<Hashtable> list = new List<Hashtable>();
 				foreach (var conn in pool.Value.AllConnections) {{
 					list.Add(new Hashtable() {{
-						{{ ""×îºó»î¶¯"", conn.LastActive }},
-						{{ ""»ñÈ¡´ÎÊý"", conn.UseSum }}
+						{{ ""ï¿½ï¿½ï¿½î¶¯"", conn.LastActive }},
+						{{ ""ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½"", conn.UseSum }}
 					}});
 				}}
 				ret.Add(pool.Key, new {{
@@ -890,12 +890,12 @@ namespace {0}.Module.Admin.Controllers {{
 		public APIReturn Get_init_sysdir() {{
 			/*
 			if (Sysdir.SelectByParent_id(null).Count() > 0)
-				return new APIReturn(-33, ""±¾ÏµÍ³ÒÑ¾­³õÊ¼»¯¹ý£¬Ò³ÃæÃ»¾­¹ýÈÎºÎ²Ù×÷ÍË³ö¡£"");
+				return new APIReturn(-33, ""ï¿½ï¿½ÏµÍ³ï¿½Ñ¾ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ÎºÎ²ï¿½ï¿½ï¿½ï¿½Ë³ï¿½ï¿½ï¿½"");
 
 			SysdirInfo dir1, dir2, dir3;
-			dir1 = Sysdir.Insert(null, DateTime.Now, ""ÔËÓª¹ÜÀí"", 1, null);{1}
+			dir1 = Sysdir.Insert(null, DateTime.Now, ""ï¿½ï¿½Óªï¿½ï¿½ï¿½ï¿½"", 1, null);{1}
 			*/
-			return new APIReturn(0, ""¹ÜÀíÄ¿Â¼ÒÑ³õÊ¼»¯Íê³É¡£"");
+			return new APIReturn(0, ""ï¿½ï¿½ï¿½ï¿½Ä¿Â¼ï¿½Ñ³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½É¡ï¿½"");
 		}}
 	}}
 }}
@@ -903,7 +903,7 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_Admin_Controllers_LoginController =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -925,24 +925,24 @@ namespace {0}.Module.Admin.Controllers {{
 		public LoginController(ILogger<LoginController> logger) : base(logger) {{ }}
 
 		[HttpGet]
-		[ÄäÃû·ÃÎÊ]
+		[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]
 		public ViewResult Index() {{
 			return View();
 		}}
 		[HttpPost]
-		[ÄäÃû·ÃÎÊ]
+		[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]
 		public APIReturn Post(LoginModel data) {{
 			HttpContext.Session.SetString(""login.username"", data.Username);
-			return APIReturn.³É¹¦;
+			return APIReturn.ï¿½É¹ï¿½;
 		}}
 
 		public class LoginModel {{
 			[FromForm]
-			[Required(ErrorMessage = ""ÇëÊäÈëµÇÂ½Ãû"")]
+			[Required(ErrorMessage = ""ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½"")]
 			public string Username {{ get; set; }}
 
 			[FromForm]
-			[Required(ErrorMessage = ""ÇëÊäÈëÃÜÂë"")]
+			[Required(ErrorMessage = ""ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"")]
 			public string Password {{ get; set; }}
 		}}
 	}}
@@ -950,7 +950,7 @@ namespace {0}.Module.Admin.Controllers {{
 ";
 			#endregion
 			public static readonly string Module_Admin_Views_Login_Index_cshtml =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"@{{
 	Layout = """";
 }}
@@ -960,7 +960,7 @@ namespace {0}.Module.Admin.Controllers {{
 <head>
 	<meta charset=""utf-8"">
 	<meta http-equiv=""X-UA-Compatible"" content=""IE=edge"">
-	<title>{0}ºóÌ¨¹ÜÀíÖÐÐÄ - µÇÂ½</title>
+	<title>{0}ï¿½ï¿½Ì¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - ï¿½ï¿½Â½</title>
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content=""width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"" name=""viewport"">
 	<link rel=""stylesheet"" href=""/module/admin/htm/bootstrap/css/bootstrap.min.css"">
@@ -983,13 +983,13 @@ namespace {0}.Module.Admin.Controllers {{
 <body class=""hold-transition login-page"">
 	<div class=""login-box"">
 		<div class=""login-logo"">
-			<a href=""/module/admin/""><b>{0}</b>ºóÌ¨¹ÜÀíÖÐÐÄ</a>
+			<a href=""/module/admin/""><b>{0}</b>ï¿½ï¿½Ì¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</a>
 		</div>
 
 		<div id=""error_msg"" style=""display:none;"">
 			<div class=""alert alert-warning alert-dismissible"">
-				<button type=""button"" class=""close"" data-dismiss=""alert"" aria-hidden=""true"">¡Á</button>
-				<h4><i class=""icon fa fa-warning""></i>¾¯¸æ!</h4>
+				<button type=""button"" class=""close"" data-dismiss=""alert"" aria-hidden=""true"">ï¿½ï¿½</button>
+				<h4><i class=""icon fa fa-warning""></i>ï¿½ï¿½ï¿½ï¿½!</h4>
 				{{0}}
 			</div>
 		</div>
@@ -1015,7 +1015,7 @@ namespace {0}.Module.Admin.Controllers {{
 					</div>
 					<!-- /.col -->
 					<div class=""col-xs-4"">
-						<button type=""submit"" class=""btn btn-primary btn-block btn-flat"">µÇ Â½</button>
+						<button type=""submit"" class=""btn btn-primary btn-block btn-flat"">ï¿½ï¿½ Â½</button>
 					</div>
 					<!-- /.col -->
 				</div>
@@ -1049,7 +1049,7 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_Admin_Controller =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
 			@"using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -1087,7 +1087,7 @@ namespace {0}.Module.Admin.Controllers {{
 		[HttpGet(@""edit"")]
 		async public Task<ActionResult> Edit({4}) {{
 			{1}Info item = await {19}{1}.GetItemAsync({5});
-			if (item == null) return APIReturn.¼ÇÂ¼²»´æÔÚ_»òÕßÃ»ÓÐÈ¨ÏÞ;
+			if (item == null) return APIReturn.ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½È¨ï¿½ï¿½;
 			ViewBag.item = item;
 			return View();
 		}}
@@ -1098,16 +1098,16 @@ namespace {0}.Module.Admin.Controllers {{
 		async public Task<APIReturn> _Add({10}) {{
 			{1}Info item = new {1}Info();{13}{7}
 			item = await {19}{1}.InsertAsync(item);{16}
-			return APIReturn.³É¹¦.SetData(""item"", item.ToBson());
+			return APIReturn.ï¿½É¹ï¿½.SetData(""item"", item.ToBson());
 		}}
 		[HttpPost(@""edit"")]
 		[ValidateAntiForgeryToken]
 		async public Task<APIReturn> _Edit({4}{11}) {{
 			{1}Info item = await {19}{1}.GetItemAsync({5});
-			if (item == null) return APIReturn.¼ÇÂ¼²»´æÔÚ_»òÕßÃ»ÓÐÈ¨ÏÞ;{6}{7}
+			if (item == null) return APIReturn.ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½È¨ï¿½ï¿½;{6}{7}
 			int affrows = await {19}{1}.UpdateAsync(item);{17}
-			if (affrows > 0) return APIReturn.³É¹¦.SetMessage($""¸üÐÂ³É¹¦£¬Ó°ÏìÐÐÊý£º{{affrows}}"");
-			return APIReturn.Ê§°Ü;
+			if (affrows > 0) return APIReturn.ï¿½É¹ï¿½.SetMessage($""ï¿½ï¿½ï¿½Â³É¹ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½{{affrows}}"");
+			return APIReturn.Ê§ï¿½ï¿½;
 		}}
 
 		[HttpPost(""del"")]
@@ -1118,13 +1118,13 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_Admin_wwwroot_index_html =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
 			@"<!DOCTYPE html>
 <html lang=""zh-cmn-Hans"">
 <head>
 	<meta charset=""utf-8"" />
 	<meta http-equiv=""X-UA-Compatible"" content=""IE=edge"" />
-	<title>{0}¹ÜÀíÏµÍ³</title>
+	<title>{0}ï¿½ï¿½ï¿½ï¿½ÏµÍ³</title>
 	<meta content=""width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"" name=""viewport"" />
 	<link href=""./htm/bootstrap/css/bootstrap.min.css"" rel=""stylesheet"" />
 	<link href=""./htm/plugins/font-awesome/css/font-awesome.min.css"" rel=""stylesheet"" />
@@ -1162,7 +1162,7 @@ namespace {0}.Module.Admin.Controllers {{
 		<header class=""main-header"">
 			<!-- Logo--><a href=""./"" class=""logo"">
 				<!-- mini logo for sidebar mini 50x50 pixels--><span class=""logo-mini""><b>{0}</b></span>
-				<!-- logo for regular state and mobile devices--><span class=""logo-lg""><b>{0}¹ÜÀíÏµÍ³</b></span>
+				<!-- logo for regular state and mobile devices--><span class=""logo-lg""><b>{0}ï¿½ï¿½ï¿½ï¿½ÏµÍ³</b></span>
 			</a>
 			<!-- Header Navbar-->
 			<nav role=""navigation"" class=""navbar navbar-static-top"">
@@ -1185,7 +1185,7 @@ namespace {0}.Module.Admin.Controllers {{
 								<!-- Menu Footer-->
 								<li class=""user-footer"">
 									<div class=""pull-right"">
-										<a href=""#"" onclick=""$('form#form_logout').submit();return false;"" class=""btn btn-default btn-flat"">°²È«ÍË³ö</a>
+										<a href=""#"" onclick=""$('form#form_logout').submit();return false;"" class=""btn btn-default btn-flat"">ï¿½ï¿½È«ï¿½Ë³ï¿½</a>
 										<form id=""form_logout"" method=""post"" action=""./exit.aspx""></form>
 									</div>
 								</li>
@@ -1204,7 +1204,7 @@ namespace {0}.Module.Admin.Controllers {{
 					<!-- Optionally, you can add icons to the links-->
 
 					<li class=""treeview active"">
-						<a href=""#""><i class=""fa fa-laptop""></i><span>Í¨ÓÃ¹ÜÀí</span><i class=""fa fa-angle-left pull-right""></i></a>
+						<a href=""#""><i class=""fa fa-laptop""></i><span>Í¨ï¿½Ã¹ï¿½ï¿½ï¿½</span><i class=""fa fa-angle-left pull-right""></i></a>
 						<ul class=""treeview-menu"">{1}
 						</ul>
 					</li>
@@ -1220,12 +1220,12 @@ namespace {0}.Module.Admin.Controllers {{
 			<section id=""right_content"" class=""content"">
 				<div style=""display:none;"">
 					<!-- Your Page Content Here-->
-					<h1>ÕâÊÇÒ»¸ö²âÊÔÊ×Ò³</h1>
-					<h2>swagger webapi£º<a href='/swagger/' target='_blank'>/swagger/</a><h2>
-					<h2>µÇÂ½µØÖ·£º<a href='/login' target='_blank'>/login</a><h2>
+					<h1>ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò³</h1>
+					<h2>swagger webapiï¿½ï¿½<a href='/swagger/' target='_blank'>/swagger/</a><h2>
+					<h2>ï¿½ï¿½Â½ï¿½ï¿½Ö·ï¿½ï¿½<a href='/login' target='_blank'>/login</a><h2>
 
-					<h2><a href='/sys/connection' target='_blank'>²é¿´ MysqlÁ¬½Ó³Ø</a><h2>
-					<h2><a href='/sys/connection/redis' target='_blank'>²é¿´ RedisÁ¬½Ó³Ø</a><h2>
+					<h2><a href='/sys/connection' target='_blank'>ï¿½é¿´ Mysqlï¿½ï¿½ï¿½Ó³ï¿½</a><h2>
+					<h2><a href='/sys/connection/redis' target='_blank'>ï¿½é¿´ Redisï¿½ï¿½ï¿½Ó³ï¿½</a><h2>
 				</div>
 			</section>
 			<!-- /.content-->
@@ -1237,8 +1237,8 @@ namespace {0}.Module.Admin.Controllers {{
 	<script type=""text/javascript"" src=""./htm/js/admin.js""></script>
 	<script type=""text/javascript"">
 		if (!location.hash) $('#right_content div:first').show();
-		// Â·ÓÉ¹¦ÄÜ
-		//Õë¶ÔÉÏÃæµÄhtml³õÊ¼»¯Â·ÓÉÁÐ±í
+		// Â·ï¿½É¹ï¿½ï¿½ï¿½
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½htmlï¿½ï¿½Ê¼ï¿½ï¿½Â·ï¿½ï¿½ï¿½Ð±ï¿½
 		function hash_encode(str) {{ return url_encode(base64.encode(str)).replace(/%/g, '_'); }}
 		function hash_decode(str) {{ return base64.decode(url_decode(str.replace(/_/g, '%'))); }}
 		window.div_left_router = {{}};
@@ -1263,7 +1263,7 @@ namespace {0}.Module.Admin.Controllers {{
 				if (hash === '') return //location.hash = $('li.treeview.active ul li a:first').attr('href');//'#base64url' + hash_encode('/resume_type/');
 				if (hash.indexOf('#base64url') !== 0) return;
 				var act = hash_decode(hash.substr(10, hash.length - 10));
-				//Ò¶ÏæÇÚÔö¼ÓµÄ´úÂë£¬¼ÓÔØ»òÕßÌá½»formºó£¬ÏÔÊ¾ÄÚÈÝ
+				//Ò¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÓµÄ´ï¿½ï¿½ë£¬ï¿½ï¿½ï¿½Ø»ï¿½ï¿½ï¿½ï¿½á½»formï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
 				function ajax_success(refererUrl) {{
 					if (refererUrl == location.pathname) {{ startRouter(); return function(){{}}; }}
 					var hash = '#base64url' + hash_encode(refererUrl);
@@ -1302,7 +1302,7 @@ namespace {0}.Module.Admin.Controllers {{
 										var doc = this.contentWindow ? this.contentWindow.document : this.document;
 										if (doc.body.innerHTML.length === 0) return;
 										if (doc.body.innerHTML.indexOf('Error:') === 0) return alert(doc.body.innerHTML.substr(6));
-										//ÒÔÏÂ '<script ' + 'ÊÇ·ÀÖ¹Óë±¾Ò³ÃæÏàÆ¥Åä£¬²»ÒªÉ¾³ý
+										//ï¿½ï¿½ï¿½ï¿½ '<script ' + 'ï¿½Ç·ï¿½Ö¹ï¿½ë±¾Ò³ï¿½ï¿½ï¿½ï¿½Æ¥ï¿½ä£¬ï¿½ï¿½ÒªÉ¾ï¿½ï¿½
 										if (doc.body.innerHTML.indexOf('<script ' + 'type=""text/javascript"">location.href=""') === -1) {{
 											ajax_success(doc.location.pathname + doc.location.search)(doc.body.innerHTML, 200, null);
 										}}
@@ -1344,7 +1344,7 @@ namespace {0}.Module.Admin.Controllers {{
 				view: '#right_content',
 			}});
 		}});
-		// Ò³Ãæ¼ÓÔØ½ø¶ÈÌõ
+		// Ò³ï¿½ï¿½ï¿½ï¿½Ø½ï¿½ï¿½ï¿½ï¿½ï¿½
 		$(document).ajaxStart(function() {{ Pace.restart(); }});
 	</script>
 </body>
@@ -1352,7 +1352,7 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_Test_Controller =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
 			@"using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -1377,7 +1377,7 @@ namespace {0}.Module.Admin.Controllers {{
 
 		[HttpGet]
 		public APIReturn List([FromServices]IConfiguration cfg) {{
-			return APIReturn.³É¹¦;
+			return APIReturn.ï¿½É¹ï¿½;
 		}}
 	}}
 }}
@@ -1385,7 +1385,7 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_csproj =
-			#region ÄÚÈÝÌ«³¤ÒÑ±»ÊÕÆð
+			#region ï¿½ï¿½ï¿½ï¿½Ì«ï¿½ï¿½ï¿½Ñ±ï¿½ï¿½ï¿½ï¿½ï¿½
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>

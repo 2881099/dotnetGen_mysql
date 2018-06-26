@@ -278,9 +278,9 @@ Github: https://github.com/2881099/dotnetgen_mysql
 							pro.Start();
 							pro.WaitForExit();
 						}
-						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"CSRedisCore""\s+Version=""2\.3\.5", RegexOptions.IgnoreCase) == false) {
+						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"CSRedisCore""\s+Version=""2\.3\.6", RegexOptions.IgnoreCase) == false) {
 							System.Diagnostics.Process pro = new System.Diagnostics.Process();
-							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package CSRedisCore --version 2.3.5") {
+							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package CSRedisCore --version 2.3.6") {
 								WorkingDirectory = OutputPath
 							};
 							pro.Start();
@@ -293,9 +293,9 @@ Github: https://github.com/2881099/dotnetgen_mysql
 					if (!string.IsNullOrEmpty(startupPath) && File.Exists(startupPath)) {
 
 						//web项目才需要 Caching.CSRedis
-						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"Caching.CSRedis""\s+Version=""2\.3\.5", RegexOptions.IgnoreCase) == false) {
+						if (Regex.IsMatch(File.ReadAllText(csprojPath), @"Caching.CSRedis""\s+Version=""2\.3\.6", RegexOptions.IgnoreCase) == false) {
 							System.Diagnostics.Process pro = new System.Diagnostics.Process();
-							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package Caching.CSRedis --version 2.3.5") {
+							pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "add package Caching.CSRedis --version 2.3.6") {
 								WorkingDirectory = OutputPath
 							};
 							pro.Start();
