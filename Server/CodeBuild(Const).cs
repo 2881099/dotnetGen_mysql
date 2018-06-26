@@ -13,7 +13,7 @@ namespace Server {
 			public static readonly string moduleAdminPath = @"src\Module\Admin\";
 			public static readonly string webHostPath = @"src\WebHost\";
 			public static readonly string sln =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
@@ -84,7 +84,7 @@ EndGlobal
 			#endregion
 
 			public static readonly string DAL_DBUtility_SqlHelper_cs =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"using System;
 using System.Data;
 using System.Threading.Tasks;
@@ -95,7 +95,7 @@ using MySql.Data.MySqlClient;
 
 namespace {0}.BLL {{
 	/// <summary>
-	/// dng.Mysql������
+	/// dng.Mysql代理类
 	/// </summary>
 	public abstract partial class SqlHelper : {0}.DAL.SqlHelper {{
 	}}
@@ -103,7 +103,7 @@ namespace {0}.BLL {{
 
 namespace {0}.DAL {{
 	/// <summary>
-	/// dng.Mysql������
+	/// dng.Mysql代理类
 	/// </summary>
 	public abstract partial class SqlHelper {{
 		internal static Executer Instance {{ get; set; }}
@@ -126,83 +126,83 @@ namespace {0}.DAL {{
 		public static Task<object> ExecuteScalarAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalarAsync(CommandType.Text, cmdText, cmdParms);
 
 		/// <summary>
-		/// �������񣨲�֧���첽����60��δִ���꽫�Զ��ύ
+		/// 开启事务（不支持异步），60秒未执行完将自动提交
 		/// </summary>
-		/// <param name=""handler"">������ () => {{}}</param>
+		/// <param name=""handler"">事务体 () => {{}}</param>
 		public static void Transaction(Action handler) => Instance.Transaction(handler);
 		/// <summary>
-		/// �������񣨲�֧���첽��
+		/// 开启事务（不支持异步）
 		/// </summary>
-		/// <param name=""handler"">������ () => {{}}</param>
-		/// <param name=""timeout"">��ʱ��δִ���꽫�Զ��ύ</param>
+		/// <param name=""handler"">事务体 () => {{}}</param>
+		/// <param name=""timeout"">超时，未执行完将自动提交</param>
 		public static void Transaction(Action handler, TimeSpan timeout) => Instance.Transaction(handler, timeout);
 
 		/// <summary>
-		/// ��������Mongodb��ObjectId���򡢲��ظ�Guid
+		/// 生成类似Mongodb的ObjectId有序、不重复Guid
 		/// </summary>
 		/// <returns></returns>
 		public static Guid NewMongodbId() => Executer.NewMongodbId();
 
 		/// <summary>
-		/// ѭ��������ɾ�����������Ŀ��ʱ��⣺Cache.Remove(""key1|key2"") ��ɹ�ɾ�� key1��key2��˵��֧������ɾ��
+		/// 循环或批量删除缓存键，项目启动时检测：Cache.Remove(""key1|key2"") 若成功删除 key1、key2，说明支持批量删除
 		/// </summary>
-		/// <param name=""keys"">�����[����]</param>
+		/// <param name=""keys"">缓存键[数组]</param>
 		public static void CacheRemove(params string[] keys) => Instance.CacheRemove(keys);
 		/// <summary>
-		/// ѭ��������ɾ�����������Ŀ��ʱ��⣺Cache.Remove(""key1|key2"") ��ɹ�ɾ�� key1��key2��˵��֧������ɾ��
+		/// 循环或批量删除缓存键，项目启动时检测：Cache.Remove(""key1|key2"") 若成功删除 key1、key2，说明支持批量删除
 		/// </summary>
-		/// <param name=""keys"">�����[����]</param>
+		/// <param name=""keys"">缓存键[数组]</param>
 		async static public Task CacheRemoveAsync(params string[] keys) => await Instance.CacheRemoveAsync(keys);
 		public static IDistributedCache Cache => Instance.Cache;
 		internal static IConfiguration CacheStrategy {{ get; private set; }}
 
 		/// <summary>
-		/// �����
+		/// 缓存壳
 		/// </summary>
-		/// <typeparam name=""T"">��������</typeparam>
-		/// <param name=""key"">�����</param>
-		/// <param name=""timeoutSeconds"">��������</param>
-		/// <param name=""getData"">��ȡԴ���ݵĺ���</param>
-		/// <param name=""serialize"">���л�����</param>
-		/// <param name=""deserialize"">�����л�����</param>
+		/// <typeparam name=""T"">缓存类型</typeparam>
+		/// <param name=""key"">缓存键</param>
+		/// <param name=""timeoutSeconds"">缓存秒数</param>
+		/// <param name=""getData"">获取源数据的函数</param>
+		/// <param name=""serialize"">序列化函数</param>
+		/// <param name=""deserialize"">反序列化函数</param>
 		/// <returns></returns>
 		public static T CacheShell<T>(string key, int timeoutSeconds, Func<T> getData, Func<T, string> serialize = null, Func<string, T> deserialize = null) => 
 			Instance.CacheShell(key, timeoutSeconds, getData, serialize, deserialize);
 		/// <summary>
-		/// �����(��ϣ��)
+		/// 缓存壳(哈希表)
 		/// </summary>
-		/// <typeparam name=""T"">��������</typeparam>
-		/// <param name=""key"">�����</param>
-		/// <param name=""field"">�ֶ�</param>
-		/// <param name=""timeoutSeconds"">��������</param>
-		/// <param name=""getData"">��ȡԴ���ݵĺ���</param>
-		/// <param name=""serialize"">���л�����</param>
-		/// <param name=""deserialize"">�����л�����</param>
+		/// <typeparam name=""T"">缓存类型</typeparam>
+		/// <param name=""key"">缓存键</param>
+		/// <param name=""field"">字段</param>
+		/// <param name=""timeoutSeconds"">缓存秒数</param>
+		/// <param name=""getData"">获取源数据的函数</param>
+		/// <param name=""serialize"">序列化函数</param>
+		/// <param name=""deserialize"">反序列化函数</param>
 		/// <returns></returns>
 		public static T CacheShell<T>(string key, string field, int timeoutSeconds, Func<T> getData, Func<(T, long), string> serialize = null, Func<string, (T, long)> deserialize = null) =>
 			Instance.CacheShell(key, field, timeoutSeconds, getData, serialize, deserialize);
 		/// <summary>
-		/// �����
+		/// 缓存壳
 		/// </summary>
-		/// <typeparam name=""T"">��������</typeparam>
-		/// <param name=""key"">�����</param>
-		/// <param name=""timeoutSeconds"">��������</param>
-		/// <param name=""getDataAsync"">��ȡԴ���ݵĺ���</param>
-		/// <param name=""serialize"">���л�����</param>
-		/// <param name=""deserialize"">�����л�����</param>
+		/// <typeparam name=""T"">缓存类型</typeparam>
+		/// <param name=""key"">缓存键</param>
+		/// <param name=""timeoutSeconds"">缓存秒数</param>
+		/// <param name=""getDataAsync"">获取源数据的函数</param>
+		/// <param name=""serialize"">序列化函数</param>
+		/// <param name=""deserialize"">反序列化函数</param>
 		/// <returns></returns>
 		async public static Task<T> CacheShellAsync<T>(string key, int timeoutSeconds, Func<Task<T>> getDataAsync, Func<T, string> serialize = null, Func<string, T> deserialize = null) =>
 			await Instance.CacheShellAsync(key, timeoutSeconds, getDataAsync, serialize, deserialize);
 		/// <summary>
-		/// �����(��ϣ��)
+		/// 缓存壳(哈希表)
 		/// </summary>
-		/// <typeparam name=""T"">��������</typeparam>
-		/// <param name=""key"">�����</param>
-		/// <param name=""field"">�ֶ�</param>
-		/// <param name=""timeoutSeconds"">��������</param>
-		/// <param name=""getDataAsync"">��ȡԴ���ݵĺ���</param>
-		/// <param name=""serialize"">���л�����</param>
-		/// <param name=""deserialize"">�����л�����</param>
+		/// <typeparam name=""T"">缓存类型</typeparam>
+		/// <param name=""key"">缓存键</param>
+		/// <param name=""field"">字段</param>
+		/// <param name=""timeoutSeconds"">缓存秒数</param>
+		/// <param name=""getDataAsync"">获取源数据的函数</param>
+		/// <param name=""serialize"">序列化函数</param>
+		/// <param name=""deserialize"">反序列化函数</param>
 		/// <returns></returns>
 		async public static Task<T> CacheShellAsync<T>(string key, string field, int timeoutSeconds, Func<Task<T>> getDataAsync, Func<(T, long), string> serialize = null, Func<string, (T, long)> deserialize = null) =>
 			await Instance.CacheShellAsync(key, field, timeoutSeconds, getDataAsync, serialize, deserialize);
@@ -211,7 +211,7 @@ namespace {0}.DAL {{
 			#endregion
 
 			public static readonly string BLL_Build_ItemCache_cs =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"using System;
 using System.Collections.Generic;
 
@@ -366,7 +366,7 @@ namespace {0}.BLL {{
 }}";
 			#endregion
 			public static readonly string Model_Build_ExtensionMethods_cs =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"using System;
 using System.Text;
 using System.Collections;
@@ -414,7 +414,7 @@ public static partial class {0}ExtensionMethods {{
 			#endregion
 
 			public static readonly string Db_csproj =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -422,14 +422,14 @@ public static partial class {0}ExtensionMethods {{
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include=""dng.Mysql"" Version=""1.1.3"" />
-		<PackageReference Include=""CSRedisCore"" Version=""2.3.6"" />
+		<PackageReference Include=""CSRedisCore"" Version=""2.3.7"" />
 	</ItemGroup>
 </Project>
 ";
 			#endregion
 
-            public static readonly string Infrastructure_csproj =
-			#region ����̫���ѱ�����
+			public static readonly string Infrastructure_csproj =
+			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
@@ -439,7 +439,7 @@ public static partial class {0}ExtensionMethods {{
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Caching.CSRedis"" Version=""2.3.6"" />
+		<PackageReference Include=""Caching.CSRedis"" Version=""2.3.7"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.0"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.0"" />
@@ -456,7 +456,7 @@ public static partial class {0}ExtensionMethods {{
 			#endregion
 
 			public static readonly string WebHost_Extensions_StarupExtensions_cs =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -564,7 +564,7 @@ public static class StarupExtensions {{
 ";
 			#endregion
 			public static readonly string WebHost_Extensions_SwaggerExtensions_cs =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -592,11 +592,11 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 					var versions = apiDesc.ControllerAttributes()
 						.OfType<ApiExplorerSettingsAttribute>()
 						.Select(attr => attr.GroupName);
-					if (docName == ""δ����"" && versions.Count() == 0) return true;
+					if (docName == ""未分类"" && versions.Count() == 0) return true;
 					return versions.Any(v => v == docName);
 				}});
 				options.IgnoreObsoleteActions();
-				//options.IgnoreObsoleteControllers(); // �ࡢ������� [Obsolete]��������ֹ��Swagger�ĵ�������
+				//options.IgnoreObsoleteControllers(); // 类、方法标记 [Obsolete]，可以阻止【Swagger文档】生成
 				options.DescribeAllEnumsAsStrings();
 				options.CustomSchemaIds(a => a.FullName);
 				options.OperationFilter<FormDataOperationFilter>();
@@ -607,7 +607,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 				foreach (var d in dirs) {{
 					xmlFile = Path.Combine(d, $""{{new DirectoryInfo(d).Name}}.xml"");
 					if (File.Exists(xmlFile))
-						options.IncludeXmlComments(xmlFile); // ʹ��ǰ�迪����Ŀע�� xmldoc
+						options.IncludeXmlComments(xmlFile); // 使用前需开启项目注释 xmldoc
 				}}
 				var InfrastructureXml = Directory.GetFiles(Directory.GetCurrentDirectory(), ""Infrastructure.xml"", SearchOption.AllDirectories);
 				if (InfrastructureXml.Any())
@@ -615,7 +615,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 			}});
 			return services;
 		}}
-		static string[] _docs = new[] {{ ""δ����"", ""�����̨"", ""��������Ա��̨"", ""APP��̨"", ""����"", ""APP��̨_����"", ""����"", ""APP��̨_����"" }};
+		static string[] _docs = new[] {{ ""未分类"", ""代理后台"", ""超级管理员后台"", ""APP后台"", ""餐饮"", ""APP后台_餐饮"", ""砍价"", ""APP后台_砍价"" }};
 		public static IApplicationBuilder UseCustomizedSwagger(this IApplicationBuilder app, IHostingEnvironment env) {{
 			return app.UseSwagger().UseSwaggerUI(options => {{
 				foreach (var doc in _docs) options.SwaggerEndpoint($""/swagger/{{doc}}/swagger.json"", doc);
@@ -626,7 +626,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 ";
 			#endregion
 			public static readonly string WebHost_nlog_config =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"<?xml version=""1.0"" encoding=""utf-8"" ?>
 <nlog xmlns=""http://www.nlog-project.org/schemas/NLog.xsd"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
 	autoReload=""true""
@@ -662,7 +662,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 ";
 			#endregion
 			public static readonly string WebHost_appsettings_json =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"{{
 	""Logging"": {{
 		""IncludeScopes"": false,
@@ -684,7 +684,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 ";
 			#endregion
 			public static readonly string WebHost_Program_cs =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
@@ -708,7 +708,7 @@ namespace {0}.WebHost {{
 			#endregion
 
 			public static readonly string WebHost_Startup_cs =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -739,7 +739,7 @@ namespace {0}.WebHost {{
 				st.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.RoundtripKind;
 				return st;
 			}};
-			//��redis�ڵ�ģʽ�����迪��Ⱥ���أ��뽫ע��ȥ������Ӧ����
+			//单redis节点模式，如需开启集群负载，请将注释去掉并做相应配置
 			RedisHelper.Initialization(
 				csredis: new CSRedis.CSRedisClient(//null,
 					//Configuration[""ConnectionStrings:redis2""],
@@ -798,7 +798,7 @@ namespace {0}.WebHost {{
 ";
 			#endregion
 			public static readonly string WebHost_csproj =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk.Web"">
 	<PropertyGroup>
 		<TargetFramework>netcoreapp2.1</TargetFramework>
@@ -830,7 +830,7 @@ namespace {0}.WebHost {{
 			#endregion
 
 			public static readonly string Module_Admin_Controllers_SysController =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -850,10 +850,10 @@ namespace {0}.Module.Admin.Controllers {{
 			List<Hashtable> ret = new List<Hashtable>();
 			foreach (var conn in SqlHelper.Pool.AllConnections) {{
 				ret.Add(new Hashtable() {{
-						{{ ""���ݿ�"", conn.SqlConnection.Database }},
-						{{ ""״̬"", conn.SqlConnection.State }},
-						{{ ""���"", conn.LastActive }},
-						{{ ""��ȡ����"", conn.UseSum }}
+						{{ ""数据库"", conn.SqlConnection.Database }},
+						{{ ""状态"", conn.SqlConnection.State }},
+						{{ ""最后活动"", conn.LastActive }},
+						{{ ""获取次数"", conn.UseSum }}
 					}});
 			}}
 			return new {{
@@ -871,8 +871,8 @@ namespace {0}.Module.Admin.Controllers {{
 				List<Hashtable> list = new List<Hashtable>();
 				foreach (var conn in pool.Value.AllConnections) {{
 					list.Add(new Hashtable() {{
-						{{ ""���"", conn.LastActive }},
-						{{ ""��ȡ����"", conn.UseSum }}
+						{{ ""最后活动"", conn.LastActive }},
+						{{ ""获取次数"", conn.UseSum }}
 					}});
 				}}
 				ret.Add(pool.Key, new {{
@@ -890,12 +890,12 @@ namespace {0}.Module.Admin.Controllers {{
 		public APIReturn Get_init_sysdir() {{
 			/*
 			if (Sysdir.SelectByParent_id(null).Count() > 0)
-				return new APIReturn(-33, ""��ϵͳ�Ѿ���ʼ������ҳ��û�����κβ����˳���"");
+				return new APIReturn(-33, ""本系统已经初始化过，页面没经过任何操作退出。"");
 
 			SysdirInfo dir1, dir2, dir3;
-			dir1 = Sysdir.Insert(null, DateTime.Now, ""��Ӫ����"", 1, null);{1}
+			dir1 = Sysdir.Insert(null, DateTime.Now, ""运营管理"", 1, null);{1}
 			*/
-			return new APIReturn(0, ""����Ŀ¼�ѳ�ʼ����ɡ�"");
+			return new APIReturn(0, ""管理目录已初始化完成。"");
 		}}
 	}}
 }}
@@ -903,7 +903,7 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_Admin_Controllers_LoginController =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -925,24 +925,24 @@ namespace {0}.Module.Admin.Controllers {{
 		public LoginController(ILogger<LoginController> logger) : base(logger) {{ }}
 
 		[HttpGet]
-		[��������]
+		[匿名访问]
 		public ViewResult Index() {{
 			return View();
 		}}
 		[HttpPost]
-		[��������]
+		[匿名访问]
 		public APIReturn Post(LoginModel data) {{
 			HttpContext.Session.SetString(""login.username"", data.Username);
-			return APIReturn.�ɹ�;
+			return APIReturn.成功;
 		}}
 
 		public class LoginModel {{
 			[FromForm]
-			[Required(ErrorMessage = ""�������½��"")]
+			[Required(ErrorMessage = ""请输入登陆名"")]
 			public string Username {{ get; set; }}
 
 			[FromForm]
-			[Required(ErrorMessage = ""����������"")]
+			[Required(ErrorMessage = ""请输入密码"")]
 			public string Password {{ get; set; }}
 		}}
 	}}
@@ -950,7 +950,7 @@ namespace {0}.Module.Admin.Controllers {{
 ";
 			#endregion
 			public static readonly string Module_Admin_Views_Login_Index_cshtml =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"@{{
 	Layout = """";
 }}
@@ -960,7 +960,7 @@ namespace {0}.Module.Admin.Controllers {{
 <head>
 	<meta charset=""utf-8"">
 	<meta http-equiv=""X-UA-Compatible"" content=""IE=edge"">
-	<title>{0}��̨�������� - ��½</title>
+	<title>{0}后台管理中心 - 登陆</title>
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content=""width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"" name=""viewport"">
 	<link rel=""stylesheet"" href=""/module/admin/htm/bootstrap/css/bootstrap.min.css"">
@@ -983,13 +983,13 @@ namespace {0}.Module.Admin.Controllers {{
 <body class=""hold-transition login-page"">
 	<div class=""login-box"">
 		<div class=""login-logo"">
-			<a href=""/module/admin/""><b>{0}</b>��̨��������</a>
+			<a href=""/module/admin/""><b>{0}</b>后台管理中心</a>
 		</div>
 
 		<div id=""error_msg"" style=""display:none;"">
 			<div class=""alert alert-warning alert-dismissible"">
-				<button type=""button"" class=""close"" data-dismiss=""alert"" aria-hidden=""true"">��</button>
-				<h4><i class=""icon fa fa-warning""></i>����!</h4>
+				<button type=""button"" class=""close"" data-dismiss=""alert"" aria-hidden=""true"">×</button>
+				<h4><i class=""icon fa fa-warning""></i>警告!</h4>
 				{{0}}
 			</div>
 		</div>
@@ -1015,7 +1015,7 @@ namespace {0}.Module.Admin.Controllers {{
 					</div>
 					<!-- /.col -->
 					<div class=""col-xs-4"">
-						<button type=""submit"" class=""btn btn-primary btn-block btn-flat"">�� ½</button>
+						<button type=""submit"" class=""btn btn-primary btn-block btn-flat"">登 陆</button>
 					</div>
 					<!-- /.col -->
 				</div>
@@ -1049,7 +1049,7 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_Admin_Controller =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
 			@"using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -1087,7 +1087,7 @@ namespace {0}.Module.Admin.Controllers {{
 		[HttpGet(@""edit"")]
 		async public Task<ActionResult> Edit({4}) {{
 			{1}Info item = await {19}{1}.GetItemAsync({5});
-			if (item == null) return APIReturn.��¼������_����û��Ȩ��;
+			if (item == null) return APIReturn.记录不存在_或者没有权限;
 			ViewBag.item = item;
 			return View();
 		}}
@@ -1098,16 +1098,16 @@ namespace {0}.Module.Admin.Controllers {{
 		async public Task<APIReturn> _Add({10}) {{
 			{1}Info item = new {1}Info();{13}{7}
 			item = await {19}{1}.InsertAsync(item);{16}
-			return APIReturn.�ɹ�.SetData(""item"", item.ToBson());
+			return APIReturn.成功.SetData(""item"", item.ToBson());
 		}}
 		[HttpPost(@""edit"")]
 		[ValidateAntiForgeryToken]
 		async public Task<APIReturn> _Edit({4}{11}) {{
 			{1}Info item = await {19}{1}.GetItemAsync({5});
-			if (item == null) return APIReturn.��¼������_����û��Ȩ��;{6}{7}
+			if (item == null) return APIReturn.记录不存在_或者没有权限;{6}{7}
 			int affrows = await {19}{1}.UpdateAsync(item);{17}
-			if (affrows > 0) return APIReturn.�ɹ�.SetMessage($""���³ɹ���Ӱ��������{{affrows}}"");
-			return APIReturn.ʧ��;
+			if (affrows > 0) return APIReturn.成功.SetMessage($""更新成功，影响行数：{{affrows}}"");
+			return APIReturn.失败;
 		}}
 
 		[HttpPost(""del"")]
@@ -1118,13 +1118,13 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_Admin_wwwroot_index_html =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
 			@"<!DOCTYPE html>
 <html lang=""zh-cmn-Hans"">
 <head>
 	<meta charset=""utf-8"" />
 	<meta http-equiv=""X-UA-Compatible"" content=""IE=edge"" />
-	<title>{0}����ϵͳ</title>
+	<title>{0}管理系统</title>
 	<meta content=""width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"" name=""viewport"" />
 	<link href=""./htm/bootstrap/css/bootstrap.min.css"" rel=""stylesheet"" />
 	<link href=""./htm/plugins/font-awesome/css/font-awesome.min.css"" rel=""stylesheet"" />
@@ -1162,7 +1162,7 @@ namespace {0}.Module.Admin.Controllers {{
 		<header class=""main-header"">
 			<!-- Logo--><a href=""./"" class=""logo"">
 				<!-- mini logo for sidebar mini 50x50 pixels--><span class=""logo-mini""><b>{0}</b></span>
-				<!-- logo for regular state and mobile devices--><span class=""logo-lg""><b>{0}����ϵͳ</b></span>
+				<!-- logo for regular state and mobile devices--><span class=""logo-lg""><b>{0}管理系统</b></span>
 			</a>
 			<!-- Header Navbar-->
 			<nav role=""navigation"" class=""navbar navbar-static-top"">
@@ -1185,7 +1185,7 @@ namespace {0}.Module.Admin.Controllers {{
 								<!-- Menu Footer-->
 								<li class=""user-footer"">
 									<div class=""pull-right"">
-										<a href=""#"" onclick=""$('form#form_logout').submit();return false;"" class=""btn btn-default btn-flat"">��ȫ�˳�</a>
+										<a href=""#"" onclick=""$('form#form_logout').submit();return false;"" class=""btn btn-default btn-flat"">安全退出</a>
 										<form id=""form_logout"" method=""post"" action=""./exit.aspx""></form>
 									</div>
 								</li>
@@ -1204,7 +1204,7 @@ namespace {0}.Module.Admin.Controllers {{
 					<!-- Optionally, you can add icons to the links-->
 
 					<li class=""treeview active"">
-						<a href=""#""><i class=""fa fa-laptop""></i><span>ͨ�ù���</span><i class=""fa fa-angle-left pull-right""></i></a>
+						<a href=""#""><i class=""fa fa-laptop""></i><span>通用管理</span><i class=""fa fa-angle-left pull-right""></i></a>
 						<ul class=""treeview-menu"">{1}
 						</ul>
 					</li>
@@ -1220,12 +1220,12 @@ namespace {0}.Module.Admin.Controllers {{
 			<section id=""right_content"" class=""content"">
 				<div style=""display:none;"">
 					<!-- Your Page Content Here-->
-					<h1>����һ��������ҳ</h1>
-					<h2>swagger webapi��<a href='/swagger/' target='_blank'>/swagger/</a><h2>
-					<h2>��½��ַ��<a href='/login' target='_blank'>/login</a><h2>
+					<h1>这是一个测试首页</h1>
+					<h2>swagger webapi：<a href='/swagger/' target='_blank'>/swagger/</a><h2>
+					<h2>登陆地址：<a href='/login' target='_blank'>/login</a><h2>
 
-					<h2><a href='/sys/connection' target='_blank'>�鿴 Mysql���ӳ�</a><h2>
-					<h2><a href='/sys/connection/redis' target='_blank'>�鿴 Redis���ӳ�</a><h2>
+					<h2><a href='/sys/connection' target='_blank'>查看 Mysql连接池</a><h2>
+					<h2><a href='/sys/connection/redis' target='_blank'>查看 Redis连接池</a><h2>
 				</div>
 			</section>
 			<!-- /.content-->
@@ -1237,8 +1237,8 @@ namespace {0}.Module.Admin.Controllers {{
 	<script type=""text/javascript"" src=""./htm/js/admin.js""></script>
 	<script type=""text/javascript"">
 		if (!location.hash) $('#right_content div:first').show();
-		// ·�ɹ���
-		//��������html��ʼ��·���б�
+		// 路由功能
+		//针对上面的html初始化路由列表
 		function hash_encode(str) {{ return url_encode(base64.encode(str)).replace(/%/g, '_'); }}
 		function hash_decode(str) {{ return base64.decode(url_decode(str.replace(/_/g, '%'))); }}
 		window.div_left_router = {{}};
@@ -1263,7 +1263,7 @@ namespace {0}.Module.Admin.Controllers {{
 				if (hash === '') return //location.hash = $('li.treeview.active ul li a:first').attr('href');//'#base64url' + hash_encode('/resume_type/');
 				if (hash.indexOf('#base64url') !== 0) return;
 				var act = hash_decode(hash.substr(10, hash.length - 10));
-				//Ҷ�������ӵĴ��룬���ػ����ύform����ʾ����
+				//叶湘勤增加的代码，加载或者提交form后，显示内容
 				function ajax_success(refererUrl) {{
 					if (refererUrl == location.pathname) {{ startRouter(); return function(){{}}; }}
 					var hash = '#base64url' + hash_encode(refererUrl);
@@ -1302,7 +1302,7 @@ namespace {0}.Module.Admin.Controllers {{
 										var doc = this.contentWindow ? this.contentWindow.document : this.document;
 										if (doc.body.innerHTML.length === 0) return;
 										if (doc.body.innerHTML.indexOf('Error:') === 0) return alert(doc.body.innerHTML.substr(6));
-										//���� '<script ' + '�Ƿ�ֹ�뱾ҳ����ƥ�䣬��Ҫɾ��
+										//以下 '<script ' + '是防止与本页面相匹配，不要删除
 										if (doc.body.innerHTML.indexOf('<script ' + 'type=""text/javascript"">location.href=""') === -1) {{
 											ajax_success(doc.location.pathname + doc.location.search)(doc.body.innerHTML, 200, null);
 										}}
@@ -1344,7 +1344,7 @@ namespace {0}.Module.Admin.Controllers {{
 				view: '#right_content',
 			}});
 		}});
-		// ҳ����ؽ�����
+		// 页面加载进度条
 		$(document).ajaxStart(function() {{ Pace.restart(); }});
 	</script>
 </body>
@@ -1352,7 +1352,7 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_Test_Controller =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
 			@"using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -1377,7 +1377,7 @@ namespace {0}.Module.Admin.Controllers {{
 
 		[HttpGet]
 		public APIReturn List([FromServices]IConfiguration cfg) {{
-			return APIReturn.�ɹ�;
+			return APIReturn.成功;
 		}}
 	}}
 }}
@@ -1385,7 +1385,7 @@ namespace {0}.Module.Admin.Controllers {{
 			#endregion
 
 			public static readonly string Module_csproj =
-			#region ����̫���ѱ�����
+			#region 内容太长已被收起
  @"<Project Sdk=""Microsoft.NET.Sdk"">
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
