@@ -16,6 +16,8 @@ public partial class BaseController : Controller {
 	public HttpRequest Req { get { return Request; } }
 	public HttpResponse Res { get { return Response; } }
 
+	public string Ip => this.Request.Headers["X-Real-IP"].FirstOrDefault() ?? this.Request.HttpContext.Connection.RemoteIpAddress.ToString();
+	public IConfiguration Configuration => (IConfiguration) HttpContext.RequestServices.GetService(typeof(IConfiguration));
 	//public SysuserInfo LoginUser { get; private set; }
 	public BaseController(ILogger logger) { _logger = logger; }
 	public override void OnActionExecuting(ActionExecutingContext context) {
