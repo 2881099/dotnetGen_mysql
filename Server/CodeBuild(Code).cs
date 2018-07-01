@@ -997,8 +997,10 @@ namespace {0}.DAL {{
 		public object GetItem(IDataReader dr, ref int dataIndex) {{
 			{0}Info item = new {0}Info();", uClass_Name);
 
-				foreach (ColumnInfo columnInfo in table.Columns) {
-					string csType = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType);
+                int getItemIndex = 0;
+                foreach (ColumnInfo columnInfo in table.Columns) {
+                    ++getItemIndex;
+                    string csType = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType);
 					string csTypeGeometry = GetCSTypeGeometry(columnInfo.SqlType);
 					if (csType == "byte[]")
 						sb1.AppendFormat(@"
@@ -1019,7 +1021,7 @@ namespace {0}.DAL {{
 						sb1.AppendFormat(@"
 			if (!dr.IsDBNull(++dataIndex)) item.{0} = {1}dr.{2}(dataIndex);", CodeBuild.UFString(columnInfo.Name), CodeBuild.GetDbToCsConvert(columnInfo.Type), CodeBuild.GetDataReaderMethod(columnInfo.Type));
 					if (columnInfo.IsPrimaryKey)
-						sb1.AppendFormat(@" if (item.{0} == null) return null;", CodeBuild.UFString(columnInfo.Name));
+						sb1.AppendFormat(@" if (item.{0} == null) {{ dataIndex += {1}; return null; }}", CodeBuild.UFString(columnInfo.Name), table.Columns.Count - getItemIndex);
 				}
 				sb1.AppendFormat(@"
 			return item;
@@ -1038,8 +1040,10 @@ namespace {0}.DAL {{
 		async public Task<(object result, int dataIndex)> GetItemAsync(MySqlDataReader dr, int dataIndex) {{
 			{0}Info item = new {0}Info();", uClass_Name);
 
-				foreach (ColumnInfo columnInfo in table.Columns) {
-					string csType = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType);
+                getItemIndex = 0;
+                foreach (ColumnInfo columnInfo in table.Columns) {
+                    ++getItemIndex;
+                    string csType = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType);
 					string csTypeGeometry = GetCSTypeGeometry(columnInfo.SqlType);
 					if (csType == "byte[]")
 						dal_async_code += string.Format(@"
@@ -1060,7 +1064,7 @@ namespace {0}.DAL {{
 						dal_async_code += string.Format(@"
 			if (!await dr.IsDBNullAsync(++dataIndex)) item.{0} = {1}dr.{2}(dataIndex);", CodeBuild.UFString(columnInfo.Name), CodeBuild.GetDbToCsConvert(columnInfo.Type), CodeBuild.GetDataReaderMethod(columnInfo.Type));
 					if (columnInfo.IsPrimaryKey)
-						dal_async_code += string.Format(@" if (item.{0} == null) return (null, dataIndex);", CodeBuild.UFString(columnInfo.Name));
+						dal_async_code += string.Format(@" if (item.{0} == null) {{ dataIndex += {1}; return (null, dataIndex); }}", CodeBuild.UFString(columnInfo.Name), table.Columns.Count - getItemIndex);
 				}
 
 				dal_async_code += string.Format(@"
