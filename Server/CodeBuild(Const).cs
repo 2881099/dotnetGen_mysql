@@ -577,11 +577,12 @@ using System.Linq;
 namespace Swashbuckle.AspNetCore.Swagger {{
 	public class FormDataOperationFilter : IOperationFilter {{
 		public void Apply(Operation operation, OperationFilterContext context) {{
-			var actattrs = context.ApiDescription.ActionAttributes();
+			if (context.ApiDescription.TryGetMethodInfo(out var method) == false) return;
+			var actattrs = method.GetCustomAttributes(false);
 			if (actattrs.OfType<HttpPostAttribute>().Any() ||
 				actattrs.OfType<HttpPutAttribute>().Any())
 				if (operation.Consumes.Count == 0)
-					operation.Consumes.Add(""multipart/form-data"");
+					operation.Consumes.Add(""application/x-www-form-urlencoded"");
 		}}
 	}}
 
@@ -590,7 +591,8 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 			services.AddSwaggerGen(options => {{
 				foreach (var doc in _docs) options.SwaggerDoc(doc, new Info {{ Version = doc }});
 				options.DocInclusionPredicate((docName, apiDesc) => {{
-					var versions = apiDesc.ControllerAttributes()
+					if (apiDesc.TryGetMethodInfo(out var method) == false) return false;
+					var versions = method.DeclaringType.GetCustomAttributes(false)
 						.OfType<ApiExplorerSettingsAttribute>()
 						.Select(attr => attr.GroupName);
 					if (docName == ""未分类"" && versions.Count() == 0) return true;
@@ -598,6 +600,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 				}});
 				options.IgnoreObsoleteActions();
 				//options.IgnoreObsoleteControllers(); // 类、方法标记 [Obsolete]，可以阻止【Swagger文档】生成
+				options.EnableAnnotations();
 				options.DescribeAllEnumsAsStrings();
 				options.CustomSchemaIds(a => a.FullName);
 				options.OperationFilter<FormDataOperationFilter>();
@@ -616,7 +619,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 			}});
 			return services;
 		}}
-		static string[] _docs = new[] {{ ""未分类"", ""代理后台"", ""超级管理员后台"", ""APP后台"", ""餐饮"", ""APP后台_餐饮"", ""砍价"", ""APP后台_砍价"" }};
+		static string[] _docs = new[] {{ ""未分类"", ""公共"", ""cms"", ""后台管理"" }};
 		public static IApplicationBuilder UseCustomizedSwagger(this IApplicationBuilder app, IHostingEnvironment env) {{
 			return app.UseSwagger().UseSwaggerUI(options => {{
 				foreach (var doc in _docs) options.SwaggerEndpoint($""/swagger/{{doc}}/swagger.json"", doc);
