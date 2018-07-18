@@ -1,18 +1,16 @@
 ﻿# dotnetGen_mysql
 .NETCore 2.1 + Mysql 生成器
 
-本项目为生成器，用于快速创建和更新 .NETCore 2.1 + Mysql 项目，非常合适敏捷开发；
+本项目为生成器，用于快速创建和更新 .NETCore 2.1 + Mysql 项目，非常合适敏捷与快速开发；
 
 优势：
  * 1、根据主键、唯一键、外键（1对1，1对多，多对多）生成功能丰富的数据库 SDK；
  * 2、避免随意创建表，严格把控数据库，有标准的ER图；
  * 3、统一规范数据库操作类与方法，一条心堆业务；
 
-[下载生成器客户端试用](http://files.cnblogs.com/files/kellynic/%E7%94%9F%E6%88%90%E5%99%A8MySql.zip)
+> 使用 navicat 模型创建和管理 ER 图，从数据库导入/同步结构到数据库，打心底里好用..
 
-> 或者 dotnet tool install -g GenMy
-
-> 查看帮助可输入 cmd -> GenMy ?
+[下载生成器客户端试用](http://files.cnblogs.com/files/kellynic/%E7%94%9F%E6%88%90%E5%99%A8MySql.zip)，或者安装命令工具 dotnet tool install -g GenMy
 
 共勉，一起学习QQ群：8578575
 
