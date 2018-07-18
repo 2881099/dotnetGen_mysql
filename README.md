@@ -184,7 +184,7 @@ CREATE TABLE `topic` (
 ```csharp
 // 更新 id = 1 所有字段
 表名Info newitem1 = 表名.Update(Id: 1, Title: "添加的标题", Content: "这是一段添加的内容", Clicks: 1);
-表名Info newitem2 = 表名.Insert(new 表名Info { Id: 1, Title = "添加的标题", Content = "这是一段添加的内容", Clicks = 1 });
+表名Info newitem2 = 表名.Update(new 表名Info { Id: 1, Title = "添加的标题", Content = "这是一段添加的内容", Clicks = 1 });
 // 更新 id = 1 指定字段
 表名.UpdateDiy(1).SetTitle("修改后的标题").SetContent("修改后的内容").SetClicks(1).ExecuteNonQuery();
 // update 表名 set clicks = clicks + 1 where id = 1
@@ -229,6 +229,17 @@ List<UserInfo> users1 = BLL.User.Select.WhereUsername("2881099@qq.com").WherePas
 
 //返回指定列，返回List<元组>
 var users2 = BLL.User.Select.WhereStatus(正常).Aggregate<(int id, string title)>("id,title");
+
+//多表查询，只返回 a 表字段
+var users3 = BLL.User.Select.From<User_group>("b").Where("a.group_id = b.id").ToList();
+
+//join查询，返回 a, b 表字段 ，将 b 表字段填充至 a表.Obj_user_group 对象，类似 ef.Include
+var users4 = BLL.User.Select.InnerJoin<User_group>("b", "a.group_id = b.id").ToList();
+
+//分组查询
+var users5 = BLL.User.Select.GroupBy("group_id").Aggregate<(int groupId, int count)>("group_id, count(1)");
+
+//等等...
 ```
 
 ## 事务
