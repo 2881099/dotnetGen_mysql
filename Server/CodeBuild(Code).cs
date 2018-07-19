@@ -899,6 +899,10 @@ namespace {0}.Model {{
 	public static string ToJson(this IEnumerable<{0}Info> items) => GetJson(items);
 	public static IDictionary[] ToBson(this {0}Info[] items, Func<{0}Info, object> func = null) => GetBson(items, func);
 	public static IDictionary[] ToBson(this IEnumerable<{0}Info> items, Func<{0}Info, object> func = null) => GetBson(items, func);
+", uClass_Name, solutionName);
+
+				if (table.PrimaryKeys.Count > 0)
+					Model_Build_ExtensionMethods_cs.AppendFormat(@"
 	public static {1}.DAL.{0}.SqlUpdateBuild UpdateDiy(this List<{0}Info> items) => {1}.BLL.{0}.UpdateDiy(items);
 ", uClass_Name, solutionName);
 				#endregion
