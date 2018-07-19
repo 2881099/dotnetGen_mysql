@@ -1077,8 +1077,7 @@ namespace {0}.Module.Admin.Controllers {{
 		[HttpGet]
 		async public Task<ActionResult> List([FromServices]IConfiguration cfg, {12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
 			var select = {19}{1}.Select{8};{9}
-			long count;
-			var items = await select.Count(out count){14}.Page(page, limit).ToListAsync();
+			var items = await select.Count(out var count){14}.Page(page, limit).ToListAsync();
 			ViewBag.items = items;
 			ViewBag.count = count;
 			return View();
