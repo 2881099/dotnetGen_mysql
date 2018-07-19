@@ -251,7 +251,7 @@ namespace {0}.Model {{
 					string csType = CodeBuild.GetCSType(column.Type, uClass_Name + column.Name.ToUpper(), column.SqlType);
 					string nColumn_Name = column.Name;
 					string uColumn_Name = CodeBuild.UFString(column.Name);
-					string comment = _column_coments[table.FullName][column.Name];
+					string comment = _column_coments.ContainsKey(table.FullName) && _column_coments[table.FullName].ContainsKey(column.Name) ? _column_coments[table.FullName][column.Name] : column.Name;
 					string prototype_comment = comment == column.Name ? "" : string.Format(@"/// <summary>
 		/// {0}
 		/// </summary>
@@ -1987,7 +1987,7 @@ namespace {0}.BLL {{
 
 						string csType = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType);
 						string csUName = CodeBuild.UFString(col.Name);
-						string comment = _column_coments[table.FullName][col.Name];
+						string comment = _column_coments.ContainsKey(table.FullName) && _column_coments[table.FullName].ContainsKey(col.Name) ? _column_coments[table.FullName][col.Name] : col.Name;
 						if (csType == "string") {
 							keyLikes += "a." + col.Name + " like {0} or ";
 						}
@@ -2428,7 +2428,7 @@ namespace {0}.BLL {{
 						string csType = CodeBuild.GetCSType(col.Type, uClass_Name + col.Name.ToUpper(), col.SqlType);
 						string csUName = CodeBuild.UFString(col.Name);
 						string lname = col.Name.ToLower();
-						string comment = _column_coments[table.FullName][col.Name];
+						string comment = _column_coments.ContainsKey(table.FullName) && _column_coments[table.FullName].ContainsKey(col.Name) ? _column_coments[table.FullName][col.Name] : col.Name;
 						string rfvEmpty = string.Empty;
 						List<ColumnInfo> us = table.Uniques.Find(delegate (List<ColumnInfo> cs) {
 							return cs.Find(delegate (ColumnInfo col88) {
