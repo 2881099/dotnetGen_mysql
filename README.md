@@ -28,6 +28,8 @@ GenMy 数据库ip[:3306] -U 登陆名 -P 密码 -D 数据库1[,数据库2] -N �
 GenMy 数据库ip[:3306] -U 登陆名 -P 密码 -D 数据库1[,数据库2] -N 命名空间 -R -S -A
 ```
 
+dotnetGen 保持相同的开发与使用习惯，现实了面向 mysql、SQLServer、PostgreSQL 三种数据库快速开发，也可混合使用。
+
 | <font color=gray>功能对比</font> | [dotnetGen_mysql](https://github.com/2881099/dotnetGen_mysql) | [dotnetGen_sqlserver](https://github.com/2881099/dotnetGen_sqlserver) | [dotnetGen_postgresql](https://github.com/2881099/dotnetGen_postgresql) |
 | ----------------: | --------------: | -------------------: | -------------------: |
 | windows            | √ | √ | √ |
