@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Text;
@@ -153,7 +153,7 @@ namespace Server {
 				if (table.Type == "P") continue;
 
 				//if (table.Uniques.Count == 0) {
-				//	throw new Exception("¼ì²éµ½±í ¡°" + table.Owner + "." + table.Name + "¡± Ã»ÓĞÉè¶¨Î©Ò»¼ü£¡");
+				//	throw new Exception("æ£€æŸ¥åˆ°è¡¨ â€œ" + table.Owner + "." + table.Name + "â€ æ²¡æœ‰è®¾å®šæƒŸä¸€é”®ï¼");
 				//}
 				if (table.Columns.Count == 0) continue;
 
@@ -262,7 +262,7 @@ namespace {0}.Model {{
 ", csType, uColumn_Name);
 
 					if (column.Type == MySqlDbType.Enum || column.Type == MySqlDbType.Set) {
-						#region Éú³É Enum/Set Ã¶¾ÙÀàĞÍ
+						#region ç”Ÿæˆ Enum/Set æšä¸¾ç±»å‹
 						sb16.AppendFormat(@"
 	{2}public enum {0}{1} {{
 		", uClass_Name, column.Name.ToUpper() + (column.Type == MySqlDbType.Set ? " : long" : ""), column.Type == MySqlDbType.Set ? "[Flags]\r\n	" : "");
@@ -365,29 +365,29 @@ namespace {0}.Model {{
 			internal set {{ _obj_{1} = value; }}
 		}}
 ", FK_uClass_Name_full, memberName, solutionName, fkcsBy, fkcsParms, FK_uClass_Name, fkcsIfNull);
-							//Èô²»´æÔÚ Obj_Íâ¼ü±íÃû£¬ÔòÔö¼Ó£¬·ñÔòInnerJoin.ToListÊ±»á±¨´í ¡°Obj_Íâ¼ü±íÃû ²»´æÔÚ¡±
-							//±ÈÈç±íÖ»ÓĞÒ» creator_person_id Ê±£¬Ğè¸½¼Ó³ÉÉúÒ»¸ö Obj_person ÊôĞÔ
+							//è‹¥ä¸å­˜åœ¨ Obj_å¤–é”®è¡¨åï¼Œåˆ™å¢åŠ ï¼Œå¦åˆ™InnerJoin.ToListæ—¶ä¼šæŠ¥é”™ â€œObj_å¤–é”®è¡¨å ä¸å­˜åœ¨â€
+							//æ¯”å¦‚è¡¨åªæœ‰ä¸€ creator_person_id æ—¶ï¼Œéœ€é™„åŠ æˆç”Ÿä¸€ä¸ª Obj_person å±æ€§
 							string fkTableClassName = fk.ReferencedTable.ClassName;
 							if (memberName == fkTableClassName) {
-								//Èç¹ûÓĞ Obj_Íâ¼ü±íÃû ÊôĞÔ£¬Ôò²»Ôö¼ÓÊ²Ã´´úÂë
+								//å¦‚æœæœ‰ Obj_å¤–é”®è¡¨å å±æ€§ï¼Œåˆ™ä¸å¢åŠ ä»€ä¹ˆä»£ç 
 								if (innerjoinObjs.ContainsKey(fkTableClassName)) innerjoinObjs.Remove(fkTableClassName);
 								innerjoinObjs.Add(fkTableClassName, "");
 							} else {
 								if (innerjoinObjs.ContainsKey(fkTableClassName)) {
 									if (!string.IsNullOrEmpty(innerjoinObjs[fkTableClassName]))
-										//Èç¹ûÓĞ¶à¸öÏàÍ¬Íâ¼ü£¬±ÈÈç a_person_id, b_person_id
+										//å¦‚æœæœ‰å¤šä¸ªç›¸åŒå¤–é”®ï¼Œæ¯”å¦‚ a_person_id, b_person_id
 										innerjoinObjs[fkTableClassName] = string.Format(
 @"
 		/// <summary>
-		/// ÅäºÏ InnerJoin .ToList ²éÑ¯ÁÙÊ±Ê¹ÓÃ
+		/// é…åˆ InnerJoin .ToList æŸ¥è¯¢ä¸´æ—¶ä½¿ç”¨
 		/// </summary>
 		public {0}Info Obj_{1} {{ get; internal set; }}", UFString(fkTableClassName), fkTableClassName, memberName);
 								} else
-									//Èç¹ûÖ»ÓĞÒ»¸öÍâ¼ü£¬±ÈÈç a_person_id
+									//å¦‚æœåªæœ‰ä¸€ä¸ªå¤–é”®ï¼Œæ¯”å¦‚ a_person_id
 									innerjoinObjs.Add(fkTableClassName, string.Format(
 @"
 		/// <summary>
-		/// Óë Obj_{2} Í¬ÒıÓÃ
+		/// ä¸ Obj_{2} åŒå¼•ç”¨
 		/// </summary>
 		public {0}Info Obj_{1} {{
 			get {{ return this.Obj_{2}; }}
@@ -483,14 +483,14 @@ namespace {0}.Model {{
 							});
 							if (fk3 != null) {
 								if (fk3.Columns[0].IsPrimaryKey)
-									if (fk3.Table.PrimaryKeys.Count == 1) return; //Èç¹ûÓĞÍâ¼üÊÇÖ÷¼ü£¬²¢ÇÒËü²»ÊÇ¸´ºÏ×éºÏ£¬ÔòÌø¹ı
+									if (fk3.Table.PrimaryKeys.Count == 1) return; //å¦‚æœæœ‰å¤–é”®æ˜¯ä¸»é”®ï¼Œå¹¶ä¸”å®ƒä¸æ˜¯å¤åˆç»„åˆï¼Œåˆ™è·³è¿‡
 							}
 						}
 					}
 					ForeignKeyInfo fk_Common = null;
 					List<ForeignKeyInfo> fks = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk) {
 						if (ffk.ReferencedTable.FullName == table.FullName/* && 
-							ffk.Table.FullName != table.FullName*/) { //×¢ÊÍÕâĞĞÌõ¼şÎªÁËÔö¼Ó parent_id µÄ obj ¶ÔÏó
+							ffk.Table.FullName != table.FullName*/) { //æ³¨é‡Šè¿™è¡Œæ¡ä»¶ä¸ºäº†å¢åŠ  parent_id çš„ obj å¯¹è±¡
 							fk_Common = ffk;
 							return true;
 						}
@@ -501,14 +501,14 @@ namespace {0}.Model {{
 						return string.Compare(table.Name + "_" + table.PrimaryKeys[0].Name, ffk.Columns[0].Name, true) == 0;
 					}) : fks[0];
 					if (fk == null) fk = fks[0];
-					//if (fk.Table.FullName == table.FullName) return; //×¢ÊÍÕâĞĞÌõ¼şÎªÁËÔö¼Ó parent_id µÄ obj ¶ÔÏó
+					//if (fk.Table.FullName == table.FullName) return; //æ³¨é‡Šè¿™è¡Œæ¡ä»¶ä¸ºäº†å¢åŠ  parent_id çš„ obj å¯¹è±¡
 					List<ForeignKeyInfo> fk2 = t2.ForeignKeys.FindAll(delegate (ForeignKeyInfo ffk2) {
 						return ffk2.Columns[0].IsPrimaryKey && ffk2 != fk;
 					});
 					// 1 -> 1
 					ForeignKeyInfo fk1v1 = table.ForeignKeys.Find(delegate (ForeignKeyInfo ffk2) {
 						return ffk2.ReferencedTable.FullName == t2.FullName
-							&& ffk2.ReferencedColumns[0].IsPrimaryKey && ffk2.Columns[0].IsPrimaryKey; //ÕâĞĞÌõ¼şÎªÁËÔö¼Ó parent_id µÄ obj ¶ÔÏó
+							&& ffk2.ReferencedColumns[0].IsPrimaryKey && ffk2.Columns[0].IsPrimaryKey; //è¿™è¡Œæ¡ä»¶ä¸ºäº†å¢åŠ  parent_id çš„ obj å¯¹è±¡
 					});
 					if (fk1v1 != null) return;
 
@@ -544,7 +544,7 @@ namespace {0}.Model {{
 					string updateDiySet = "";
 					string add_or_flag = "Add";
 					int ms = 0;
-					//ÈôÖĞ¼ä±í£¬Á½Íâ¼üÖ¸ÏòÏàÍ¬±í£¬ÔòÑ¡Ôñ ±íÃû_Ö÷¼üÃû ´Ë×Ö¶Î×÷ÎªÖ÷²Î¿¼×Ö¶Î
+					//è‹¥ä¸­é—´è¡¨ï¼Œä¸¤å¤–é”®æŒ‡å‘ç›¸åŒè¡¨ï¼Œåˆ™é€‰æ‹© è¡¨å_ä¸»é”®å æ­¤å­—æ®µä½œä¸ºä¸»å‚è€ƒå­—æ®µ
 					string main_column = fk.Columns[0].Name;
 					foreach (ColumnInfo columnInfo in t2.Columns) {
 						string csType = GetCSType(columnInfo.Type, "", columnInfo.SqlType);
@@ -606,7 +606,7 @@ namespace {0}.Model {{
 								parms4 += CodeBuild.GetCSType(columnInfo.Type, CodeBuild.UFString(t2.ClassName) + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 								parmsNoneType4 += string.Format(GetCSTypeValue(columnInfo.Type), CodeBuild.UFString(columnInfo.Name)) + ", ";
 							}
-							if (add_or_flag != "Flag" && fk.Columns[0].IsPrimaryKey) //ÖĞ¼ä±í¹ØÏµ¼ü£¬±ØĞëÎªÖ÷¼ü
+							if (add_or_flag != "Flag" && fk.Columns[0].IsPrimaryKey) //ä¸­é—´è¡¨å…³ç³»é”®ï¼Œå¿…é¡»ä¸ºä¸»é”®
 								t2.Uniques.ForEach(delegate (List<ColumnInfo> cs) {
 									if (cs.Count < 2) return;
 									ms = 0;
@@ -721,7 +721,7 @@ namespace {0}.Model {{
 							string objs_value = string.Format(@"
 		private List<{0}Info> _obj_{1}s;
 		public List<{0}Info> Obj_{1}s => _obj_{1}s ?? (_obj_{1}s = BLL.{0}.SelectBy{5}_{4}({3}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), solutionName, civ, table.PrimaryKeys[0].Name, CodeBuild.UFString(f5));
-							//Èç¹ûÖĞ¼ä±í×Ö¶Î > 2£¬ÄÇÃ´Ó¦¸Ã°ÑÆäÖĞ¼ä±íÒ²²éÑ¯³öÀ´
+							//å¦‚æœä¸­é—´è¡¨å­—æ®µ > 2ï¼Œé‚£ä¹ˆåº”è¯¥æŠŠå…¶ä¸­é—´è¡¨ä¹ŸæŸ¥è¯¢å‡ºæ¥
 							if (t2.Columns.Count > 2) {
 								string _f6 = fk.Columns[0].Name;
 								string _f7 = fk.ReferencedTable.PrimaryKeys[0].Name;
@@ -740,7 +740,7 @@ namespace {0}.Model {{
 		public {2}Info Obj_{3} {{ set; get; }}
 		private List<{0}Info> _obj_{1}s;
 		/// <summary>
-		/// ±éÀúÊ±£¬¿ÉÍ¨¹ı Obj_{3} ¿É»ñÈ¡ÖĞ¼ä±íÊı¾İ
+		/// éå†æ—¶ï¼Œå¯é€šè¿‡ Obj_{3} å¯è·å–ä¸­é—´è¡¨æ•°æ®
 		/// </summary>
 		public List<{0}Info> Obj_{1}s =>_obj_{1}s ?? (_obj_{1}s = BLL.{0}.Select.InnerJoin<BLL.{2}>(""b"", ""b.`{6}` = a.`{5}`"").Where(""b.`{4}` = {{0}}"", {7}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname_schema), CodeBuild.UFString(t2.ClassName), CodeBuild.LFString(t2.ClassName),
 			_f6, _f7, _f8, civ.Replace(".Value", ""));
@@ -753,7 +753,7 @@ namespace {0}.Model {{
 						}
 					} else {
 						string f2 = fk.Columns[0].Name.CompareTo("parent_id") == 0 ? t2name : fk.Columns[0].Name.Replace(tablename + "_" + table.PrimaryKeys[0].Name, "") + CodeBuild.LFString(t2name);
-						if (fk.Columns[0].IsPrimaryKey && fk.Table.PrimaryKeys.Count == 1) { //1¶Ô1¹ØÏµ£¬²»Ó¦¸ÃÉú³É obj_xxxs
+						if (fk.Columns[0].IsPrimaryKey && fk.Table.PrimaryKeys.Count == 1) { //1å¯¹1å…³ç³»ï¼Œä¸åº”è¯¥ç”Ÿæˆ obj_xxxs
 							string obj_value = string.Format(@"
 		private {0}Info _obj_{1};
 		public {0}Info Obj_{1} {{
@@ -836,7 +836,7 @@ namespace {0}.Model {{
 
 				sb1.AppendFormat(@"
 {1}{2}
-		#region ĞòÁĞ»¯£¬·´ĞòÁĞ»¯
+		#region åºåˆ—åŒ–ï¼Œååºåˆ—åŒ–
 		protected static readonly string StringifySplit = ""@<{0}(Info]?#>"";
 		public string Stringify() {{
 			return string.Concat({7});
@@ -844,7 +844,7 @@ namespace {0}.Model {{
 		public static {0}Info Parse(string stringify) {{
 			if (string.IsNullOrEmpty(stringify) || stringify == ""null"") return null;
 			string[] ret = stringify.Split(new char[] {{ '|' }}, {6}, StringSplitOptions.None);
-			if (ret.Length != {6}) throw new Exception($""¸ñÊ½²»ÕıÈ·£¬{0}Info£º{{stringify}}"");
+			if (ret.Length != {6}) throw new Exception($""æ ¼å¼ä¸æ­£ç¡®ï¼Œ{0}Infoï¼š{{stringify}}"");
 			{0}Info item = new {0}Info();{8}
 			return item;
 		}}
@@ -1138,7 +1138,7 @@ namespace {0}.DAL {{
 				});
 
 				if (table.PrimaryKeys.Count > 0) {
-					#region Èç¹ûÃ»ÓĞÖ÷¼üµÄ´¦ÀíUpdateBuild
+					#region å¦‚æœæ²¡æœ‰ä¸»é”®çš„å¤„ç†UpdateBuild
 					foreach (ColumnInfo col in table.Columns) {
 						if (col.IsIdentity ||
 							col.IsPrimaryKey ||
@@ -1309,7 +1309,7 @@ namespace {0}.DAL {{
 			public SqlUpdateBuild() {{ }}
 			public override string ToString() {{
 				if (string.IsNullOrEmpty(_fields)) return string.Empty;
-				if (string.IsNullOrEmpty(_where)) throw new Exception(""·ÀÖ¹ {9}.DAL.{0}.SqlUpdateBuild ÎóĞŞ¸Ä£¬Çë±ØĞëÉèÖÃ where Ìõ¼ş¡£"");
+				if (string.IsNullOrEmpty(_where)) throw new Exception(""é˜²æ­¢ {9}.DAL.{0}.SqlUpdateBuild è¯¯ä¿®æ”¹ï¼Œè¯·å¿…é¡»è®¾ç½® where æ¡ä»¶ã€‚"");
 				return string.Concat(""UPDATE "", TSQL.Table, "" SET "", _fields.Substring(1), "" WHERE "", _where);
 			}}
 			public int ExecuteNonQuery() {{
@@ -1339,7 +1339,7 @@ namespace {0}.DAL {{
 			}}
 
 			public SqlUpdateBuild Set(string field, string value, params MySqlParameter[] parms) {{
-				if (value.IndexOf('\'') != -1) throw new Exception(""{9}.DAL.{0}.SqlUpdateBuild ¿ÉÄÜ´æÔÚ×¢ÈëÂ©¶´£¬²»ÔÊĞí´«µİ ' ¸ø²ÎÊı value£¬ÈôÊ¹ÓÃÕı³£×Ö·û´®£¬ÇëÊ¹ÓÃ²ÎÊı»¯´«µİ¡£"");
+				if (value.IndexOf('\'') != -1) throw new Exception(""{9}.DAL.{0}.SqlUpdateBuild å¯èƒ½å­˜åœ¨æ³¨å…¥æ¼æ´ï¼Œä¸å…è®¸ä¼ é€’ ' ç»™å‚æ•° valueï¼Œè‹¥ä½¿ç”¨æ­£å¸¸å­—ç¬¦ä¸²ï¼Œè¯·ä½¿ç”¨å‚æ•°åŒ–ä¼ é€’ã€‚"");
 				_fields = string.Concat(_fields, "", "", field, "" = "", value);
 				if (parms != null && parms.Length > 0) _parameters.AddRange(parms);
 				return this;
@@ -1476,7 +1476,7 @@ namespace {0}.BLL {{
 				}
 
 				if (table.PrimaryKeys.Count > 0) {
-					#region Èç¹ûÃ»ÓĞÖ÷¼üµÄ´¦Àí
+					#region å¦‚æœæ²¡æœ‰ä¸»é”®çš„å¤„ç†
 					sb2.AppendFormat(@"|deleteby_fk|");
 
 					sb1.AppendFormat(@"
@@ -1491,7 +1491,7 @@ namespace {0}.BLL {{
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ itemCacheTimeout > 0 ? new {1}Info {{ {4} }} : GetItem({3}) }});
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy(List<{1}Info> dataSource) => new {0}.DAL.{1}.SqlUpdateBuild(dataSource);
 		/// <summary>
-		/// ÓÃÓÚÅúÁ¿¸üĞÂ£¬²»»á¸üĞÂ»º´æ
+		/// ç”¨äºæ‰¹é‡æ›´æ–°ï¼Œä¸ä¼šæ›´æ–°ç¼“å­˜
 		/// </summary>
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiyDangerous => new {0}.DAL.{1}.SqlUpdateBuild();
 ", solutionName, uClass_Name, pkCsParam, pkCsParamNoType, pkCsParamNoTypeFieldInit);
@@ -1505,7 +1505,7 @@ namespace {0}.BLL {{
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ new {1}Info {{ {4} }} }});
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy(List<{1}Info> dataSource) => new {0}.DAL.{1}.SqlUpdateBuild(dataSource);
 		/// <summary>
-		/// ÓÃÓÚÅúÁ¿¸üĞÂ£¬²»»á¸üĞÂ»º´æ
+		/// ç”¨äºæ‰¹é‡æ›´æ–°ï¼Œä¸ä¼šæ›´æ–°ç¼“å­˜
 		/// </summary>
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiyDangerous => new {0}.DAL.{1}.SqlUpdateBuild();
 ", solutionName, uClass_Name, pkCsParam, pkCsParamNoType, xxxxtempskdf.Substring(0, xxxxtempskdf.Length - 2));
@@ -1518,7 +1518,7 @@ namespace {0}.BLL {{
 					if (table.Columns.Count > 5)
 						sb1.AppendFormat(@"
 		/// <summary>
-		/// ÊÊÓÃ×Ö¶Î½ÏÉÙµÄ±í£»±Ü¹æºóĞø¸Ä±í·çÏÕ£¬×Ö¶ÎÊı½Ï´óÇë¸ÄÓÃ {0}.Insert({0}Info item)
+		/// é€‚ç”¨å­—æ®µè¾ƒå°‘çš„è¡¨ï¼›é¿è§„åç»­æ”¹è¡¨é£é™©ï¼Œå­—æ®µæ•°è¾ƒå¤§è¯·æ”¹ç”¨ {0}.Insert({0}Info item)
 		/// </summary>
 		[Obsolete]", uClass_Name);
 					sb1.AppendFormat(@"
@@ -1529,7 +1529,7 @@ namespace {0}.BLL {{
 					if (table.Columns.Count > 5)
 						bll_async_code += string.Format(@"
 		/// <summary>
-		/// ÊÊÓÃ×Ö¶Î½ÏÉÙµÄ±í£»±Ü¹æºóĞø¸Ä±í·çÏÕ£¬×Ö¶ÎÊı½Ï´óÇë¸ÄÓÃ {0}.Insert({0}Info item)
+		/// é€‚ç”¨å­—æ®µè¾ƒå°‘çš„è¡¨ï¼›é¿è§„åç»­æ”¹è¡¨é£é™©ï¼Œå­—æ®µæ•°è¾ƒå¤§è¯·æ”¹ç”¨ {0}.Insert({0}Info item)
 		/// </summary>
 		[Obsolete]", uClass_Name);
 					bll_async_code += string.Format(@"
@@ -1554,10 +1554,10 @@ namespace {0}.BLL {{
 					}
 					var bll_synccode_insertMulti = identityColumn == null ? string.Format(@"
 		/// <summary>
-		/// ÅúÁ¿²åÈë
+		/// æ‰¹é‡æ’å…¥
 		/// </summary>
-		/// <param name=""items"">¼¯ºÏ</param>
-		/// <returns>Ó°ÏìµÄĞĞÊı</returns>
+		/// <param name=""items"">é›†åˆ</param>
+		/// <returns>å½±å“çš„è¡Œæ•°</returns>
 		public static int Insert(IEnumerable<{0}Info> items) {{{1}
 			var affrows = dal.Insert(items);
 			if (itemCacheTimeout > 0) RemoveCache(items);
@@ -1565,10 +1565,10 @@ namespace {0}.BLL {{
 		}}", uClass_Name, cspk2GuidSetValuesss) : "";
 					var bll_asynccode_insertMulti = identityColumn == null ? string.Format(@"
 		/// <summary>
-		/// ÅúÁ¿²åÈë
+		/// æ‰¹é‡æ’å…¥
 		/// </summary>
-		/// <param name=""items"">¼¯ºÏ</param>
-		/// <returns>Ó°ÏìµÄĞĞÊı</returns>
+		/// <param name=""items"">é›†åˆ</param>
+		/// <returns>å½±å“çš„è¡Œæ•°</returns>
 		async public static Task<int> InsertAsync(IEnumerable<{0}Info> items) {{{1}
 			var affrows = await dal.InsertAsync(items);
 			if (itemCacheTimeout > 0) await RemoveCacheAsync(items);
@@ -1706,7 +1706,7 @@ namespace {0}.BLL {{
 						return ffk2.Columns[0].IsPrimaryKey && ffk2 != fk;
 					});
 					if (fk2.Count != 1) return;
-					if (fk.Columns[0].IsPrimaryKey == false) return; //ÖĞ¼ä±í¹ØÏµ¼ü£¬±ØĞëÎªÖ÷¼ü
+					if (fk.Columns[0].IsPrimaryKey == false) return; //ä¸­é—´è¡¨å…³ç³»é”®ï¼Œå¿…é¡»ä¸ºä¸»é”®
 
 					//t2.Columns
 					string t2name = t2.Name;
@@ -1740,7 +1740,7 @@ namespace {0}.BLL {{
 					string _f8 = fk2[0].Columns[0].Name;
 					string _f9 = GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper(), fk2[0].ReferencedTable.PrimaryKeys[0].SqlType).Replace("?", "");
 
-					//ÈôÖĞ¼ä±í£¬Á½Íâ¼üÖ¸ÏòÏàÍ¬±í£¬ÔòÑ¡Ôñ ±íÃû_Ö÷¼üÃû ´Ë×Ö¶Î×÷ÎªÖ÷²Î¿¼×Ö¶Î
+					//è‹¥ä¸­é—´è¡¨ï¼Œä¸¤å¤–é”®æŒ‡å‘ç›¸åŒè¡¨ï¼Œåˆ™é€‰æ‹© è¡¨å_ä¸»é”®å æ­¤å­—æ®µä½œä¸ºä¸»å‚è€ƒå­—æ®µ
 					string main_column = fk.Columns[0].Name;
 					if (fk.ReferencedTable.ClassName == fk2[0].ReferencedTable.ClassName &&
 						string.Compare(main_column, fk.Columns[0].Name, true) == 0) {
@@ -1881,10 +1881,10 @@ namespace {0}.BLL {{
 					if (csType == "MygisPoint") {
 						sb6.AppendFormat(@"
 		/// <summary>
-		/// ²éÕÒµØÀíÎ»ÖÃ¶àÉÙÃ×·¶Î§ÄÚµÄ¼ÇÂ¼£¬¾àÀëÓÉ½üµ½Ô¶ÅÅĞò
+		/// æŸ¥æ‰¾åœ°ç†ä½ç½®å¤šå°‘ç±³èŒƒå›´å†…çš„è®°å½•ï¼Œè·ç¦»ç”±è¿‘åˆ°è¿œæ’åº
 		/// </summary>
-		/// <param name=""point"">¾­Î³¶È</param>
-		/// <param name=""meter"">Ã×(=0Ê±ÎŞÏŞÖÆ)</param>
+		/// <param name=""point"">ç»çº¬åº¦</param>
+		/// <param name=""meter"">ç±³(=0æ—¶æ— é™åˆ¶)</param>
 		/// <returns></returns>
 		public {0}SelectBuild Where{1}MbrContains(MygisPoint point, double meter = 0) {{
 			return this.Where(meter > 0, @""MBRContains(LineString(
@@ -1955,10 +1955,10 @@ namespace {0}.BLL {{
 					admin_controllers_syscontroller_init_sysdir.Add(string.Format(@"
 
 			dir2 = Sysdir.Insert(dir1.Id, DateTime.Now, ""{0}"", {1}, ""/{0}/"");
-			dir3 = Sysdir.Insert(dir2.Id, DateTime.Now, ""ÁĞ±í"", 1, ""/{0}/"");
-			dir3 = Sysdir.Insert(dir2.Id, DateTime.Now, ""Ìí¼Ó"", 2, ""/{0}/add"");
-			dir3 = Sysdir.Insert(dir2.Id, DateTime.Now, ""±à¼­"", 3, ""/{0}/edit"");
-			dir3 = Sysdir.Insert(dir2.Id, DateTime.Now, ""É¾³ı"", 4, ""/{0}/del"");", nClass_Name, admin_controllers_syscontroller_init_sysdir.Count + 1));
+			dir3 = Sysdir.Insert(dir2.Id, DateTime.Now, ""åˆ—è¡¨"", 1, ""/{0}/"");
+			dir3 = Sysdir.Insert(dir2.Id, DateTime.Now, ""æ·»åŠ "", 2, ""/{0}/add"");
+			dir3 = Sysdir.Insert(dir2.Id, DateTime.Now, ""ç¼–è¾‘"", 3, ""/{0}/edit"");
+			dir3 = Sysdir.Insert(dir2.Id, DateTime.Now, ""åˆ é™¤"", 4, ""/{0}/del"");", nClass_Name, admin_controllers_syscontroller_init_sysdir.Count + 1));
 					#endregion
 
 					#region Controller.cs
@@ -2001,7 +2001,7 @@ namespace {0}.BLL {{
 							}) != null;
 						});
 
-						//Íâ¼ü
+						//å¤–é”®
 						ForeignKeyInfo fk = null;
 						string FK_uEntry_Name = string.Empty;
 						string tableNamefe3 = string.Empty;
@@ -2038,10 +2038,10 @@ namespace {0}.BLL {{
 							sb3.AppendFormat(@"
 			if ({0}.Length > 0) select.Where{0}({0});", csUName);
 						} else if (!col.IsIdentity && us.Count == 1 || col.IsPrimaryKey && table.PrimaryKeys.Count == 1) {
-							//Ö÷¼ü»òÎ¨Ò»¼ü£¬·Ç×Ô¶¯ÔöÖµ
+							//ä¸»é”®æˆ–å”¯ä¸€é”®ï¼Œéè‡ªåŠ¨å¢å€¼
 						}
 
-						//Ç°¶Ëjs»òÕßÄ£°å
+						//å‰ç«¯jsæˆ–è€…æ¨¡æ¿
 						if (!col.IsIdentity && fks.Count == 1 && fks[0].Table.FullName != fks[0].ReferencedTable.FullName) {
 							str_listTh += string.Format(@"<th scope=""col"">{0}</th>
 						", comment);
@@ -2104,7 +2104,7 @@ namespace {0}.BLL {{
 						} else if (col88.IsIdentity) {
 						} else if ((csLName == "img" || csLName.StartsWith("img_") || csLName.EndsWith("_img") ||
 							csLName == "path" || csLName.StartsWith("path_") || csLName.EndsWith("_path")) && (col88.Type == MySqlDbType.VarChar || col88.Type == MySqlDbType.VarString || col88.Type == MySqlDbType.String)) {
-							//Í¼Æ¬×Ö¶Î
+							//å›¾ç‰‡å­—æ®µ
 							itemCsParamInsertForm += string.Format(", [FromForm] {0} {1}, [FromForm] IFormFile {1}_file", csType, csUName);
 							itemCsParamUpdateForm += string.Format(", [FromForm] {0} {1}, [FromForm] IFormFile {1}_file", csType, csUName);
 							itemSetValuePKInsert += string.Format(@"
@@ -2162,8 +2162,8 @@ namespace {0}.BLL {{
 							return ffk2 != fk;
 						});
 						if (fk2.Count != 1) return;
-						if (fk.Columns[0].IsPrimaryKey == false) return; //ÖĞ¼ä±í¹ØÏµ¼ü£¬±ØĞëÎªÖ÷¼ü
-						if (t2.Columns.Count != 2) return; //mn±íÈô²»ÊÇÁ½¸ö×Ö¶Î£¬Ôò²»´¦Àí
+						if (fk.Columns[0].IsPrimaryKey == false) return; //ä¸­é—´è¡¨å…³ç³»é”®ï¼Œå¿…é¡»ä¸ºä¸»é”®
+						if (t2.Columns.Count != 2) return; //mnè¡¨è‹¥ä¸æ˜¯ä¸¤ä¸ªå­—æ®µï¼Œåˆ™ä¸å¤„ç†
 
 						//t2.Columns
 						string t2name = t2.Name;
@@ -2198,15 +2198,15 @@ namespace {0}.BLL {{
 			{{ name: '{0}', field: '{4}', text: @Html.Json(fk_{1}s.Select(a => a.{2})), value: @Html.Json(fk_{1}s.Select(a => a.{3})) }},",
 			CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(fk2[0].ReferencedTable.ClassName),
 			string.IsNullOrEmpty(strName) ? "ToString()" : strName.TrimStart('.'), CodeBuild.UFString(fk2[0].ReferencedColumns[0].Name), CodeBuild.UFString(fk2[0].Columns[0].Name));
-						//add.html ±êÇ©¹ØÁª
+						//add.html æ ‡ç­¾å…³è”
 						itemCsParamInsertForm += string.Format(", [FromForm] {0}[] mn_{1}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper(), fk2[0].ReferencedColumns[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname));
 						itemCsParamUpdateForm += string.Format(", [FromForm] {0}[] mn_{1}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper(), fk2[0].ReferencedColumns[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname));
 						str_controller_insert_mn += string.Format(@"
-			//¹ØÁª {1}
+			//å…³è” {1}
 			foreach ({0} mn_{1}_in in mn_{1})
 				item.Flag{1}(mn_{1}_in);", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper(), fk2[0].ReferencedColumns[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname));
 						str_controller_update_mn += string.Format(@"
-			//¹ØÁª {1}
+			//å…³è” {1}
 			if (mn_{1}.Length == 0) {{
 				item.Unflag{1}ALL();
 			}} else {{
@@ -2241,8 +2241,8 @@ namespace {0}.BLL {{
 			int affrows = 0;
 			foreach ({2} id2 in id)
 				affrows += await {3}{1}.DeleteAsync(id2);
-			if (affrows > 0) return APIReturn.³É¹¦.SetMessage($""É¾³ı³É¹¦£¬Ó°ÏìĞĞÊı£º{{affrows}}"");
-			return APIReturn.Ê§°Ü;
+			if (affrows > 0) return APIReturn.æˆåŠŸ.SetMessage($""åˆ é™¤æˆåŠŸï¼Œå½±å“è¡Œæ•°ï¼š{{affrows}}"");
+			return APIReturn.å¤±è´¥;
 		}}", solutionName, uClass_Name, CodeBuild.GetCSType(table.PrimaryKeys[0].Type, CodeBuild.UFString(table.ClassName) + table.PrimaryKeys[0].Name.ToUpper(), table.PrimaryKeys[0].SqlType).Replace("?", ""), uClass_Name == "User" ? "BLL." : "");
 					if (table.PrimaryKeys.Count > 1) {
 						string pkParses = "";
@@ -2258,8 +2258,8 @@ namespace {0}.BLL {{
 				string[] vs = id2.Split(',');
 				affrows += await {3}{1}.DeleteAsync({2});
 			}}
-			if (affrows > 0) return APIReturn.³É¹¦.SetMessage($""É¾³ı³É¹¦£¬Ó°ÏìĞĞÊı£º{{affrows}}"");
-			return APIReturn.Ê§°Ü;
+			if (affrows > 0) return APIReturn.æˆåŠŸ.SetMessage($""åˆ é™¤æˆåŠŸï¼Œå½±å“è¡Œæ•°ï¼š{{affrows}}"");
+			return APIReturn.å¤±è´¥;
 		}}", solutionName, uClass_Name, pkParses, uClass_Name == "User" ? "BLL." : "");
 					}
 
@@ -2311,7 +2311,7 @@ namespace {0}.BLL {{
 <div class=""box"">
 	<div class=""box-header with-border"">
 		<h3 id=""box-title"" class=""box-title""></h3>
-		<span class=""form-group mr15""></span><a href=""./add"" data-toggle=""modal"" class=""btn btn-success pull-right"">Ìí¼Ó</a>
+		<span class=""form-group mr15""></span><a href=""./add"" data-toggle=""modal"" class=""btn btn-success pull-right"">æ·»åŠ </a>
 	</div>
 	<div class=""box-body"">
 		<div class=""table-responsive"">
@@ -2330,13 +2330,13 @@ namespace {0}.BLL {{
 						@foreach({0}Info item in ViewBag.items) {{
 							<tr>
 								<td><input type=""checkbox"" id=""id"" name=""id"" value=""{2}"" /></td>
-								{4}<td><a href=""./edit?{1}"">ĞŞ¸Ä</a></td>
+								{4}<td><a href=""./edit?{1}"">ä¿®æ”¹</a></td>
 							</tr>
 						}}
 					</tbody>
 				</table>
 			</form>
-			<a id=""btn_delete_sel"" href=""#"" class=""btn btn-danger pull-right"">É¾³ıÑ¡ÖĞÏî</a>
+			<a id=""btn_delete_sel"" href=""#"" class=""btn btn-danger pull-right"">åˆ é™¤é€‰ä¸­é¡¹</a>
 			<div id=""kkpager""></div>
 		</div>
 	</div>
@@ -2370,7 +2370,7 @@ namespace {0}.BLL {{
 						clearSb();
 						#endregion
 					} else {
-						#region wwwroot/xxx/index.html(µİ¹é¹ØÏµ)
+						#region wwwroot/xxx/index.html(é€’å½’å…³ç³»)
 						sb1.AppendFormat(@"@{{ 
 	Layout = """";
 }}
@@ -2378,7 +2378,7 @@ namespace {0}.BLL {{
 <div class=""box"">
 	<div class=""box-header with-border"">
 		<h3 id=""box-title"" class=""box-title""></h3>
-		<span class=""form-group mr15""></span><a href=""./add"" data-toggle=""modal"" class=""btn btn-success pull-right"">Ìí¼Ó</a>
+		<span class=""form-group mr15""></span><a href=""./add"" data-toggle=""modal"" class=""btn btn-success pull-right"">æ·»åŠ </a>
 	</div>
 	<div class=""box-body"">
 		<div class=""table-responsive"">
@@ -2388,12 +2388,12 @@ namespace {0}.BLL {{
 				<table id=""GridView1"" cellspacing=""0"" rules=""all"" border=""1"" style=""border-collapse:collapse;"" class=""table table-bordered table-hover"">
 					<tr>
 						{8}{6}<th scope=""col"" style=""width:5%;"">&nbsp;</th>
-						<th scope=""col"" style=""width:5%;"">É¾³ı</th>
+						<th scope=""col"" style=""width:5%;"">åˆ é™¤</th>
 					</tr>
 					<tbody>
 						@foreach({0}Info item in ViewBag.items) {{
 							<tr data-tt-id=""@item.{1}"" data-tt-parent-id=""@item.{2}"">
-								{9}{7}<td><a href=""./edit?{4}"">ĞŞ¸Ä</a></td>
+								{9}{7}<td><a href=""./edit?{4}"">ä¿®æ”¹</a></td>
 								<td><input id=""id"" name=""id"" type=""checkbox"" value=""{5}"" /></td>
 							</tr>
 						}}
@@ -2405,8 +2405,8 @@ namespace {0}.BLL {{
 </div>
 
 <div>
-	<font color=""red"">*</font> É¾³ı¸¸ÏîÊ±£¬ÇëÏÈÉ¾³ıÆäËùÓĞ×ÓÏî¡£
-	<a id=""btn_delete_sel"" href=""#"" class=""btn btn-danger pull-right"">É¾³ıÑ¡ÖĞÏî</a>
+	<font color=""red"">*</font> åˆ é™¤çˆ¶é¡¹æ—¶ï¼Œè¯·å…ˆåˆ é™¤å…¶æ‰€æœ‰å­é¡¹ã€‚
+	<a id=""btn_delete_sel"" href=""#"" class=""btn btn-danger pull-right"">åˆ é™¤é€‰ä¸­é¡¹</a>
 </div>
 
 <script type=""text/javascript"">
@@ -2460,7 +2460,7 @@ namespace {0}.BLL {{
 								<td><input name=""{0}"" type=""text"" readonly class=""datepicker"" style=""width:20%;background-color:#ddd;"" /></td>
 							</tr>", csUName, comment);
 						} else if (col.IsPrimaryKey && col.IsIdentity) {
-							//Ö÷¼ü×Ô¶¯ÔöÖµ
+							//ä¸»é”®è‡ªåŠ¨å¢å€¼
 							sb4.AppendFormat(@"
 						@if (item != null) {{
 							<tr>
@@ -2469,7 +2469,7 @@ namespace {0}.BLL {{
 							</tr>
 						}}", csUName, comment);
 						} else if (fks_comb.Count == 1) {
-							//Íâ¼üÏÂÀ­¿ò
+							//å¤–é”®ä¸‹æ‹‰æ¡†
 							ForeignKeyInfo fkcb = fks_comb[0];
 							string FK_uClass_Name = fkcb.ReferencedTable != null ? CodeBuild.UFString(fkcb.ReferencedTable.ClassName) :
 								CodeBuild.UFString(TableInfo.GetClassName(fkcb.ReferencedTableName));
@@ -2505,7 +2505,7 @@ namespace {0}.BLL {{
 							<td>{1}</td>
 							<td>
 								<select name=""{0}"">
-									<option value="""">------ ÇëÑ¡Ôñ ------</option>
+									<option value="""">------ è¯·é€‰æ‹© ------</option>
 									@foreach (var fk in fk_{4}s) {{ <option value=""@fk.{2}"">@fk.{3}</option> }}
 								</select>
 							</td>
@@ -2515,11 +2515,11 @@ namespace {0}.BLL {{
 								str_fk_getlist += string.Format(@"
 	var fk_{0}s = {1}{0}.Select.ToList();", FK_uClass_Name, FK_uClass_Name == "User" ? solutionName + ".BLL." : "");
 						} else if ((col.Type == MySqlDbType.UInt32 || col.Type == MySqlDbType.UInt64) && (lname == "status" || lname.StartsWith("status_") || lname.EndsWith("_status"))) {
-							//¼ÓÔØ multi ¶à×´Ì¬×Ö¶Î
+							//åŠ è½½ multi å¤šçŠ¶æ€å­—æ®µ
 							sb4.AppendFormat(@"
 						<tr>
 							<td>{1}</td>
-							<td><input name=""{0}"" type=""hidden"" multi_status=""×´Ì¬1,×´Ì¬2,×´Ì¬3,×´Ì¬4,×´Ì¬5"" /></td>
+							<td><input name=""{0}"" type=""hidden"" multi_status=""çŠ¶æ€1,çŠ¶æ€2,çŠ¶æ€3,çŠ¶æ€4,çŠ¶æ€5"" /></td>
 						</tr>", csUName, comment);
 						} else if (
 							col.Type == MySqlDbType.Byte || col.Type == MySqlDbType.Int16 || col.Type == MySqlDbType.Int24 || col.Type == MySqlDbType.Int32 || col.Type == MySqlDbType.Int64 ||
@@ -2536,21 +2536,21 @@ namespace {0}.BLL {{
 							<td>{1}</td>
 							<td>
 								<div class=""input-group"" style=""width:200px;"">
-									<span class=""input-group-addon"">£¤</span>
+									<span class=""input-group-addon"">ï¿¥</span>
 									<input name=""{0}"" type=""text"" class=""form-control"" data-inputmask=""'mask': '9', 'repeat': 10, 'greedy': false"" data-mask />
 									<span class=""input-group-addon"">.00</span>
 								</div>
 							</td>
 						</tr>", csUName, comment);
 						} else if (col.Type == MySqlDbType.Date || col.Type == MySqlDbType.Time || col.Type == MySqlDbType.Timestamp || col.Type == MySqlDbType.Datetime) {
-							//ÈÕÆÚ
+							//æ—¥æœŸ
 							sb4.AppendFormat(@"
 						<tr>
 							<td>{1}</td>
 							<td><input name=""{0}"" type=""text"" class=""datepicker"" /></td>
 						</tr>", csUName, comment);
 						} else if (col.Type == MySqlDbType.Date) {
-							//ÈÕÆÚ¿Ø¼ş
+							//æ—¥æœŸæ§ä»¶
 							sb4.AppendFormat(@"
 						<tr>
 							<td>{1}</td>
@@ -2563,7 +2563,7 @@ namespace {0}.BLL {{
 						</tr>", csUName, comment);
 						} else if ((lname == "img" || lname.StartsWith("img_") || lname.EndsWith("_img") ||
 							lname == "path" || lname.StartsWith("path_") || lname.EndsWith("_path")) && (col.Type == MySqlDbType.VarChar || col.Type == MySqlDbType.VarString || col.Type == MySqlDbType.String)) {
-							//Í¼Æ¬×Ö¶Î
+							//å›¾ç‰‡å­—æ®µ
 							sb4.AppendFormat(@"
 						<tr>
 							<td>{1}</td>
@@ -2573,7 +2573,7 @@ namespace {0}.BLL {{
 							</td>
 						</tr>", csUName, comment);
 						} else if (col.Type == MySqlDbType.TinyText || col.Type == MySqlDbType.Text || col.Type == MySqlDbType.MediumText || col.Type == MySqlDbType.LongText) {
-							//¼ÓÔØ°Ù¶È±à¼­Æ÷
+							//åŠ è½½ç™¾åº¦ç¼–è¾‘å™¨
 							sb4.AppendFormat(@"
 						<tr>
 							<td>{1}</td>
@@ -2588,7 +2588,7 @@ namespace {0}.BLL {{
 									@foreach (object eo in Enum.GetValues(typeof({2}))) {{ <option value=""@eo"">@eo</option> }}
 								</select>
 							</td>
-						</tr>", csUName, comment, GetCSType(col.Type, CodeBuild.UFString(table.ClassName) + col.Name.ToUpper(), col.SqlType).Replace("?", ""), col.Type == MySqlDbType.Set ? string.Format(@" data-placeholder=""Select a {0}"" class=""form-control select2"" multiple>", comment) : @"><option value="""">------ ÇëÑ¡Ôñ ------</option>");
+						</tr>", csUName, comment, GetCSType(col.Type, CodeBuild.UFString(table.ClassName) + col.Name.ToUpper(), col.SqlType).Replace("?", ""), col.Type == MySqlDbType.Set ? string.Format(@" data-placeholder=""Select a {0}"" class=""form-control select2"" multiple>", comment) : @"><option value="""">------ è¯·é€‰æ‹© ------</option>");
 						} else {
 							sb4.AppendFormat(@"
 						<tr>
@@ -2623,7 +2623,7 @@ namespace {0}.BLL {{
 					<table cellspacing=""0"" rules=""all"" class=""table table-bordered table-hover"" border=""1"" style=""border-collapse:collapse;"">{1}{5}
 						<tr>
 							<td width=""8%"">&nbsp</td>
-							<td><input type=""submit"" value=""@(item == null ? ""Ìí¼Ó"" : ""¸üĞÂ"")"" />&nbsp;<input type=""button"" value=""È¡Ïû"" /></td>
+							<td><input type=""submit"" value=""@(item == null ? ""æ·»åŠ "" : ""æ›´æ–°"")"" />&nbsp;<input type=""button"" value=""å–æ¶ˆ"" /></td>
 						</tr>
 					</table>
 				</div>
@@ -2663,7 +2663,7 @@ namespace {0}.BLL {{
 			//loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\BLL\", basicName, @"\ItemCache.cs"), Deflate.Compress(sb1.ToString())));
 			clearSb();
 			#endregion
-			#region Model ExtensionMethods.cs À©Õ¹·½·¨
+			#region Model ExtensionMethods.cs æ‰©å±•æ–¹æ³•
 			sb1.AppendFormat(CONST.Model_Build_ExtensionMethods_cs, solutionName, Model_Build_ExtensionMethods_cs.ToString());
 			loc1.Add(new BuildInfo(string.Concat(CONST.corePath, solutionName, @".db\Model\", basicName, @"\ExtensionMethods.cs"), Deflate.Compress(sb1.ToString())));
 			clearSb();
@@ -2753,180 +2753,180 @@ namespace {0}.BLL {{
 				#endregion
 				#region readme.md
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\readme.md"), Deflate.Compress(string.Format(@"# {0}
-.net coreÄ£¿é»¯¿ª·¢¿ò¼Ü
+.net coreæ¨¡å—åŒ–å¼€å‘æ¡†æ¶
 
-# ÏîÄ¿½á¹¹½éÉÜ
+# é¡¹ç›®ç»“æ„ä»‹ç»
 
 ## Module
 
-	ËùÓĞÒµÎñ½Ó¿ÚÔ¼¶¨ÔÚ Module »®·Ö¿ª·¢
+	æ‰€æœ‰ä¸šåŠ¡æ¥å£çº¦å®šåœ¨ Module åˆ’åˆ†å¼€å‘
 
 	Module/Admin
-	Éú³ÉµÄºóÌ¨¹ÜÀíÄ£¿é£¬http://localhost:5001/module/Admin ¿É·ÃÎÊ
+	ç”Ÿæˆçš„åå°ç®¡ç†æ¨¡å—ï¼Œhttp://localhost:5001/module/Admin å¯è®¿é—®
 
 	Module/Test
-	Éú³ÉµÄ²âÊÔÄ£¿é
+	ç”Ÿæˆçš„æµ‹è¯•æ¨¡å—
 
 ## WebHost
 
-	WebHost ±àÒëµÄÊ±ºò£¬»á½« Module/* ËùĞèÎÄ¼ş¸´ÖÆµ½µ±Ç°Ä¿Â¼
-	WebHost Ö»µ±×öÖ÷ÒıÇæÔËĞĞÊ±°´Ğè¼ÓÔØÏàÓ¦µÄ Module
+	WebHost ç¼–è¯‘çš„æ—¶å€™ï¼Œä¼šå°† Module/* æ‰€éœ€æ–‡ä»¶å¤åˆ¶åˆ°å½“å‰ç›®å½•
+	WebHost åªå½“åšä¸»å¼•æ“è¿è¡Œæ—¶æŒ‰éœ€åŠ è½½ç›¸åº”çš„ Module
 
 ## Infrastructure
 
-	Module ÀïÃæÃ¿¸ö×ÓÄ£¿éµÄÒÀÀµËùĞè
+	Module é‡Œé¢æ¯ä¸ªå­æ¨¡å—çš„ä¾èµ–æ‰€éœ€
 
 #### {0}.db
 
-	°üº¬Ò»ÇĞÊı¾İ¿â²Ù×÷µÄ·â×°
-	{0}.Model(ÊµÌåÓ³Éä ÃüÃû£º±íÃûInfo)
-	{0}.BLL(¾²Ì¬·½·¨·â×° ÃüÃû£º±íÃû)
-	{0}.DAL(Êı¾İ·ÃÎÊ ÃüÃû£º±íÃû)
-	Éú³ÉÃûÌØÕ÷È¡Êı¾İ¿âÃûÊ××ÖÄ¸´óĞ´(Èç: ±í test ¶ÔÓ¦ {0}.Model.TestInfo¡¢{0}.BLL.Test¡¢{0}.DAL.Test)
+	åŒ…å«ä¸€åˆ‡æ•°æ®åº“æ“ä½œçš„å°è£…
+	{0}.Model(å®ä½“æ˜ å°„ å‘½åï¼šè¡¨åInfo)
+	{0}.BLL(é™æ€æ–¹æ³•å°è£… å‘½åï¼šè¡¨å)
+	{0}.DAL(æ•°æ®è®¿é—® å‘½åï¼šè¡¨å)
+	ç”Ÿæˆåç‰¹å¾å–æ•°æ®åº“åé¦–å­—æ¯å¤§å†™(å¦‚: è¡¨ test å¯¹åº” {0}.Model.TestInfoã€{0}.BLL.Testã€{0}.DAL.Test)
 
-	Êı¾İ¿âÉè¼ÆÃüÃûÏ°¹ß£ºËùÓĞÃüÃû(Ğ¡Ğ´¼ÓÏÂ»®Ïß)¡¢Íâ¼ü×Ö¶Î(¶ÔÓ¦Ö÷±íÃû_Ö÷±íPKÃû)
-	Íâ¼ü²»Ö§³Ö×éºÏ×Ö¶Î£¬½öÖ§³ÖÖ÷¼ü×÷ÎªÍâ¼ü(ps: ²»Ö§³ÖÎ¨Ò»¼ü×÷ÎªÍâ¼ü)
-	ĞŞ¸ÄÊı¾İ¿âºó£¬Ë«»÷¡°./GenMyÖ»¸üĞÂdb.bat¡±¿É¿ìËÙ¸²¸Ç£¬ËùÓĞÀà¶¼Ê¹ÓÃ partial£¬·½±ã´úÂëÀ©Õ¹Òà²»»á±»¶ş´ÎÉú³É¸²¸Ç
+	æ•°æ®åº“è®¾è®¡å‘½åä¹ æƒ¯ï¼šæ‰€æœ‰å‘½å(å°å†™åŠ ä¸‹åˆ’çº¿)ã€å¤–é”®å­—æ®µ(å¯¹åº”ä¸»è¡¨å_ä¸»è¡¨PKå)
+	å¤–é”®ä¸æ”¯æŒç»„åˆå­—æ®µï¼Œä»…æ”¯æŒä¸»é”®ä½œä¸ºå¤–é”®(ps: ä¸æ”¯æŒå”¯ä¸€é”®ä½œä¸ºå¤–é”®)
+	ä¿®æ”¹æ•°æ®åº“åï¼ŒåŒå‡»â€œ./GenMyåªæ›´æ–°db.batâ€å¯å¿«é€Ÿè¦†ç›–ï¼Œæ‰€æœ‰ç±»éƒ½ä½¿ç”¨ partialï¼Œæ–¹ä¾¿ä»£ç æ‰©å±•äº¦ä¸ä¼šè¢«äºŒæ¬¡ç”Ÿæˆè¦†ç›–
 
-# Êı¾İ¿âÏà¹Ø·½·¨
+# æ•°æ®åº“ç›¸å…³æ–¹æ³•
 
-	¼ÙÉèÏÂÃæµÄ´úÂë¶¼Ê¹ÓÃÁË using {0}.BLL; using {0}.Model;
+	å‡è®¾ä¸‹é¢çš„ä»£ç éƒ½ä½¿ç”¨äº† using {0}.BLL; using {0}.Model;
 
-## Ìí¼Ó¼ÇÂ¼
+## æ·»åŠ è®°å½•
 
 ```csharp
-	// ÈçÓĞ create_time ×Ö¶Î²¢ÇÒÀàĞÍÎªÈÕÆÚ£¬ÄÚ²¿»á³õÊ¼»¯
-	±íÃûInfo newitem1 = ±íÃû.Insert(Title: ""Ìí¼ÓµÄ±êÌâ"", Content: ""ÕâÊÇÒ»¶ÎÌí¼ÓµÄÄÚÈİ"");
-	±íÃûInfo newitem2 = ±íÃû.Insert(new ±íÃûInfo {{ Title = ""Ìí¼ÓµÄ±êÌâ"", Content = ""ÕâÊÇÒ»¶ÎÌí¼ÓµÄÄÚÈİ"" }});
+	// å¦‚æœ‰ create_time å­—æ®µå¹¶ä¸”ç±»å‹ä¸ºæ—¥æœŸï¼Œå†…éƒ¨ä¼šåˆå§‹åŒ–
+	è¡¨åInfo newitem1 = è¡¨å.Insert(Title: ""æ·»åŠ çš„æ ‡é¢˜"", Content: ""è¿™æ˜¯ä¸€æ®µæ·»åŠ çš„å†…å®¹"");
+	è¡¨åInfo newitem2 = è¡¨å.Insert(new è¡¨åInfo {{ Title = ""æ·»åŠ çš„æ ‡é¢˜"", Content = ""è¿™æ˜¯ä¸€æ®µæ·»åŠ çš„å†…å®¹"" }});
 ```
 
-## Ìí¼Ó¼ÇÂ¼(ÅúÁ¿)
+## æ·»åŠ è®°å½•(æ‰¹é‡)
 
 ```csharp
-	List<±íÃûInfo> newitems1 = ±íÃû.Insert(new [] {{
-		new ±íÃûInfo {{ Title = ""Ìí¼ÓµÄ±êÌâ1"", Content = ""ÕâÊÇÒ»¶ÎÌí¼ÓµÄÄÚÈİ1"" }},
-		new ±íÃûInfo {{ Title = ""Ìí¼ÓµÄ±êÌâ2"", Content = ""ÕâÊÇÒ»¶ÎÌí¼ÓµÄÄÚÈİ2"" }}
+	List<è¡¨åInfo> newitems1 = è¡¨å.Insert(new [] {{
+		new è¡¨åInfo {{ Title = ""æ·»åŠ çš„æ ‡é¢˜1"", Content = ""è¿™æ˜¯ä¸€æ®µæ·»åŠ çš„å†…å®¹1"" }},
+		new è¡¨åInfo {{ Title = ""æ·»åŠ çš„æ ‡é¢˜2"", Content = ""è¿™æ˜¯ä¸€æ®µæ·»åŠ çš„å†…å®¹2"" }}
 	}});
 ```
 
-## ¸üĞÂ¼ÇÂ¼
+## æ›´æ–°è®°å½•
 
 ```csharp
-	// ¸üĞÂ id = 1 ËùÓĞ×Ö¶Î
-	±íÃûInfo newitem1 = ±íÃû.Update(Id: 1, Title: ""Ìí¼ÓµÄ±êÌâ"", Content: ""ÕâÊÇÒ»¶ÎÌí¼ÓµÄÄÚÈİ"", Clicks: 1);
-	±íÃûInfo newitem2 = ±íÃû.Update(new ±íÃûInfo {{ Id: 1, Title = ""Ìí¼ÓµÄ±êÌâ"", Content = ""ÕâÊÇÒ»¶ÎÌí¼ÓµÄÄÚÈİ"", Clicks = 1 }});
-	// ¸üĞÂ id = 1 Ö¸¶¨×Ö¶Î
-	±íÃû.UpdateDiy(1).SetTitle(""ĞŞ¸ÄºóµÄ±êÌâ"").SetContent(""ĞŞ¸ÄºóµÄÄÚÈİ"").SetClicks(1).ExecuteNonQuery();
-	// update ±íÃû set clicks = clicks + 1 where id = 1
-	±íÃû.UpdateDiy(1).SetClicksIncrement(1).ExecuteNonQuery();
-	// {0}.Model ²ãÒ²ÓĞ UpdateDiy£¬¼´ new ±íÃûInfo {{ Id = 1 }}.UpdateDiy.SetClicks(1).ExecuteNonQuery();
+	// æ›´æ–° id = 1 æ‰€æœ‰å­—æ®µ
+	è¡¨åInfo newitem1 = è¡¨å.Update(Id: 1, Title: ""æ·»åŠ çš„æ ‡é¢˜"", Content: ""è¿™æ˜¯ä¸€æ®µæ·»åŠ çš„å†…å®¹"", Clicks: 1);
+	è¡¨åInfo newitem2 = è¡¨å.Update(new è¡¨åInfo {{ Id: 1, Title = ""æ·»åŠ çš„æ ‡é¢˜"", Content = ""è¿™æ˜¯ä¸€æ®µæ·»åŠ çš„å†…å®¹"", Clicks = 1 }});
+	// æ›´æ–° id = 1 æŒ‡å®šå­—æ®µ
+	è¡¨å.UpdateDiy(1).SetTitle(""ä¿®æ”¹åçš„æ ‡é¢˜"").SetContent(""ä¿®æ”¹åçš„å†…å®¹"").SetClicks(1).ExecuteNonQuery();
+	// update è¡¨å set clicks = clicks + 1 where id = 1
+	è¡¨å.UpdateDiy(1).SetClicksIncrement(1).ExecuteNonQuery();
+	// {0}.Model å±‚ä¹Ÿæœ‰ UpdateDiyï¼Œå³ new è¡¨åInfo {{ Id = 1 }}.UpdateDiy.SetClicks(1).ExecuteNonQuery();
 ```
 
-## ¸üĞÂ¼ÇÂ¼(ÅúÁ¿)
+## æ›´æ–°è®°å½•(æ‰¹é‡)
 
 ```csharp
-	//ÏÈ²éÕÒ clicks ÔÚ 0 - 100 µÄ¼ÇÂ¼
-	List<±íÃûInfo> newitems1 = ±íÃû.Select.WhereClicksRange(0, 100).ToList();
-	// update ±íÃû set clicks = clicks + 1 where id in (newitems1ËùÓĞid)
+	//å…ˆæŸ¥æ‰¾ clicks åœ¨ 0 - 100 çš„è®°å½•
+	List<è¡¨åInfo> newitems1 = è¡¨å.Select.WhereClicksRange(0, 100).ToList();
+	// update è¡¨å set clicks = clicks + 1 where id in (newitems1æ‰€æœ‰id)
 	newitems1.UpdateDiy().SetClicksIncrement(1).ExecuteNonQuery();
 ```
 
-## É¾³ı¼ÇÂ¼
+## åˆ é™¤è®°å½•
 
 ```csharp
-	// É¾³ı id = 1 µÄ¼ÇÂ¼
-	±íÃû.Delete(1);
+	// åˆ é™¤ id = 1 çš„è®°å½•
+	è¡¨å.Delete(1);
 ```
 
-## °´Ö÷¼ü/Î¨Ò»¼ü»ñÈ¡µ¥Ìõ¼ÇÂ¼
+## æŒ‰ä¸»é”®/å”¯ä¸€é”®è·å–å•æ¡è®°å½•
 
-> appsettings¿ÉÅäÖÃ»º´æÊ±¼ä£¬ÒÔÉÏËùÓĞÔö¡¢¸Ä¡¢É¾¶¼»áÉ¾³ı»º´æ±£ÕÏÍ¬²½
+> appsettingså¯é…ç½®ç¼“å­˜æ—¶é—´ï¼Œä»¥ä¸Šæ‰€æœ‰å¢ã€æ”¹ã€åˆ éƒ½ä¼šåˆ é™¤ç¼“å­˜ä¿éšœåŒæ­¥
 
 ```csharp
-	//°´Ö÷¼ü»ñÈ¡
+	//æŒ‰ä¸»é”®è·å–
 	UserInfo user1 = BLL.User.GetItem(1);
-	//°´Î¨Ò»¼ü
+	//æŒ‰å”¯ä¸€é”®
 	UserInfo user2 = BLL.User.GetItemByUsername(""2881099@qq.com"");
-	// ·µ»Ø null »ò UserInfo
+	// è¿”å› null æˆ– UserInfo
 ```
 
 ```csharp
-//BLL.±íÃû.Select ÊÇÒ»¸öÁ´Ê½²éÑ¯¶ÔÏó£¬¼¸ºõÖ§³ÖËùÓĞ²éÑ¯£¬°üÀ¨ group by¡¢inner joinµÈµÈ£¬×îÖÕ ToList ToOne Aggregate Ö´ĞĞ sql
-List<UserInfo> users1 = BLL.User.Select.WhereUsername(""2881099@qq.com"").WherePassword(""******"").WhereStatus(Õı³£).ToList();
-//·µ»Ø new List<UserInfo>() »ò ÓĞÔªËØµÄ List£¬ÓÀ²»·µ»Ø null
+//BLL.è¡¨å.Select æ˜¯ä¸€ä¸ªé“¾å¼æŸ¥è¯¢å¯¹è±¡ï¼Œå‡ ä¹æ”¯æŒæ‰€æœ‰æŸ¥è¯¢ï¼ŒåŒ…æ‹¬ group byã€inner joinç­‰ç­‰ï¼Œæœ€ç»ˆ ToList ToOne Aggregate æ‰§è¡Œ sql
+List<UserInfo> users1 = BLL.User.Select.WhereUsername(""2881099@qq.com"").WherePassword(""******"").WhereStatus(æ­£å¸¸).ToList();
+//è¿”å› new List<UserInfo>() æˆ– æœ‰å…ƒç´ çš„ Listï¼Œæ°¸ä¸è¿”å› null
 
-//·µ»ØÖ¸¶¨ÁĞ£¬·µ»ØList<Ôª×é>
-var users2 = BLL.User.Select.WhereStatus(Õı³£).Aggregate<(int id, string title)>(""id,title"");
+//è¿”å›æŒ‡å®šåˆ—ï¼Œè¿”å›List<å…ƒç»„>
+var users2 = BLL.User.Select.WhereStatus(æ­£å¸¸).Aggregate<(int id, string title)>(""id,title"");
 
-//¶à±í²éÑ¯£¬Ö»·µ»Ø a ±í×Ö¶Î
+//å¤šè¡¨æŸ¥è¯¢ï¼Œåªè¿”å› a è¡¨å­—æ®µ
 var users3 = BLL.User.Select.From<User_group>(""b"").Where(""a.group_id = b.id"").ToList();
 
-//join²éÑ¯£¬·µ»Ø a, b ±í×Ö¶Î £¬½« b ±í×Ö¶ÎÌî³äÖÁ a±í.Obj_user_group ¶ÔÏó£¬ÀàËÆ ef.Include
+//joinæŸ¥è¯¢ï¼Œè¿”å› a, b è¡¨å­—æ®µ ï¼Œå°† b è¡¨å­—æ®µå¡«å……è‡³ aè¡¨.Obj_user_group å¯¹è±¡ï¼Œç±»ä¼¼ ef.Include
 var users4 = BLL.User.Select.InnerJoin<User_group>(""b"", ""a.group_id = b.id"").ToList();
 
-//·Ö×é²éÑ¯
+//åˆ†ç»„æŸ¥è¯¢
 var users5 = BLL.User.Select.GroupBy(""group_id"").Aggregate<(int groupId, int count)>(""group_id, count(1)"");
 
-//µÈµÈ...
+//ç­‰ç­‰...
 ```
 
-## ÊÂÎñ
+## äº‹åŠ¡
 
 ```csharp
-//´íÎó»á»Ø¹ö£¬ÊÂÎñÄÚÖ§³ÖËùÓĞÉú³ÉµÄÍ¬²½·½·¨£¨²»Ö§³ÖÉú³É¶ÔÓ¦µÄAsync·½·¨£©
+//é”™è¯¯ä¼šå›æ»šï¼Œäº‹åŠ¡å†…æ”¯æŒæ‰€æœ‰ç”Ÿæˆçš„åŒæ­¥æ–¹æ³•ï¼ˆä¸æ”¯æŒç”Ÿæˆå¯¹åº”çš„Asyncæ–¹æ³•ï¼‰
 SqlHelper.Transaction(() => {{
-	if (this.Balance.UpdateDiy.SetAmountIncrement(-num).ExecuteNonQuery() <= 0) throw new Exception(""Óà¶î²»×ã"");
+	if (this.Balance.UpdateDiy.SetAmountIncrement(-num).ExecuteNonQuery() <= 0) throw new Exception(""ä½™é¢ä¸è¶³"");
 	extdata[""amountNew""] = this.Balance.Amount.ToString();
 	extdata[""balanceChangelogId""] = SqlHelper.NewMongodbId();
-	order = this.AddBet_order(Amount: 1, Count: num, Count_off: num, Extdata: extdata, Status: Et_bet_order_statusENUM.NEW, Type: Et_bet_tradetypeENUM.²ğ·Ö);
+	order = this.AddBet_order(Amount: 1, Count: num, Count_off: num, Extdata: extdata, Status: Et_bet_order_statusENUM.NEW, Type: Et_bet_tradetypeENUM.æ‹†åˆ†);
 }});
 ```
 
-## »º´æ
+## ç¼“å­˜
 
-1¡¢{0}.BLL GetItem¡¢GetItemByÎ¨Ò»¼ü£¬Ê¹ÓÃÁËÄ¬ÈÏ»º´æ²ßÂÔ180Ãë£¬ÓÃÀ´»º´æÒ»Ìõ¼ÇÂ¼£¬db ²ãÄÜ×Ô¶¯Î¬»¤»º´æÍ¬²½£¬ÀıÈç£º
+1ã€{0}.BLL GetItemã€GetItemByå”¯ä¸€é”®ï¼Œä½¿ç”¨äº†é»˜è®¤ç¼“å­˜ç­–ç•¥180ç§’ï¼Œç”¨æ¥ç¼“å­˜ä¸€æ¡è®°å½•ï¼Œdb å±‚èƒ½è‡ªåŠ¨ç»´æŠ¤ç¼“å­˜åŒæ­¥ï¼Œä¾‹å¦‚ï¼š
 
 ```csharp
-//Ö»ÓĞµÚÒ»´Î²éÑ¯ÁËÊı¾İ¿â£¬ºóÃæ99´Î¶ÁÈ¡redisµÄ»º´æÖµ
+//åªæœ‰ç¬¬ä¸€æ¬¡æŸ¥è¯¢äº†æ•°æ®åº“ï¼Œåé¢99æ¬¡è¯»å–redisçš„ç¼“å­˜å€¼
 UserInfo u;
 for (var a = 0; a < 100; a++)
 	u = BLL.User.GetItemByUsername(""2881099@qq.com"");
 
-//Ö´ĞĞÀàËÆÒÔÏÂµÄÊı¾İ±ä¶¯·½·¨£¬»áÉ¾³ıredis¶ÔÓ¦µÄ»º´æ
+//æ‰§è¡Œç±»ä¼¼ä»¥ä¸‹çš„æ•°æ®å˜åŠ¨æ–¹æ³•ï¼Œä¼šåˆ é™¤rediså¯¹åº”çš„ç¼“å­˜
 u.UpdateDiy.SetLogin_time(DateTime.Now).ExecuteNonQuery();
 ```
 
-2¡¢BLL.Select.ToList(10, ""cache_key"")£¬½«²éÑ¯½á¹û»º´æ10Ãë£¬ĞèÒªÊÖ¹¤É¾³ıredis¶ÔÓ¦µÄ¼ü
+2ã€BLL.Select.ToList(10, ""cache_key"")ï¼Œå°†æŸ¥è¯¢ç»“æœç¼“å­˜10ç§’ï¼Œéœ€è¦æ‰‹å·¥åˆ é™¤rediså¯¹åº”çš„é”®
 
-# Éú³É¹æÔò
+# ç”Ÿæˆè§„åˆ™
 
-## ²»»áÉú³É
+## ä¸ä¼šç”Ÿæˆ
 
-* Ã»ÓĞÖ÷¼ü£¬²»»áÉú³É Ôö¡¢¸Ä¡¢É¾ ·½·¨
-* ÓĞ×ÔÔö×Ö¶Î£¬²»»áÉú³É ÅúÁ¿ Insert ·½·¨
+* æ²¡æœ‰ä¸»é”®ï¼Œä¸ä¼šç”Ÿæˆ å¢ã€æ”¹ã€åˆ  æ–¹æ³•
+* æœ‰è‡ªå¢å­—æ®µï¼Œä¸ä¼šç”Ÿæˆ æ‰¹é‡ Insert æ–¹æ³•
 
-## »áÉú³É
+## ä¼šç”Ÿæˆ
 
-* ÓĞÍâ¼ü£¬»áÉú³É
-	> new Ö÷¼ü±íInfo().Addxxx¡¢new Ö÷¼ü±íModel().Obj_Íâ¼ü±ís
+* æœ‰å¤–é”®ï¼Œä¼šç”Ÿæˆ
+	> new ä¸»é”®è¡¨Info().Addxxxã€new ä¸»é”®è¡¨Model().Obj_å¤–é”®è¡¨s
 
-	> new Íâ¼ü±íInfo().Obj_Ö÷¼ü±í¡¢Íâ¼ü±í.DeleteByÍâ¼ü¡¢Íâ¼ü±í.Select.WhereÍâ¼ü
-* ¶à¶Ô¶à£¬»áÉú³É
-	> new ±í1Info().Flag±í2¡¢new ±í1Info().UnFlag±í2¡¢new ±í1Info().Obj_±í2s¡¢±í1.Select.Where±í2
+	> new å¤–é”®è¡¨Info().Obj_ä¸»é”®è¡¨ã€å¤–é”®è¡¨.DeleteByå¤–é”®ã€å¤–é”®è¡¨.Select.Whereå¤–é”®
+* å¤šå¯¹å¤šï¼Œä¼šç”Ÿæˆ
+	> new è¡¨1Info().Flagè¡¨2ã€new è¡¨1Info().UnFlagè¡¨2ã€new è¡¨1Info().Obj_è¡¨2sã€è¡¨1.Select.Whereè¡¨2
 
-	> new ±í2Info().Flag±í1¡¢new ±í2Info().UnFlag±í1¡¢new ±í2Info().Obj_±í1s¡¢±í2.Select.Where±í1
-* ×Ö¶ÎÀàĞÍ point£¬»áÉú³É
-	> ±í.Select.Where×Ö¶ÎMbrContains(²éÕÒµØÀíÎ»ÖÃ¶àÉÙÃ×·¶Î§ÄÚµÄ¼ÇÂ¼£¬¾àÀëÓÉ½üµ½Ô¶ÅÅĞò)
+	> new è¡¨2Info().Flagè¡¨1ã€new è¡¨2Info().UnFlagè¡¨1ã€new è¡¨2Info().Obj_è¡¨1sã€è¡¨2.Select.Whereè¡¨1
+* å­—æ®µç±»å‹ pointï¼Œä¼šç”Ÿæˆ
+	> è¡¨.Select.Whereå­—æ®µMbrContains(æŸ¥æ‰¾åœ°ç†ä½ç½®å¤šå°‘ç±³èŒƒå›´å†…çš„è®°å½•ï¼Œè·ç¦»ç”±è¿‘åˆ°è¿œæ’åº)
 
-* ×Ö¶ÎÀàĞÍ stringÏà¹Ø²¢ÇÒ³¤¶È <= 300£¬»áÉú³É
-	> ±í.Select.Where×Ö¶ÎLike
-* 90%µÄÊı¾İÀàĞÍ±»Ö§³Ö
+* å­—æ®µç±»å‹ stringç›¸å…³å¹¶ä¸”é•¿åº¦ <= 300ï¼Œä¼šç”Ÿæˆ
+	> è¡¨.Select.Whereå­—æ®µLike
+* 90%çš„æ•°æ®ç±»å‹è¢«æ”¯æŒ
 ", solutionName))));
 				clearSb();
 				#endregion
 
-				#region GenMyÖ»¸üĞÂdb.bat
-				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\GenMyÖ»¸üĞÂdb.bat"), Deflate.Compress(string.Format(@"
+				#region GenMyåªæ›´æ–°db.bat
+				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\GenMyåªæ›´æ–°db.bat"), Deflate.Compress(string.Format(@"
 GenMy {0}:{1} -U {2} -P {3} -D {4} -N {5}", _client.Server, _client.Port, _client.Username, _client.Password, _client.Database, solutionName))));
 				clearSb();
 				#endregion
