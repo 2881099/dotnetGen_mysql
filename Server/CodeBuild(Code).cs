@@ -177,6 +177,8 @@ namespace Server {
 				string CsParamNoType1 = "";
 				string CsParam2 = "";
 				string CsParamNoType2 = "";
+				string CsParam3 = "";
+				string CsParamNoType3 = "";
 				string csItemAllFieldCopy = "";
 				string pkMvcRoute = "";
 				string orderBy = table.Clustereds.Count > 0 ?
@@ -210,21 +212,31 @@ namespace Server {
 					pkEvalsQuerystring = pkEvalsQuerystring.Substring(0, pkEvalsQuerystring.Length - 1);
 				}
 				foreach (ColumnInfo columnInfo in table.Columns) {
-					CsParam1 += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+					string getcstype = CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType);
+					CsParam1 += getcstype + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 					CsParamNoType1 += CodeBuild.UFString(columnInfo.Name) + ", ";
 					csItemAllFieldCopy += string.Format(@"
 			item.{0} = newitem.{0};", UFString(columnInfo.Name));
 					if (columnInfo.IsIdentity) {
 						//CsParamNoType2 += "0, ";
 					} else {
-						CsParam2 += CodeBuild.GetCSType(columnInfo.Type, uClass_Name + columnInfo.Name.ToUpper(), columnInfo.SqlType) + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
+						CsParam2 += getcstype + " " + CodeBuild.UFString(columnInfo.Name) + ", ";
 						CsParamNoType2 += string.Format("\r\n				{0} = {0}, ", CodeBuild.UFString(columnInfo.Name));
+
+						if (getcstype == "DateTime?" && (columnInfo.Name.ToLower() == "create_time" || columnInfo.Name.ToLower() == "update_time") ||
+							getcstype == "bool?" && (columnInfo.Name.ToLower() == "is_deleted")) ;
+						else {
+							CsParam3 += getcstype + " " + UFString(columnInfo.Name) + ", ";
+							CsParamNoType3 += string.Format("\r\n				{0} = {0}, ", UFString(columnInfo.Name));
+						}
 					}
 				}
 				CsParam1 = CsParam1.Substring(0, CsParam1.Length - 2);
 				CsParamNoType1 = CsParamNoType1.Substring(0, CsParamNoType1.Length - 2);
 				if (CsParam2.Length > 0) CsParam2 = CsParam2.Substring(0, CsParam2.Length - 2);
 				if (CsParamNoType2.Length > 0) CsParamNoType2 = CsParamNoType2.Substring(0, CsParamNoType2.Length - 2);
+				if (CsParam3.Length > 0) CsParam3 = CsParam3.Substring(0, CsParam3.Length - 2);
+				if (CsParamNoType3.Length > 0) CsParamNoType3 = CsParamNoType3.Substring(0, CsParamNoType3.Length - 2);
 				#endregion
 
 				#region Model *.cs
@@ -1401,6 +1413,10 @@ namespace {0}.BLL {{
 					if (uniques_dic.ContainsKey(parms)) continue;
 					uniques_dic.Add(parms, true);
 				}
+				bool is_deleted_column = table.Columns.Find(delegate (ColumnInfo findIsDeleted) {
+					string getcstype = CodeBuild.GetCSType(findIsDeleted.Type, uClass_Name + findIsDeleted.Name.ToUpper(), findIsDeleted.SqlType);
+					return findIsDeleted.Name.ToLower() == "is_deleted" && getcstype == "bool?";
+				}) != null;
 				string bll_async_code = "";
 				Dictionary<string, bool> del_exists2 = new Dictionary<string, bool>();
 				foreach (List<ColumnInfo> cs in table.Uniques) {
@@ -1524,7 +1540,7 @@ namespace {0}.BLL {{
 					sb1.AppendFormat(@"
 		public static {0}Info Insert({1}) {{
 			return Insert(new {0}Info {{{2}}});
-		}}", uClass_Name, CsParam2, CsParamNoType2);
+		}}", uClass_Name, CsParam3, CsParamNoType3);
 
 					if (table.Columns.Count > 5)
 						bll_async_code += string.Format(@"
@@ -1535,8 +1551,8 @@ namespace {0}.BLL {{
 					bll_async_code += string.Format(@"
 		public static Task<{0}Info> InsertAsync({1}) {{
 			return InsertAsync(new {0}Info {{{2}}});
-		}}", uClass_Name, CsParam2, CsParamNoType2);
-					
+		}}", uClass_Name, CsParam3, CsParamNoType3);
+
 					var redisRemove = sb4.ToString();
 					string cspk2GuidSetValue = "";
 					string cspk2GuidSetValuesss = "";
@@ -1546,10 +1562,14 @@ namespace {0}.BLL {{
 							cspk2GuidSetValue += string.Format("\r\n			if (item.{0} == null) item.{0} = SqlHelper.NewMongodbId();", UFString(cspk2.Name));
 							cspk2GuidSetValuesss += string.Format("\r\n			foreach (var item in items) if (item != null && item.{0} == null) item.{0} = SqlHelper.NewMongodbId();", UFString(cspk2.Name));
 						}
-						if (getcstype == "DateTime?" && cspk2.Name == "create_time" ||
-							getcstype == "DateTime?" && cspk2.Name == "update_time") {
+						if (getcstype == "DateTime?" && cspk2.Name.ToLower() == "create_time" ||
+							getcstype == "DateTime?" && cspk2.Name.ToLower() == "update_time") {
 							cspk2GuidSetValue += string.Format("\r\n			if (item.{0} == null) item.{0} = DateTime.Now;", UFString(cspk2.Name));
 							cspk2GuidSetValuesss += string.Format("\r\n			foreach (var item in items) if (item != null && item.{0} == null) item.{0} = DateTime.Now;", UFString(cspk2.Name));
+						}
+						if (getcstype == "bool?" && cspk2.Name.ToLower() == "is_deleted") {
+							cspk2GuidSetValue += string.Format("\r\n			if (item.{0} == null) item.{0} = false;", UFString(cspk2.Name));
+							cspk2GuidSetValuesss += string.Format("\r\n			foreach (var item in items) if (item != null && item.{0} == null) item.{0} = false;", UFString(cspk2.Name));
 						}
 					}
 					var bll_synccode_insertMulti = identityColumn == null ? string.Format(@"
@@ -1613,9 +1633,20 @@ namespace {0}.BLL {{
 				}
 
 				sb1.AppendFormat(@"
-		public static List<{0}Info> GetItems() => Select.ToList();
-		public static {0}SelectBuild Select => new {0}SelectBuild(dal);
+		public static List<{0}Info> GetItems() => Select.ToList();", uClass_Name, solutionName);
+				if (is_deleted_column)
+					sb1.AppendFormat(@"
+		public static {0}SelectBuild SelectRaw => new {0}SelectBuild(dal);
+		/// <summary>
+		/// 开启软删除功能，默认查询 is_deleted = false 的数据，查询所有使用 SelectRaw，软删除数据使用 Update is_deleted = true，物理删除数据使用 Delete 方法
+		/// </summary>
+		public static {0}SelectBuild Select => SelectRaw.WhereIs_deleted(false);", uClass_Name, solutionName);
+				else
+					sb1.AppendFormat(@"
+		public static {0}SelectBuild Select => new {0}SelectBuild(dal);", uClass_Name, solutionName);
+				sb1.AppendFormat(@"
 		public static {0}SelectBuild SelectAs(string alias = ""a"") => Select.As(alias);", uClass_Name, solutionName);
+
 				bll_async_code += string.Format(@"
 		public static Task<List<{0}Info>> GetItemsAsync() => Select.ToListAsync();", uClass_Name, solutionName);
 
