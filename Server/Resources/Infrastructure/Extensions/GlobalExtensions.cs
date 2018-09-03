@@ -25,7 +25,7 @@ public static class GlobalExtensions {
 	/// <param name="time"></param>
 	/// <returns></returns>
 	public static long GetTime(this DateTime time) {
-		return (long)time.ToUniversalTime().Subtract(new DateTime(1970, 1, 1).ToUniversalTime()).TotalSeconds;
+		return (long)time.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 	}
 
 	static DateTime dt19700101 = new DateTime(1970, 1, 1);
@@ -35,6 +35,6 @@ public static class GlobalExtensions {
 	/// <param name="time"></param>
 	/// <returns></returns>
 	public static long GetTimeMilliseconds(this DateTime time) {
-		return (long) time.Subtract(dt19700101).TotalMilliseconds;
+		return (long)time.ToUniversalTime().Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
 	}
 }
