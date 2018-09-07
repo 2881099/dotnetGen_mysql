@@ -2946,6 +2946,7 @@ BLL Select.ToList(10, ""cache_key"")，将查询结果缓存10秒，需要手工
 ```csharp
 Topic.Select.WhereId(1).ToOne(); //读【从库】（默认）
 Topic.Select.Master().WhereId(1).ToOne(); //读【主库】
+```
 
 # 生成规则
 
