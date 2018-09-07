@@ -86,6 +86,8 @@ EndGlobal
 			public static readonly string DAL_DBUtility_SqlHelper_cs =
 			#region 内容太长已被收起
  @"using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
@@ -107,22 +109,65 @@ namespace {0}.DAL {{
 	/// </summary>
 	public abstract partial class SqlHelper {{
 		internal static Executer Instance {{ get; set; }}
-		public static ConnectionPool Pool => Instance.Pool;
-		public static void Initialization(IDistributedCache cache, IConfiguration cacheStrategy, string connectionString, ILogger log) {{
+		public static ConnectionPool Pool => Instance.MasterPool;
+		public static List<ConnectionPool> SlavePools => Instance.SlavePools;
+		public static void Initialization(IDistributedCache cache, IConfiguration cacheStrategy, string masterConnectionString, string[] slaveConnectionString, ILogger log) {{
 			CacheStrategy = cacheStrategy;
-			Instance = new Executer(cache, connectionString, log);
+			Instance = new Executer(cache, masterConnectionString, slaveConnectionString, log);
 		}}
 	
 		public static string Addslashes(string filter, params object[] parms) {{ return Executer.Addslashes(filter, parms); }}
 
+		/// <summary>
+		/// 若使用读写分离，查询【从库】条件cmdText.StartsWith(""SELECT "")，否则查询【主库】
+		/// </summary>
+		/// <param name=""readerHander""></param>
+		/// <param name=""cmdText""></param>
+		/// <param name=""cmdParms""></param>
 		public static void ExecuteReader(Action<MySqlDataReader> readerHander, string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteReader(readerHander, CommandType.Text, cmdText, cmdParms);
+		/// <summary>
+		/// 若使用读写分离，查询【从库】条件cmdText.StartsWith(""SELECT "")，否则查询【主库】
+		/// </summary>
+		/// <param name=""cmdText""></param>
+		/// <param name=""cmdParms""></param>
 		public static object[][] ExecuteArray(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteArray(CommandType.Text, cmdText, cmdParms);
+		/// <summary>
+		/// 在【主库】执行
+		/// </summary>
+		/// <param name=""cmdText""></param>
+		/// <param name=""cmdParms""></param>
 		public static int ExecuteNonQuery(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteNonQuery(CommandType.Text, cmdText, cmdParms);
+		/// <summary>
+		/// 在【主库】执行
+		/// </summary>
+		/// <param name=""cmdText""></param>
+		/// <param name=""cmdParms""></param>
 		public static object ExecuteScalar(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalar(CommandType.Text, cmdText, cmdParms);
 
+		/// <summary>
+		/// 若使用读写分离，查询【从库】条件cmdText.StartsWith(""SELECT "")，否则查询【主库】
+		/// </summary>
+		/// <param name=""readerHander""></param>
+		/// <param name=""cmdText""></param>
+		/// <param name=""cmdParms""></param>
 		public static Task ExecuteReaderAsync(Func<MySqlDataReader, Task> readerHander, string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteReaderAsync(readerHander, CommandType.Text, cmdText, cmdParms);
+		/// <summary>
+		/// 若使用读写分离，查询【从库】条件cmdText.StartsWith(""SELECT "")，否则查询【主库】
+		/// </summary>
+		/// <param name=""cmdText""></param>
+		/// <param name=""cmdParms""></param>
 		public static Task<object[][]> ExecuteArrayAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteArrayAsync(CommandType.Text, cmdText, cmdParms);
+		/// <summary>
+		/// 在【主库】执行
+		/// </summary>
+		/// <param name=""cmdText""></param>
+		/// <param name=""cmdParms""></param>
 		public static Task<int> ExecuteNonQueryAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteNonQueryAsync(CommandType.Text, cmdText, cmdParms);
+		/// <summary>
+		/// 在【主库】执行
+		/// </summary>
+		/// <param name=""cmdText""></param>
+		/// <param name=""cmdParms""></param>
 		public static Task<object> ExecuteScalarAsync(string cmdText, params MySqlParameter[] cmdParms) => Instance.ExecuteScalarAsync(CommandType.Text, cmdText, cmdParms);
 
 		/// <summary>
@@ -421,7 +466,7 @@ public static partial class {0}ExtensionMethods {{
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""dng.Mysql"" Version=""1.1.7"" />
+		<PackageReference Include=""dng.Mysql"" Version=""1.1.9"" />
 		<PackageReference Include=""CSRedisCore"" Version=""2.6.0"" />
 	</ItemGroup>
 </Project>
@@ -787,7 +832,7 @@ namespace {0}.WebHost {{
 				app.UseDeveloperExceptionPage();
 
 			{0}.BLL.SqlHelper.Initialization(app.ApplicationServices.GetService<IDistributedCache>(), Configuration.GetSection(""{0}_BLL_ITEM_CACHE""),
-				Configuration[""ConnectionStrings:{0}_mysql""], loggerFactory.CreateLogger(""{0}_DAL_sqlhelper""));
+				Configuration[""ConnectionStrings:{0}_mysql""], null, loggerFactory.CreateLogger(""{0}_DAL_sqlhelper""));
 
 			app.UseSession();
 			app.UseCors(""cors_all"");
@@ -836,8 +881,8 @@ namespace {0}.WebHost {{
 			public static readonly string Module_Admin_Controllers_SysController =
 			#region 内容太长已被收起
  @"using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -851,22 +896,32 @@ namespace {0}.Module.Admin.Controllers {{
 	public class SysController : Controller {{
 		[HttpGet(@""connection"")]
 		public object Get_connection() {{
-			List<Hashtable> ret = new List<Hashtable>();
-			foreach (var conn in SqlHelper.Pool.AllConnections) {{
-				ret.Add(new Hashtable() {{
+			var pools = new List<MySql.Data.MySqlClient.ConnectionPool>();
+			pools.Add(SqlHelper.Pool);
+			pools.AddRange(SqlHelper.SlavePools);
+
+			var ret = new List<object>();
+			for (var a = 0; a < pools.Count; a++) {{
+				var pool = pools[a];
+				List<Hashtable> list = new List<Hashtable>();
+				foreach (var conn in pool.AllConnections) {{
+					list.Add(new Hashtable() {{
 						{{ ""数据库"", conn.SqlConnection.Database }},
 						{{ ""状态"", conn.SqlConnection.State }},
 						{{ ""最后活动"", conn.LastActive }},
 						{{ ""获取次数"", conn.UseSum }}
 					}});
+				}}
+				ret.Add(new {{
+					Key = a == 0 ? ""【主库】"" : $""【从库{{a - 1}}】"",
+					FreeConnections = pool.FreeConnections.Count,
+					AllConnections = pool.AllConnections.Count,
+					GetConnectionQueue = pool.GetConnectionQueue.Count,
+					GetConnectionAsyncQueue = pool.GetConnectionAsyncQueue.Count,
+					List = list
+				}});
 			}}
-			return new {{
-				FreeConnections = SqlHelper.Pool.FreeConnections.Count,
-				AllConnections = SqlHelper.Pool.AllConnections.Count,
-				GetConnectionQueue = SqlHelper.Pool.GetConnectionQueue.Count,
-				GetConnectionAsyncQueue = SqlHelper.Pool.GetConnectionAsyncQueue.Count,
-				List = ret
-			}};
+			return ret;
 		}}
 		[HttpGet(@""connection/redis"")]
 		public object Get_connection_redis() {{
