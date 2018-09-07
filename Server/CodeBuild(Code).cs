@@ -2939,6 +2939,13 @@ u.UpdateDiy.SetLogin_time(DateTime.Now).ExecuteNonQuery();
 
 BLL Select.ToList(10, ""cache_key"")，将查询结果缓存10秒，需要手工删除redis对应的键
 
+## 读写分离
+
+内置现实读和写分离，一个主多个从，从库的查询策略为随机方式。
+
+```csharp
+Topic.Select.WhereId(1).ToOne(); //读【从库】（默认）
+Topic.Select.Master().WhereId(1).ToOne(); //读【主库】
 
 # 生成规则
 

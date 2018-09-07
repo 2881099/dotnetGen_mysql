@@ -44,6 +44,7 @@ dotnetGen 保持相同的开发与使用习惯，现实了面向 mysql、SQLServ
 | 连接池             | √ | √ | √ |
 | 事务               | √ | √ | √ |
 | 多数据库            | √ | - | - |
+| 读写分离            | √ | √ | √ |
 | 表                 | √ | √ | √ |
 | 表关系(1对1)        | √ | √ | √ |
 | 表关系(1对多)       | √ | √ | √ |
@@ -287,6 +288,14 @@ u.UpdateDiy.SetLogin_time(DateTime.Now).ExecuteNonQuery();
 
 BLL Select.ToList(10, "cache_key")，将查询结果缓存10秒，需要手工删除redis对应的键
 
+## 读写分离
+
+内置现实读和写分离，一个主多个从，从库的查询策略为随机方式。
+
+```csharp
+Topic.Select.WhereId(1).ToOne(); //读【从库】（默认）
+Topic.Select.Master().WhereId(1).ToOne(); //读【主库】
+```
 
 # 生成规则
 
