@@ -108,9 +108,17 @@ namespace {0}.DAL {{
 	/// dng.Mysql代理类
 	/// </summary>
 	public abstract partial class SqlHelper {{
-		internal static Executer Instance {{ get; set; }}
+		internal static Executer Instance {{ get; private set; }}
 		public static ConnectionPool Pool => Instance.MasterPool;
 		public static List<ConnectionPool> SlavePools => Instance.SlavePools;
+		/// <summary>
+		/// 是否跟踪记录SQL执行性能日志
+		/// </summary>
+		public static bool IsTracePerformance {{ get => Instance.IsTracePerformance; set => Instance.IsTracePerformance = value; }}
+		/// <summary>
+		/// 从数据库发生故障后，检查可用性间隔时间(单位：秒)
+		/// </summary>
+		public static int SlaveCheckAvailableInterval {{ get => Instance.SlaveCheckAvailableInterval; set => Instance.SlaveCheckAvailableInterval = value; }}
 		public static void Initialization(IDistributedCache cache, IConfiguration cacheStrategy, string masterConnectionString, string[] slaveConnectionString, ILogger log) {{
 			CacheStrategy = cacheStrategy;
 			Instance = new Executer(cache, masterConnectionString, slaveConnectionString, log);
@@ -466,8 +474,8 @@ public static partial class {0}ExtensionMethods {{
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""dng.Mysql"" Version=""1.1.9"" />
-		<PackageReference Include=""CSRedisCore"" Version=""2.6.4"" />
+		<PackageReference Include=""dng.Mysql"" Version=""1.1.13"" />
+		<PackageReference Include=""CSRedisCore"" Version=""2.6.6"" />
 	</ItemGroup>
 </Project>
 ";
@@ -484,7 +492,7 @@ public static partial class {0}ExtensionMethods {{
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Caching.CSRedis"" Version=""2.6.4"" />
+		<PackageReference Include=""Caching.CSRedis"" Version=""2.6.6"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.1"" />
@@ -722,7 +730,7 @@ namespace Swashbuckle.AspNetCore.Swagger {{
 		}}
 	}},
 	""ConnectionStrings"": {{
-		""{0}_mysql"": ""{{connectionString}};Encrypt=False;Max pool size=100"",
+		""{0}_mysql"": ""{{connectionString}};SslMode=none;Max pool size=100"",
 		""redis1"": ""127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,ssl=false,writeBuffer=20480,prefix={0}"",
 		""redis2"": ""127.0.0.1:6379,password=,defaultDatabase=13,poolsize=50,ssl=false,writeBuffer=20480,prefix={0}""
 	}},
@@ -832,7 +840,7 @@ namespace {0}.WebHost {{
 				app.UseDeveloperExceptionPage();
 
 			{0}.BLL.SqlHelper.Initialization(app.ApplicationServices.GetService<IDistributedCache>(), Configuration.GetSection(""{0}_BLL_ITEM_CACHE""),
-				Configuration[""ConnectionStrings:{0}_mysql""], null, loggerFactory.CreateLogger(""{0}_DAL_sqlhelper""));
+				Configuration[""ConnectionStrings:{0}_mysql""], /* 此参数可以配置【从数据库】 */ null, loggerFactory.CreateLogger(""{0}_DAL_sqlhelper""));
 
 			app.UseSession();
 			app.UseCors(""cors_all"");
@@ -914,6 +922,8 @@ namespace {0}.Module.Admin.Controllers {{
 				}}
 				ret.Add(new {{
 					Key = a == 0 ? ""【主库】"" : $""【从库{{a - 1}}】"",
+					IsAvailable = pool.IsAvailable,
+					UnavailableTime = pool.UnavailableTime,
 					FreeConnections = pool.FreeConnections.Count,
 					AllConnections = pool.AllConnections.Count,
 					GetConnectionQueue = pool.GetConnectionQueue.Count,
@@ -977,31 +987,36 @@ using {0}.BLL;
 using {0}.Model;
 
 namespace {0}.Module.Admin.Controllers {{
+
+	[Route("""")]
+	public class HomeController {{
+		[HttpGet]
+		public RedirectResult Index() {{
+			return new RedirectResult(""/module/Admin"");
+		}}
+	}}
+
 	[Route(""[controller]"")]
 	[Obsolete]
 	public class LoginController : BaseController {{
 
 		public LoginController(ILogger<LoginController> logger) : base(logger) {{ }}
 
-		[HttpGet]
-		[匿名访问]
+		[HttpGet, 匿名访问]
 		public ViewResult Index() {{
 			return View();
 		}}
-		[HttpPost]
-		[匿名访问]
+		[HttpPost, 匿名访问]
 		public APIReturn Post(LoginModel data) {{
 			HttpContext.Session.SetString(""login.username"", data.Username);
 			return APIReturn.成功;
 		}}
 
 		public class LoginModel {{
-			[FromForm]
-			[Required(ErrorMessage = ""请输入登陆名"")]
+			[FromForm, Required(ErrorMessage = ""请输入登陆名"")]
 			public string Username {{ get; set; }}
 
-			[FromForm]
-			[Required(ErrorMessage = ""请输入密码"")]
+			[FromForm, Required(ErrorMessage = ""请输入密码"")]
 			public string Password {{ get; set; }}
 		}}
 	}}

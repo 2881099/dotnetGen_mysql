@@ -2786,6 +2786,8 @@ namespace {0}.BLL {{
 				loc1.Add(new BuildInfo(string.Concat(CONST.corePath, @"..\readme.md"), Deflate.Compress(string.Format(@"# {0}
 .net core模块化开发框架
 
+本项目由 [【dotnetGen_mysql】](https://github.com/2881099/dotnetGen_mysql) 工具生成
+
 ## Module
 
 	所有业务接口约定在 Module 划分并行开发，互不依赖
@@ -2941,7 +2943,11 @@ BLL Select.ToList(10, ""cache_key"")，将查询结果缓存10秒，需要手工
 
 ## 读写分离
 
-内置现实读和写分离，一个主多个从，从库的查询策略为随机方式。
+内置现实读和写分离，一个【主库】多个【从库】，【从库】的查询策略为随机方式。
+
+若某【从库】发生故障，将切换到其他可用【从库】，若已全部不可用则使用【主库】查询。
+
+出现故障【从库】被隔离起来间隔性的检查可用状态，以待恢复。
 
 ```csharp
 Topic.Select.WhereId(1).ToOne(); //读【从库】（默认）

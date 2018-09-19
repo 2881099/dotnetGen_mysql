@@ -253,7 +253,7 @@ Github: https://github.com/2881099/dotnetgen_mysql
 					var appsettings = Newtonsoft.Json.JsonConvert.DeserializeObject(File.Exists(appsettingsPath) ? File.ReadAllText(appsettingsPath) : "{}") as JToken;
 					var oldtxt = appsettings.ToString();
 					if (appsettings["ConnectionStrings"] == null) appsettings["ConnectionStrings"] = new JObject();
-					if (appsettings["ConnectionStrings"][$"{this.SolutionName}_mysql"] == null) appsettings["ConnectionStrings"][$"{this.SolutionName}_mysql"] = this.ConnectionString + ";Encrypt=False;Max pool size=100";
+					if (appsettings["ConnectionStrings"][$"{this.SolutionName}_mysql"] == null) appsettings["ConnectionStrings"][$"{this.SolutionName}_mysql"] = this.ConnectionString + ";SslMode=none;Max pool size=100";
 					if (appsettings["ConnectionStrings"]["redis1"] == null) appsettings["ConnectionStrings"]["redis1"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,ssl=false,writeBuffer=20480,prefix={this.SolutionName}";
 					if (appsettings["ConnectionStrings"]["redis2"] == null) appsettings["ConnectionStrings"]["redis2"] = $"127.0.0.1:6379,password=,defaultDatabase=13,poolsize=10,ssl=false,writeBuffer=20480,prefix={this.SolutionName}";
 					if (appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] == null) appsettings[$"{this.SolutionName}_BLL_ITEM_CACHE"] = JToken.FromObject(new {
@@ -369,14 +369,14 @@ Github: https://github.com/2881099/dotnetgen_mysql
 
 								var connStr = $@"Configuration[""ConnectionStrings:{this.SolutionName}_mysql""]";
 								if (File.Exists(appsettingsPath) == false) {
-									connStr = $"{this.ConnectionString};Encrypt=False;Max pool size=100";
+									connStr = $"{this.ConnectionString};SslMode=none;Max pool size=100";
 								}
 
 								return str1 + str2 + $@"{{
 
 			
 			{this.SolutionName}.BLL.SqlHelper.Initialization({appName.Groups[1].Value}.ApplicationServices.GetService<IDistributedCache>(), Configuration.GetSection(""{this.SolutionName}_BLL_ITEM_CACHE""),
-				{connStr}, {loggerFactory.Groups[1].Value}.CreateLogger(""{this.SolutionName}_DAL_sqlhelper""));
+				{connStr}, /* 此参数可以配置【从数据库】 */ null, {loggerFactory.Groups[1].Value}.CreateLogger(""{this.SolutionName}_DAL_sqlhelper""));
 
 
 ";
@@ -440,7 +440,7 @@ GenMy {this.Server}:{this.Port} -U {this.Username} -P {this.Password} -D {this.D
 
 		public static int ExecuteNonQuery(string connectionString, string cmdText) {
 			int val = 0;
-			using (MySqlConnection conn = new MySqlConnection(connectionString + ";Encrypt=False")) {
+			using (MySqlConnection conn = new MySqlConnection(connectionString + ";SslMode=none;")) {
 				MySqlCommand cmd = new MySqlCommand(cmdText, conn);
 				try {
 					cmd.Connection.Open();
@@ -455,7 +455,7 @@ GenMy {this.Server}:{this.Port} -U {this.Username} -P {this.Password} -D {this.D
 		}
 		public static DataSet ExecuteDataSet(string connectionString, string cmdText) {
 			DataSet ds = new DataSet();
-			using (MySqlConnection conn = new MySqlConnection(connectionString + ";Encrypt=False")) {
+			using (MySqlConnection conn = new MySqlConnection(connectionString + ";SslMode=none;")) {
 				MySqlCommand cmd = new MySqlCommand(cmdText, conn);
 				MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
 				try {
