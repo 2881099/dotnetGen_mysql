@@ -171,6 +171,7 @@ where a.constraint_schema in ('{1}') and a.table_name in ({0}) and isnull(positi
 				if (dbs.Length == 1) {
 					table_id = table_id.Substring(table_id.IndexOf('.') + 1);
 				}
+				if (loc3.ContainsKey(table_id) == false || loc3[table_id].ContainsKey(column) == false) continue;
 				ColumnInfo loc9 = loc3[table_id][column];
 				if (loc9.IsClustered == false && is_clustered) loc9.IsClustered = is_clustered;
 				if (loc9.IsPrimaryKey == false && is_primary_key) loc9.IsPrimaryKey = is_primary_key;
@@ -237,7 +238,7 @@ where a.constraint_schema in ('{1}') and a.table_name in ({0}) and not isnull(po
 					table_id = table_id.Substring(table_id.IndexOf('.') + 1);
 					ref_table_id = ref_table_id.Substring(ref_table_id.IndexOf('.') + 1);
 				}
-
+				if (loc3.ContainsKey(table_id) == false || loc3[table_id].ContainsKey(column) == false) continue;
 				ColumnInfo loc9 = loc3[table_id][column];
 				TableInfo loc10 = null;
 				ColumnInfo loc11 = null;
