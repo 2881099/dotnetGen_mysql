@@ -303,11 +303,11 @@ Topic.Select.Master().WhereId(1).ToOne(); //读【主库】
 
 #### 测试
 
-> ![](https://www.cnblogs.com/images/cnblogs_com/kellynic/133561/t_1111.png)
+> ![](https://www.cnblogs.com/images/cnblogs_com/kellynic/133561/o_1111.png)
 
-> ![](https://www.cnblogs.com/images/cnblogs_com/kellynic/133561/t_2222.png)
+> ![](https://www.cnblogs.com/images/cnblogs_com/kellynic/133561/o_2222.png)
 
-> ![](https://www.cnblogs.com/images/cnblogs_com/kellynic/133561/t_3333.png)
+> ![](https://www.cnblogs.com/images/cnblogs_com/kellynic/133561/o_3333.png)
 
 
 # 生成规则
