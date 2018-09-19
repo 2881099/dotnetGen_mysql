@@ -301,6 +301,15 @@ Topic.Select.WhereId(1).ToOne(); //读【从库】（默认）
 Topic.Select.Master().WhereId(1).ToOne(); //读【主库】
 ```
 
+#### 测试
+
+> ![](https://www.cnblogs.com/images/cnblogs_com/kellynic/133561/t_1111.png)
+
+> ![](https://www.cnblogs.com/images/cnblogs_com/kellynic/133561/t_2222.png)
+
+> ![](https://www.cnblogs.com/images/cnblogs_com/kellynic/133561/t_3333.png)
+
+
 # 生成规则
 
 ## 不会生成
