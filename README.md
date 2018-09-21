@@ -14,7 +14,7 @@
  * 1、新项目开发，只管设计数据ER图，无须考虑db相关代码；
  * 2、老项目数据库访问方式不堪入目的，表数量越多收益越大；
 
-[下载生成器winform客户端](https://files.cnblogs.com/files/kellynic/%E7%94%9F%E6%88%90%E5%99%A8mysql.zip)，或者安装命令工具 dotnet tool install -g GenMy
+[下载生成器winform客户端](https://files.cnblogs.com/files/kellynic/%E7%94%9F%E6%88%90%E5%99%A8mysql.zip)，推荐安装命令工具 dotnet tool install -g GenMy
 
 新人指导教学链接：https://pan.baidu.com/s/1gx8ClLF7AzL06j2D43kBWQ 密码：lr6n
 

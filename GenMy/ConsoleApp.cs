@@ -179,6 +179,8 @@ Github: https://github.com/2881099/dotnetgen_mysql
 				return;
 			}
 
+			WriteLine("正在生成，稍候 …", ConsoleColor.DarkGreen);
+
 			SocketMessager messager = new SocketMessager("GetDatabases", this._client);
 			this._socket.Write(messager, delegate (object sender2, ClientSocketReceiveEventArgs e2) {
 				List<DatabaseInfo> dbs = e2.Messager.Arg as List<DatabaseInfo>;
@@ -248,6 +250,79 @@ Github: https://github.com/2881099/dotnetgen_mysql
 				}
 				var appsettingsPath = Path.Combine(OutputPath, "appsettings.json");
 				var appsettingsPathWebHost = Path.Combine(OutputPath, @"src\WebHost\appsettings.json");
+				var htmZipPath = Path.Combine(OutputPath, "htm.zip");
+				//解压htm.zip
+				if (this.IsDownloadRes && File.Exists(htmZipPath)) {
+					try {
+						System.IO.Compression.ZipFile.ExtractToDirectory(htmZipPath, OutputPath, Encoding.UTF8, true);
+					} catch (Exception ex) {
+						var color = Console.ForegroundColor;
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine($"解压 htm.zip 失败：{ex.Message}");
+						Console.ForegroundColor = color;
+					}
+				}
+				if (this.IsMakeSolution) {
+					WriteLine("代码已生成完毕！使用 -S 生成完整项目，正在建立脚手架，大约需要10秒 …", ConsoleColor.DarkGreen);
+
+					var shellret = ShellRun(OutputPath, "gulp -v");
+
+					if (!string.IsNullOrEmpty(shellret.err)) {
+						WriteLine("");
+						WriteLine(@"正在安装gulp-cli …", ConsoleColor.DarkGreen);
+						shellret = ShellRun(OutputPath, "npm install --global gulp-cli");
+						if (!string.IsNullOrEmpty(shellret.err)) WriteLine(shellret.err, ConsoleColor.Red);
+						if (!string.IsNullOrEmpty(shellret.warn)) WriteLine(shellret.warn, ConsoleColor.Yellow);
+						if (!string.IsNullOrEmpty(shellret.info)) WriteLine(shellret.info, ConsoleColor.DarkGray);
+					}
+
+					//WriteLine("");
+					//WriteLine("正在还原项目 …", ConsoleColor.DarkGreen);
+					//shellret = ShellRun(OutputPath, "dotnet1 restore");
+					//if (!string.IsNullOrEmpty(shellret.err)) WriteLine(shellret.err, ConsoleColor.Red);
+					//if (!string.IsNullOrEmpty(shellret.warn)) WriteLine(shellret.warn, ConsoleColor.Yellow);
+					//if (!string.IsNullOrEmpty(shellret.info)) WriteLine(shellret.info, ConsoleColor.DarkGray);
+
+					WriteLine("");
+					WriteLine(@"正在编译Module\Test …", ConsoleColor.DarkGreen);
+					shellret = ShellRun(Path.Combine(OutputPath, @"src\Module\Test"), "dotnet build");
+					if (!string.IsNullOrEmpty(shellret.err)) WriteLine(shellret.err, ConsoleColor.Red);
+					if (!string.IsNullOrEmpty(shellret.warn)) WriteLine(shellret.warn, ConsoleColor.Yellow);
+					if (!string.IsNullOrEmpty(shellret.info)) WriteLine(shellret.info, ConsoleColor.DarkGray);
+
+					WriteLine("");
+					WriteLine(@"正在编译Module\Admin …", ConsoleColor.DarkGreen);
+					shellret = ShellRun(Path.Combine(OutputPath, @"src\Module\Admin"), "dotnet build");
+					if (!string.IsNullOrEmpty(shellret.err)) WriteLine(shellret.err, ConsoleColor.Red);
+					if (!string.IsNullOrEmpty(shellret.warn)) WriteLine(shellret.warn, ConsoleColor.Yellow);
+					if (!string.IsNullOrEmpty(shellret.info)) WriteLine(shellret.info, ConsoleColor.DarkGray);
+
+					WriteLine("");
+					WriteLine("正在安装npm包 …", ConsoleColor.DarkGreen);
+					shellret = ShellRun(Path.Combine(OutputPath, @"src\WebHost"), "npm install");
+					if (!string.IsNullOrEmpty(shellret.err)) WriteLine(shellret.err, ConsoleColor.Red);
+					if (!string.IsNullOrEmpty(shellret.warn)) WriteLine(shellret.warn, ConsoleColor.Yellow);
+					if (!string.IsNullOrEmpty(shellret.info)) WriteLine(shellret.info, ConsoleColor.DarkGray);
+
+					WriteLine("");
+					WriteLine("正在编译WebHost …", ConsoleColor.DarkGreen);
+					shellret = ShellRun(Path.Combine(OutputPath, @"src\WebHost"), "dotnet build");
+					if (!string.IsNullOrEmpty(shellret.err)) WriteLine(shellret.err, ConsoleColor.Red);
+					if (!string.IsNullOrEmpty(shellret.warn)) WriteLine(shellret.warn, ConsoleColor.Yellow);
+					if (!string.IsNullOrEmpty(shellret.info)) WriteLine(shellret.info, ConsoleColor.DarkGray);
+
+					WriteLine("");
+					WriteLine($"脚手架建立完成。", ConsoleColor.DarkGreen);
+					WriteLine("");
+					Write($"项目运行依赖 ", ConsoleColor.DarkYellow);
+					Write($"redis-server", ConsoleColor.Green);
+					Write($"，安装地址：", ConsoleColor.DarkYellow);
+					Write("https://files.cnblogs.com/files/kellynic/Redis-x64-2.8.2402.zip", ConsoleColor.Blue);
+					WriteLine($"，或前往官方下载", ConsoleColor.DarkYellow);
+					WriteLine($"{Path.Combine(OutputPath, @"src\WebHost")} 目执行 dotnet run", ConsoleColor.DarkYellow);
+					WriteLine("");
+					//Console.WriteLine(ShellRun(Path.Combine(OutputPath, @"src\WebHost"), "dotnet run"));
+				}
 				//如果三个选项为false，并且 src\WebHost\appsettings.json 不存在，则在当前目录使用 appsettings.json
 				if (this.IsDownloadRes == false && this.IsMakeSolution == false && this.IsMakeWebAdmin == false && File.Exists(appsettingsPathWebHost) == false) {
 					var appsettings = Newtonsoft.Json.JsonConvert.DeserializeObject(File.Exists(appsettingsPath) ? File.ReadAllText(appsettingsPath) : "{}") as JToken;
@@ -470,6 +545,53 @@ GenMy {this.Server}:{this.Port} -U {this.Username} -P {this.Password} -D {this.D
 				cmd.Parameters.Clear();
 			}
 			return ds;
+		}
+
+		public static (string info, string warn, string err) ShellRun(string cddir, params string[] bat) {
+			if (bat == null || bat.Any() == false) return ("", "", "");
+			var proc = new System.Diagnostics.Process();
+			proc.StartInfo = new System.Diagnostics.ProcessStartInfo {
+				CreateNoWindow = true,
+				FileName = "cmd.exe",
+				UseShellExecute = false,
+				RedirectStandardError = true,
+				RedirectStandardInput = true,
+				RedirectStandardOutput = true,
+				WorkingDirectory = cddir
+			};
+			proc.Start();
+			foreach (var cmd in bat)
+				proc.StandardInput.WriteLine(cmd);
+			proc.StandardInput.WriteLine("exit");
+			var outStr = proc.StandardOutput.ReadToEnd();
+			var errStr = proc.StandardError.ReadToEnd();
+			proc.Close();
+			var idx = outStr.IndexOf($">{bat[0]}");
+			if (idx != -1) {
+				idx = outStr.IndexOf("\n", idx);
+				if (idx != -1) outStr = outStr.Substring(idx + 1);
+			}
+			idx = outStr.LastIndexOf(">exit");
+			if (idx != -1) {
+				idx = outStr.LastIndexOf("\n", idx);
+				if (idx != -1) outStr = outStr.Remove(idx);
+			}
+			outStr = outStr.Trim();
+			if (outStr == "") outStr = null;
+			if (errStr == "") errStr = null;
+			return (outStr, string.IsNullOrEmpty(outStr) ? null : errStr, string.IsNullOrEmpty(outStr) ? errStr : null);
+		}
+
+		public static void WriteLine(string text, ConsoleColor? foregroundColor = null, ConsoleColor? backgroundColor = null) => Write($"{text}\r\n", foregroundColor, backgroundColor);
+		public static void Write(string text, ConsoleColor? foregroundColor = null, ConsoleColor? backgroundColor = null) {
+			var bgcolor = Console.BackgroundColor;
+			var fgcolor = Console.ForegroundColor;
+
+			if (backgroundColor != null) Console.BackgroundColor = backgroundColor.Value;
+			if (foregroundColor != null) Console.ForegroundColor = foregroundColor.Value;
+			Console.Write(text);
+			if (backgroundColor != null) Console.BackgroundColor = bgcolor;
+			if (foregroundColor != null) Console.ForegroundColor = fgcolor;
 		}
 	}
 }
