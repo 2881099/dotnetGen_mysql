@@ -2164,6 +2164,7 @@ namespace {0}.BLL {{
 							} else {
 								string csType2 = csType;
 								if (col88.Type == MySqlDbType.Set) csType2 = csType2.Replace("?", "[]");
+								if (csType2 == "bool?") csType2 = "bool";
 								itemCsParamInsertForm += string.Format(", [FromForm] {0} {1}", csType2, csUName);
 								itemCsParamUpdateForm += string.Format(", [FromForm] {0} {1}", csType2, csUName);
 								colvalue = csUName;

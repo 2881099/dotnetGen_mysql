@@ -313,15 +313,26 @@ Github: https://github.com/2881099/dotnetgen_mysql
 
 					WriteLine("");
 					WriteLine($"脚手架建立完成。", ConsoleColor.DarkGreen);
+
+					//WriteLine("");
+					//Write($"项目运行依赖 ", ConsoleColor.DarkYellow);
+					//Write($"redis-server", ConsoleColor.Green);
+					//Write($"，安装地址：", ConsoleColor.DarkYellow);
+					//Write("https://files.cnblogs.com/files/kellynic/Redis-x64-2.8.2402.zip", ConsoleColor.Blue);
+					//WriteLine($"，或前往官方下载", ConsoleColor.DarkYellow);
+
 					WriteLine("");
-					Write($"项目运行依赖 ", ConsoleColor.DarkYellow);
-					Write($"redis-server", ConsoleColor.Green);
-					Write($"，安装地址：", ConsoleColor.DarkYellow);
-					Write("https://files.cnblogs.com/files/kellynic/Redis-x64-2.8.2402.zip", ConsoleColor.Blue);
-					WriteLine($"，或前往官方下载", ConsoleColor.DarkYellow);
 					WriteLine($"{Path.Combine(OutputPath, @"src\WebHost")} 目执行 dotnet run", ConsoleColor.DarkYellow);
 					WriteLine("");
 					//Console.WriteLine(ShellRun(Path.Combine(OutputPath, @"src\WebHost"), "dotnet run"));
+
+					var pro = new System.Diagnostics.Process();
+					pro.StartInfo = new System.Diagnostics.ProcessStartInfo("dotnet", "run --urls=http://0.0.0.0:5000") {
+						WorkingDirectory = Path.Combine(OutputPath, @"src\WebHost"),
+						EnvironmentVariables = { ["ASPNETCORE_ENVIRONMENT"] = "Development" }
+					};
+					pro.Start();
+					pro.WaitForExit();
 				}
 				//如果三个选项为false，并且 src\WebHost\appsettings.json 不存在，则在当前目录使用 appsettings.json
 				if (this.IsDownloadRes == false && this.IsMakeSolution == false && this.IsMakeWebAdmin == false && File.Exists(appsettingsPathWebHost) == false) {
