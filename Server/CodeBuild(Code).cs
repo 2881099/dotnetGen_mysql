@@ -2249,7 +2249,7 @@ namespace {0}.BLL {{
 					else mn_{1}_list.RemoveAt(idx);
 				}}
 				mn_{1}_list.ForEach(a => item.Flag{1}(a));
-			}}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper(), fk2[0].ReferencedColumns[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname), addname);
+			}}", CodeBuild.GetCSType(fk2[0].ReferencedColumns[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedColumns[0].Name.ToUpper(), fk2[0].ReferencedColumns[0].SqlType).Replace("?", ""), CodeBuild.UFString(addname), CodeBuild.LFString(addname));
 						str_addhtml_mn += string.Format(@"
 						<tr>
 							<td>{1}</td>
