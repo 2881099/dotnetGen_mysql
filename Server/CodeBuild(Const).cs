@@ -474,7 +474,7 @@ public static partial class {0}ExtensionMethods {{
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""dng.Mysql"" Version=""1.1.14"" />
+		<PackageReference Include=""dng.Mysql"" Version=""1.1.15"" />
 		<PackageReference Include=""CSRedisCore"" Version=""2.6.6"" />
 	</ItemGroup>
 </Project>
