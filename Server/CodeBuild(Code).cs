@@ -735,7 +735,7 @@ namespace {0}.Model {{
 							//}
 							string objs_value = string.Format(@"
 		private List<{0}Info> _obj_{1}s;
-		public List<{0}Info> Obj_{1}s => _obj_{1}s ?? (_obj_{1}s = BLL.{0}.SelectBy{5}_{4}({3}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), solutionName, civ, table.PrimaryKeys[0].Name, CodeBuild.UFString(f5));
+		public List<{0}Info> Obj_{1}s => _obj_{1}s ?? (_obj_{1}s = BLL.{0}.SelectBy{5}_{4}({3}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), solutionName, civ, fk2[0].ReferencedTable.PrimaryKeys[0].Name, CodeBuild.UFString(f5));
 							//如果中间表字段 > 2，那么应该把其中间表也查询出来
 							if (t2.Columns.Count > 2) {
 								string _f6 = fk.Columns[0].Name;
