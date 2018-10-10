@@ -109,16 +109,12 @@ namespace {0}.DAL {{
 	/// </summary>
 	public abstract partial class SqlHelper {{
 		internal static Executer Instance {{ get; private set; }}
-		public static ConnectionPool Pool => Instance.MasterPool;
-		public static List<ConnectionPool> SlavePools => Instance.SlavePools;
+		public static MySqlConnectionPool Pool => Instance.MasterPool;
+		public static List<MySqlConnectionPool> SlavePools => Instance.SlavePools;
 		/// <summary>
 		/// 是否跟踪记录SQL执行性能日志
 		/// </summary>
 		public static bool IsTracePerformance {{ get => Instance.IsTracePerformance; set => Instance.IsTracePerformance = value; }}
-		/// <summary>
-		/// 从数据库发生故障后，检查可用性间隔时间(单位：秒)
-		/// </summary>
-		public static int SlaveCheckAvailableInterval {{ get => Instance.SlaveCheckAvailableInterval; set => Instance.SlaveCheckAvailableInterval = value; }}
 		public static void Initialization(IDistributedCache cache, IConfiguration cacheStrategy, string masterConnectionString, string[] slaveConnectionString, ILogger log) {{
 			CacheStrategy = cacheStrategy;
 			Instance = new Executer(cache, masterConnectionString, slaveConnectionString, log);
@@ -474,7 +470,7 @@ public static partial class {0}ExtensionMethods {{
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""dng.Mysql"" Version=""1.1.16"" />
+		<PackageReference Include=""dng.Mysql"" Version=""1.1.18"" />
 		<PackageReference Include=""CSRedisCore"" Version=""2.6.12"" />
 	</ItemGroup>
 </Project>
@@ -909,31 +905,17 @@ namespace {0}.Module.Admin.Controllers {{
 	public class SysController : Controller {{
 		[HttpGet(@""connection"")]
 		public object Get_connection() {{
-			var pools = new List<MySql.Data.MySqlClient.ConnectionPool>();
+			var pools = new List<MySql.Data.MySqlClient.MySqlConnectionPool>();
 			pools.Add(SqlHelper.Pool);
 			pools.AddRange(SqlHelper.SlavePools);
-
 			var ret = new List<object>();
 			for (var a = 0; a < pools.Count; a++) {{
 				var pool = pools[a];
-				List<Hashtable> list = new List<Hashtable>();
-				foreach (var conn in pool.AllConnections) {{
-					list.Add(new Hashtable() {{
-						{{ ""数据库"", conn.SqlConnection.Database }},
-						{{ ""状态"", conn.SqlConnection.State }},
-						{{ ""最后活动"", conn.LastActive }},
-						{{ ""获取次数"", conn.UseSum }}
-					}});
-				}}
 				ret.Add(new {{
-					Key = a == 0 ? ""【主库】"" : $""【从库{{a - 1}}】"",
-					IsAvailable = pool.IsAvailable,
-					UnavailableTime = pool.UnavailableTime,
-					FreeConnections = pool.FreeConnections.Count,
-					AllConnections = pool.AllConnections.Count,
-					GetConnectionQueue = pool.GetConnectionQueue.Count,
-					GetConnectionAsyncQueue = pool.GetConnectionAsyncQueue.Count,
-					List = list
+					pool.Policy.Name,
+					pool.IsAvailable,
+					pool.UnavailableTime,
+					pool.StatisticsFullily
 				}});
 			}}
 			return ret;
