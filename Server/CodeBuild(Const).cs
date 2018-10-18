@@ -470,8 +470,8 @@ public static partial class {0}ExtensionMethods {{
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""dng.Mysql"" Version=""1.1.18"" />
-		<PackageReference Include=""CSRedisCore"" Version=""2.6.12"" />
+		<PackageReference Include=""dng.Mysql"" Version=""1.1.19"" />
+		<PackageReference Include=""CSRedisCore"" Version=""3.0.2"" />
 	</ItemGroup>
 </Project>
 ";
@@ -488,7 +488,7 @@ public static partial class {0}ExtensionMethods {{
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Caching.CSRedis"" Version=""2.6.12"" />
+		<PackageReference Include=""Caching.CSRedis"" Version=""3.0.2"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.1"" />
@@ -799,10 +799,8 @@ namespace {0}.WebHost {{
 				return st;
 			}};
 			//去掉以下注释可开启 RedisHelper 静态类
-			//RedisHelper.Initialization(
-			//	csredis: new CSRedis.CSRedisClient(Configuration[""ConnectionStrings:redis1""]), //单redis节点模式
-			//	serialize: value => Newtonsoft.Json.JsonConvert.SerializeObject(value),
-			//	deserialize: (data, type) => Newtonsoft.Json.JsonConvert.DeserializeObject(data, type));
+			//var csredis = new CSRedis.CSRedisClient(Configuration[""ConnectionStrings:redis1""]); //单redis节点模式
+			//RedisHelper.Initialization(csredis);
 		}}
 
 		public static IList<ModuleInfo> Modules = new List<ModuleInfo>();
@@ -922,21 +920,13 @@ namespace {0}.Module.Admin.Controllers {{
 		}}
 		[HttpGet(@""connection/redis"")]
 		public object Get_connection_redis() {{
-			var ret = new Hashtable();
-			foreach(var pool in RedisHelper.ClusterNodes) {{
-				List<Hashtable> list = new List<Hashtable>();
-				foreach (var conn in pool.Value.AllConnections) {{
-					list.Add(new Hashtable() {{
-						{{ ""最后活动"", conn.LastActive }},
-						{{ ""获取次数"", conn.UseSum }}
-					}});
-				}}
-				ret.Add(pool.Key, new {{
-					FreeConnections = pool.Value.FreeConnections.Count,
-					AllConnections = pool.Value.AllConnections.Count,
-					GetConnectionQueue = pool.Value.GetConnectionQueue.Count,
-					GetConnectionAsyncQueue = pool.Value.GetConnectionAsyncQueue.Count,
-					List = list
+			var ret = new List<object>();
+			foreach(var pool in RedisHelper.Nodes.Values) {{
+				ret.Add(new {{
+					pool.Policy.Name,
+					pool.IsAvailable,
+					pool.UnavailableTime,
+					pool.StatisticsFullily
 				}});
 			}}
 			return ret;
