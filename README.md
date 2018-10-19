@@ -16,7 +16,9 @@
 
 [下载生成器winform客户端](https://files.cnblogs.com/files/kellynic/%E7%94%9F%E6%88%90%E5%99%A8mysql.zip)，推荐安装命令工具 dotnet tool install -g GenMy
 
-新人指导教学链接：https://pan.baidu.com/s/1gx8ClLF7AzL06j2D43kBWQ 密码：lr6n
+* [.NETCore 快速开发做一个简易商城](https://www.cnblogs.com/kellynic/p/9712483.html)
+* [.NETCore 基于 dbfirst 体验快速开发项目](https://www.cnblogs.com/kellynic/p/9706082.html)
+* [新人指导教学](https://pan.baidu.com/s/1gx8ClLF7AzL06j2D43kBWQ) https://pan.baidu.com/s/1gx8ClLF7AzL06j2D43kBWQ 密码：lr6n
 
 学习QQ群：8578575
 
