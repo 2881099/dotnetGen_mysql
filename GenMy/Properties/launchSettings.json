@@ -2,7 +2,7 @@
   "profiles": {
     "GenMy": {
       "commandName": "Project",
-      "commandLineArgs": "127.0.0.1:3306 -U root -P root -D wsj,test -N genmy21 -O \"C:\\Users\\Administrator\\Desktop\\ngnet\""
+      "commandLineArgs": "52.197.199.192:3306 -U root -P root -D cccddd,goodin, -N csd -O \"C:\\Users\\28810\\Desktop\\ngnet\""
     }
   }
 }

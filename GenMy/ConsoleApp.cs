@@ -524,7 +524,7 @@ GenMy {this.Server}:{this.Port} -U {this.Username} -P {this.Password} -D {this.D
 
 		public static int ExecuteNonQuery(string connectionString, string cmdText) {
 			int val = 0;
-			using (MySqlConnection conn = new MySqlConnection(connectionString + ";SslMode=none;")) {
+			using (MySqlConnection conn = new MySqlConnection(connectionString + ";SslMode=none;AllowPublicKeyRetrieval=true;")) {
 				MySqlCommand cmd = new MySqlCommand(cmdText, conn);
 				try {
 					cmd.Connection.Open();
@@ -539,7 +539,7 @@ GenMy {this.Server}:{this.Port} -U {this.Username} -P {this.Password} -D {this.D
 		}
 		public static DataSet ExecuteDataSet(string connectionString, string cmdText) {
 			DataSet ds = new DataSet();
-			using (MySqlConnection conn = new MySqlConnection(connectionString + ";SslMode=none;")) {
+			using (MySqlConnection conn = new MySqlConnection(connectionString + ";SslMode=none;AllowPublicKeyRetrieval=true;")) {
 				MySqlCommand cmd = new MySqlCommand(cmdText, conn);
 				MySqlDataAdapter sda = new MySqlDataAdapter(cmd);
 				try {
