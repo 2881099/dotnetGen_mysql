@@ -470,8 +470,8 @@ public static partial class {0}ExtensionMethods {{
 		<AssemblyName>{0}.db</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include=""dng.Mysql"" Version=""1.1.23"" />
-		<PackageReference Include=""CSRedisCore"" Version=""3.0.18"" />
+		<PackageReference Include=""dng.Mysql"" Version=""1.2.2"" />
+		<PackageReference Include=""CSRedisCore"" Version=""3.0.21"" />
 	</ItemGroup>
 </Project>
 ";
@@ -488,17 +488,17 @@ public static partial class {0}ExtensionMethods {{
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Caching.CSRedis"" Version=""3.0.18"" />
+		<PackageReference Include=""Caching.CSRedis"" Version=""3.0.21"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.Extensions.Configuration.EnvironmentVariables"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.Extensions.Configuration.FileExtensions"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.Extensions.Configuration.Json"" Version=""2.1.1"" />
-		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.1.0"" />
-		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.5.4"" />
-		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""3.0.0"" />
-		<PackageReference Include=""Swashbuckle.AspNetCore.Annotations"" Version=""3.0.0"" />
+		<PackageReference Include=""NLog.Extensions.Logging"" Version=""1.3.0"" />
+		<PackageReference Include=""NLog.Web.AspNetCore"" Version=""4.7.0"" />
+		<PackageReference Include=""Swashbuckle.AspNetCore"" Version=""4.0.1"" />
+		<PackageReference Include=""Swashbuckle.AspNetCore.Annotations"" Version=""4.0.1"" />
 		<PackageReference Include=""System.Text.Encoding.CodePages"" Version=""4.5.0"" />
 	</ItemGroup>
 </Project>
