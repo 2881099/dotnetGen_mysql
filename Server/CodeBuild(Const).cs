@@ -471,7 +471,7 @@ public static partial class {0}ExtensionMethods {{
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include=""dng.Mysql"" Version=""1.2.2"" />
-		<PackageReference Include=""CSRedisCore"" Version=""3.0.21"" />
+		<PackageReference Include=""CSRedisCore"" Version=""3.0.25"" />
 	</ItemGroup>
 </Project>
 ";
@@ -488,7 +488,7 @@ public static partial class {0}ExtensionMethods {{
 		<ProjectReference Include=""..\{0}.db\{0}.db.csproj"" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include=""Caching.CSRedis"" Version=""3.0.21"" />
+		<PackageReference Include=""Caching.CSRedis"" Version=""3.0.25"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Mvc"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Session"" Version=""2.1.1"" />
 		<PackageReference Include=""Microsoft.AspNetCore.Diagnostics"" Version=""2.1.1"" />
@@ -510,19 +510,21 @@ public static partial class {0}ExtensionMethods {{
  @"using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
 
 public static class StarupExtensions {{
 	public static ConfigurationBuilder LoadInstalledModules(this ConfigurationBuilder build, IList<ModuleInfo> modules, IHostingEnvironment env) {{
@@ -530,9 +532,14 @@ public static class StarupExtensions {{
 		var moduleFolders = moduleRootFolder.GetDirectories();
 
 		foreach (var moduleFolder in moduleFolders) {{
-			Assembly assembly;
+			Assembly assembly = null;
+			IModuleInitializer moduleInitializer = null;
 			try {{
 				assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(Path.Combine(moduleFolder.FullName, moduleFolder.Name + "".dll""));
+				var moduleInitializerType = assembly.GetTypes().FirstOrDefault(x => typeof(IModuleInitializer).IsAssignableFrom(x));
+				if ((moduleInitializerType != null) && (moduleInitializerType != typeof(IModuleInitializer))) {{
+					moduleInitializer = (IModuleInitializer)Activator.CreateInstance(moduleInitializerType);
+				}}
 			}} catch (FileLoadException) {{
 				throw;
 			}}
@@ -540,6 +547,7 @@ public static class StarupExtensions {{
 				modules.Add(new ModuleInfo {{
 					Name = moduleFolder.Name,
 					Assembly = assembly,
+					Initializer = moduleInitializer,
 					Path = moduleFolder.FullName
 				}});
 		}}
@@ -568,8 +576,8 @@ public static class StarupExtensions {{
 	public static IServiceCollection AddCustomizedMvc(this IServiceCollection services, IList<ModuleInfo> modules) {{
 		var mvcBuilder = services.AddMvc().AddJsonOptions(a => {{
 				a.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
-				a.SerializerSettings.DateFormatHandling = Newtonsoft.Json.DateFormatHandling.IsoDateFormat;
-				a.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+				a.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+				a.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 			}})
 			.AddRazorOptions(o => {{
 				foreach (var module in modules) {{
@@ -580,23 +588,14 @@ public static class StarupExtensions {{
 			.AddViewLocalization()
 			.AddDataAnnotationsLocalization();
 
-		foreach (var module in modules)
+		foreach (var module in modules) {{
 			mvcBuilder.AddApplicationPart(module.Assembly);
+		}}
+		services.Configure<RazorViewEngineOptions>(options => {{ options.ViewLocationExpanders.Add(new ModuleViewLocationExpander()); }});
 
 		return services;
 	}}
 
-	public static IApplicationBuilder UseCustomizedMvc(this IApplicationBuilder app, IList<ModuleInfo> modules) {{
-		foreach (var module in modules) {{
-			var moduleInitializerType =
-				module.Assembly.GetTypes().FirstOrDefault(x => typeof(IModuleInitializer).IsAssignableFrom(x));
-			if ((moduleInitializerType != null) && (moduleInitializerType != typeof(IModuleInitializer))) {{
-				var moduleInitializer = (IModuleInitializer)Activator.CreateInstance(moduleInitializerType);
-				moduleInitializer.Init(app);
-			}}
-		}}
-		return app.UseMvc();
-	}}
 	public static IApplicationBuilder UseCustomizedStaticFiles(this IApplicationBuilder app, IList<ModuleInfo> modules) {{
 		app.UseDefaultFiles();
 		app.UseStaticFiles(new StaticFileOptions() {{
@@ -803,7 +802,7 @@ namespace {0}.WebHost {{
 			//RedisHelper.Initialization(csredis);
 		}}
 
-		public static IList<ModuleInfo> Modules = new List<ModuleInfo>();
+		public static List<ModuleInfo> Modules = new List<ModuleInfo>();
 		public IConfiguration Configuration {{ get; }}
 		public IHostingEnvironment env {{ get; }}
 
@@ -820,7 +819,7 @@ namespace {0}.WebHost {{
 			}});
 			services.AddCors(options => options.AddPolicy(""cors_all"", builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
 			services.AddCustomizedMvc(Modules);
-			services.Configure<RazorViewEngineOptions>(options => {{ options.ViewLocationExpanders.Add(new ModuleViewLocationExpander()); }});
+			Modules.ForEach(module => module.Initializer?.ConfigureServices(services, env));
 
 			if (env.IsDevelopment())
 				services.AddCustomizedSwaggerGen();
@@ -843,8 +842,9 @@ namespace {0}.WebHost {{
 
 			app.UseSession();
 			app.UseCors(""cors_all"");
-			app.UseCustomizedMvc(Modules);
+			app.UseMvc();
 			app.UseCustomizedStaticFiles(Modules);
+			Modules.ForEach(module => module.Initializer?.Configure(app, env, loggerFactory, lifetime));
 
 			if (env.IsDevelopment())
 				app.UseCustomizedSwagger(env);
@@ -1421,7 +1421,7 @@ using Newtonsoft.Json.Linq;
 using {0}.BLL;
 using {0}.Model;
 
-namespace {0}.Module.Admin.Controllers {{
+namespace {0}.Module.Test.Controllers {{
 	[Route(""[controller]"")]
 	public class {1}Controller : BaseController {{
 		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
@@ -1429,6 +1429,37 @@ namespace {0}.Module.Admin.Controllers {{
 		[HttpGet]
 		public APIReturn List([FromServices]IConfiguration cfg) {{
 			return APIReturn.成功;
+		}}
+	}}
+}}
+";
+			#endregion
+
+			public static readonly string Module_Test_Init_cs =
+			#region 内容太长已被收起
+			@"using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using {0}.BLL;
+using {0}.Model;
+
+namespace {0}.Module.{1} {{
+
+	/// <summary>
+	/// 配置本 Module 依赖注入等，由 WebHost/Startup.cs 加载触发执行
+	/// </summary>
+	public class Init : IModuleInitializer {{
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime lifetime) {{
+
+		}}
+
+		public void ConfigureServices(IServiceCollection services, IHostingEnvironment env) {{
+
 		}}
 	}}
 }}

@@ -5,6 +5,7 @@ public class ModuleInfo {
 	public string Name { get; set; }
 
 	public Assembly Assembly { get; set; }
+	public IModuleInitializer Initializer { get; set; }
 
 	public string ShortName {
 		get {

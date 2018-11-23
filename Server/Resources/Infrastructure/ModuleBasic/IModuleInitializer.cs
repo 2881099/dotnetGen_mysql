@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 public interface IModuleInitializer {
-	void Init(IApplicationBuilder services);
+	void ConfigureServices(IServiceCollection services, IHostingEnvironment env);
+	void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime lifetime);
 }
