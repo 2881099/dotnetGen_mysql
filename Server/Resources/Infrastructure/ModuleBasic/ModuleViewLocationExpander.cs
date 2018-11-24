@@ -21,7 +21,7 @@ public class ModuleViewLocationExpander : IViewLocationExpander {
 
 	public void PopulateValues(ViewLocationExpanderContext context) {
 		var controller = context.ActionContext.ActionDescriptor.DisplayName;
-		var moduleName = controller.Split('.')[2];
+		var moduleName = controller.Split('(')[1].Split(')')[0];
 		context.Values[_moduleKey] = moduleName;
 	}
 }
