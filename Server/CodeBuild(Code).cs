@@ -1808,27 +1808,33 @@ namespace {0}.BLL {{
 					if (byItems.ContainsKey(fkcsBy)) return;
 					byItems.Add(fkcsBy, true);
 
+					string comment = _column_coments.ContainsKey(table.FullName) && _column_coments[table.FullName].ContainsKey(col.Name) ? _column_coments[table.FullName][col.Name] : col.Name;
+					string prototype_comment = comment == col.Name ? "" : string.Format(@"/// <summary>
+		/// {0}，多个参数等于 OR 查询
+		/// </summary>
+		", comment.Replace("\r\n", "\n").Replace("\n", "\r\n		/// "));
+
 					if (csType == "bool?" || csType == "Guid?") {
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
+		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name);
+		}}", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name, prototype_comment);
 						return;
 					}
 					if (col.Type == MySqlDbType.Byte || col.Type == MySqlDbType.Int16 || col.Type == MySqlDbType.Int24 || col.Type == MySqlDbType.Int32 || col.Type == MySqlDbType.Int64 ||
 						col.Type == MySqlDbType.UByte || col.Type == MySqlDbType.UInt16 || col.Type == MySqlDbType.UInt24 || col.Type == MySqlDbType.UInt32 || col.Type == MySqlDbType.UInt64 ||
 						col.Type == MySqlDbType.Year) {
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
+		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name);
+		}}", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name, prototype_comment);
 						return;
 					}
 					if (col.Type == MySqlDbType.Double || col.Type == MySqlDbType.Float || col.Type == MySqlDbType.Decimal) {
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
+		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType, col.Name);
+		}}", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}Range({2} begin) {{
 			return base.Where(""a.`{3}` >= {{0}}"", begin);
@@ -1842,9 +1848,9 @@ namespace {0}.BLL {{
 					if (col.Type == MySqlDbType.Date || col.Type == MySqlDbType.Time || col.Type == MySqlDbType.Timestamp || col.Type == MySqlDbType.Datetime) {
 						if (col.IsPrimaryKey)
 							sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}({2} {1}) {{
+		{4}public {0}SelectBuild Where{1}({2} {1}) {{
 			return base.Where(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType, col.Name);
+		}}", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}Range({2} begin) {{
 			return base.Where(""a.`{3}` >= {{0}}"", begin);
@@ -1870,7 +1876,7 @@ namespace {0}.BLL {{
 		public {0}SelectBuild Where{1}_IN(params {2}[] {1}s) {{
 			return this.Where1Or(""(a.`{3}` & {{0}}) = {{0}}"", {1}s);
 		}}
-		public {0}SelectBuild Where{1}({2} {1}1) {{
+		{4}public {0}SelectBuild Where{1}({2} {1}1) {{
 			return this.Where{1}_IN({1}1);
 		}}
 		#region Where{1}
@@ -1886,7 +1892,7 @@ namespace {0}.BLL {{
 		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4, {2} {1}5) {{
 			return this.Where{1}_IN({1}1, {1}2, {1}3, {1}4, {1}5);
 		}}
-		#endregion", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name);
+		#endregion", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name, prototype_comment);
 						return;
 					}
 					if (col.Type == MySqlDbType.Enum) {
@@ -1894,7 +1900,7 @@ namespace {0}.BLL {{
 		public {0}SelectBuild Where{1}_IN(params {2}?[] {1}s) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1}s);
 		}}
-		public {0}SelectBuild Where{1}({2} {1}1) {{
+		{4}public {0}SelectBuild Where{1}({2} {1}1) {{
 			return this.Where{1}_IN({1}1);
 		}}
 		#region Where{1}
@@ -1910,7 +1916,7 @@ namespace {0}.BLL {{
 		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4, {2} {1}5) {{
 			return this.Where{1}_IN({1}1, {1}2, {1}3, {1}4, {1}5);
 		}}
-		#endregion", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name);
+		#endregion", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name, prototype_comment);
 						return;
 					}
 					if (csType == "MygisPoint") {
@@ -1929,11 +1935,11 @@ namespace {0}.BLL {{
 						return;
 					}
 					if (csType == "string") {
-						if (col.Length < 301)
+						if (col.Length > 0 && col.Length < 301)
 							sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
+		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) {{
 			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType, col.Name);
+		}}", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
 		public {0}SelectBuild Where{1}Like(params {2}[] {1}) {{
 			if ({1} == null || {1}.Where(a => !string.IsNullOrEmpty(a)).Any() == false) return this;
