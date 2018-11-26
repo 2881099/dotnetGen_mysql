@@ -1501,15 +1501,35 @@ namespace {0}.BLL {{
 					#region 如果没有主键的处理
 					sb2.AppendFormat(@"|deleteby_fk|");
 
+					var bllfields_ = "";
+					foreach(var col33 in table.Columns) {
+						string comment = _column_coments.ContainsKey(table.FullName) && _column_coments[table.FullName].ContainsKey(col33.Name) ? _column_coments[table.FullName][col33.Name] : col33.Name;
+						string prototype_comment = comment == col33.Name ? @"
+			" : string.Format(@"
+			/// <summary>
+			/// {0}
+			/// </summary>
+			", comment.Replace("\r\n", "\n").Replace("\n", "\r\n			/// "));
+
+						bllfields_ += prototype_comment + UFString(col33.Name) + (bllfields_.Length == 0 ? " = 1, " : ", ");
+					}
+					if (bllfields_.Length > 0) bllfields_ = bllfields_.Substring(0, bllfields_.Length - 2);
+
 					sb1.AppendFormat(@"
 
 		#region delete, update, insert
 {0}
-", sb2.ToString());
+
+		#region enum _
+		public enum _ {{{1}
+		}}
+		#endregion
+", sb2.ToString(), bllfields_);
 
 					if (uniques_dic.Count > 1)
 						sb1.AppendFormat(@"
-		public static int Update({1}Info item, params string[] ignoreFields) => dal.Update(item, ignoreFields).ExecuteNonQuery();
+		public static int Update({1}Info item, _ ignore1 = 0, _ ignore2 = 0, _ ignore3 = 0) => Update(item, new[] {{ ignore1, ignore2, ignore3 }});
+		public static int Update({1}Info item, _[] ignore) => dal.Update(item, ignore?.Where(a => a > 0).Select(a => Enum.GetName(typeof(_), a)).ToArray()).ExecuteNonQuery();
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ itemCacheTimeout > 0 ? new {1}Info {{ {4} }} : GetItem({3}) }});
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy(List<{1}Info> dataSource) => new {0}.DAL.{1}.SqlUpdateBuild(dataSource);
 		/// <summary>
@@ -1523,7 +1543,8 @@ namespace {0}.BLL {{
 							xxxxtempskdf += xxxxtempskdfstr + " = " + xxxxtempskdfstr + ", ";
 						}
 						sb1.AppendFormat(@"
-		public static int Update({1}Info item, params string[] ignoreFields) => dal.Update(item, ignoreFields).ExecuteNonQuery();
+		public static int Update({1}Info item, _ ignore1 = 0, _ ignore2 = 0, _ ignore3 = 0) => Update(item, new[] {{ ignore1, ignore2, ignore3 }});
+		public static int Update({1}Info item, _[] ignore) => dal.Update(item, ignore?.Where(a => a > 0).Select(a => Enum.GetName(typeof(_), a)).ToArray()).ExecuteNonQuery();
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ new {1}Info {{ {4} }} }});
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy(List<{1}Info> dataSource) => new {0}.DAL.{1}.SqlUpdateBuild(dataSource);
 		/// <summary>
@@ -1534,7 +1555,8 @@ namespace {0}.BLL {{
 					}
 
 					bll_async_code += string.Format(@"
-		async public static Task<int> UpdateAsync({1}Info item, params string[] ignoreFields) => await dal.Update(item, ignoreFields).ExecuteNonQueryAsync();
+		public static Task<int> UpdateAsync({1}Info item, _ ignore1 = 0, _ ignore2 = 0, _ ignore3 = 0) => UpdateAsync(item, new[] {{ ignore1, ignore2, ignore3 }});
+		public static Task<int> UpdateAsync({1}Info item, _[] ignore) => dal.Update(item, ignore?.Where(a => a > 0).Select(a => Enum.GetName(typeof(_), a)).ToArray()).ExecuteNonQueryAsync();
 ", solutionName, uClass_Name);
 
 					if (table.Columns.Count > 5)
@@ -1625,7 +1647,7 @@ namespace {0}.BLL {{
 			if (itemCacheTimeout > 0) await RemoveCacheAsync(item);
 			return item;
 		}}{6}
-		async internal static Task RemoveCacheAsync({0}Info item) => await RemoveCacheAsync(item == null ? null : new [] {{ item }});
+		internal static Task RemoveCacheAsync({0}Info item) => RemoveCacheAsync(item == null ? null : new [] {{ item }});
 		async internal static Task RemoveCacheAsync(IEnumerable<{0}Info> items) {{
 			if (itemCacheTimeout <= 0 || items == null || items.Any() == false) return;
 			var keys = new string[items.Count() * {5}];
@@ -1642,16 +1664,16 @@ namespace {0}.BLL {{
 		public static List<{0}Info> GetItems() => Select.ToList();", uClass_Name, solutionName);
 				if (is_deleted_column)
 					sb1.AppendFormat(@"
-		public static {0}SelectBuild SelectRaw => new {0}SelectBuild(dal);
+		public static SelectBuild SelectRaw => new SelectBuild(dal);
 		/// <summary>
 		/// 开启软删除功能，默认查询 is_deleted = false 的数据，查询所有使用 SelectRaw，软删除数据使用 Update is_deleted = true，物理删除数据使用 Delete 方法
 		/// </summary>
-		public static {0}SelectBuild Select => SelectRaw.WhereIs_deleted(false);", uClass_Name, solutionName);
+		public static SelectBuild Select => SelectRaw.WhereIs_deleted(false);", uClass_Name, solutionName);
 				else
 					sb1.AppendFormat(@"
-		public static {0}SelectBuild Select => new {0}SelectBuild(dal);", uClass_Name, solutionName);
+		public static SelectBuild Select => new SelectBuild(dal);", uClass_Name, solutionName);
 				sb1.AppendFormat(@"
-		public static {0}SelectBuild SelectAs(string alias = ""a"") => Select.As(alias);", uClass_Name, solutionName);
+		public static SelectBuild SelectAs(string alias = ""a"") => Select.As(alias);", uClass_Name, solutionName);
 
 				bll_async_code += string.Format(@"
 		public static Task<List<{0}Info>> GetItemsAsync() => Select.ToListAsync();", uClass_Name, solutionName);
@@ -1693,36 +1715,29 @@ namespace {0}.BLL {{
 		@"
 		public static List<{0}Info> GetItemsBy{1}({2}) => Select.Where{1}({3}).ToList();
 		public static List<{0}Info> GetItemsBy{1}({2}, int limit) => Select.Where{1}({3}).Limit(limit).ToList();
-		public static {0}SelectBuild SelectBy{1}({2}) => Select.Where{1}({3});", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms);
+		public static SelectBuild SelectBy{1}({2}) => Select.Where{1}({3});", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms);
 						bll_async_code += string.Format(
 		@"
 		public static Task<List<{0}Info>> GetItemsBy{1}Async({2}) => Select.Where{1}({3}).ToListAsync();
 		public static Task<List<{0}Info>> GetItemsBy{1}Async({2}, int limit) => Select.Where{1}({3}).Limit(limit).ToListAsync();", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms);
 
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}({2}) {{
-			return base.Where(""{4}"", {3});
-		}}", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms, fkcsFilter, solutionName);
+			public SelectBuild Where{1}({2}) => base.Where(""{4}"", {3});", uClass_Name, fkcsBy, fkcsTypeParms, fkcsParms, fkcsFilter, solutionName);
 					} else if (fk.Columns.Count == 1/* && fk.Columns[0].IsPrimaryKey == false*/) {
 						string csType = CodeBuild.GetCSType(fk.Columns[0].Type, CodeBuild.UFString(fk.Table.ClassName) + fk.Columns[0].Name.ToUpper(), fk.Columns[0].SqlType);
 						sb1.AppendFormat(
 		@"
 		public static List<{0}Info> GetItemsBy{1}(params {2}[] {1}) => Select.Where{1}({1}).ToList();
 		public static List<{0}Info> GetItemsBy{1}({2}[] {1}, int limit) => Select.Where{1}({1}).Limit(limit).ToList();
-		public static {0}SelectBuild SelectBy{1}(params {2}[] {1}) => Select.Where{1}({1});", uClass_Name, fkcsBy, csType);
+		public static SelectBuild SelectBy{1}(params {2}[] {1}) => Select.Where{1}({1});", uClass_Name, fkcsBy, csType);
 						bll_async_code += string.Format(
 		@"
 		public static Task<List<{0}Info>> GetItemsBy{1}Async(params {2}[] {1}) => Select.Where{1}({1}).ToListAsync();
 		public static Task<List<{0}Info>> GetItemsBy{1}Async({2}[] {1}, int limit) => Select.Where{1}({1}).Limit(limit).ToListAsync();", uClass_Name, fkcsBy, csType);
 
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}[] {1}) {{
-			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}
-		public {0}SelectBuild Where{1}({4}SelectBuild select, bool isNotIn = false) {{
-			var opt = isNotIn ? ""NOT IN"" : ""IN"";
-			return this.Where($""a.`{3}` {{opt}} ({{select.ToString(""`{5}`"")}})"");
-		}}", uClass_Name, fkcsBy, csType, fk.Columns[0].Name, UFString(fk.ReferencedTable.ClassName), fk.ReferencedColumns[0].Name);
+			public SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(""a.`{3}` = {{0}}"", {1});
+			public SelectBuild Where{1}({4}.SelectBuild select, bool isNotIn = false) => this.Where($""a.`{3}` {{(isNotIn ? ""NOT IN"" : ""IN"")}} ({{select.ToString(""`{5}`"")}})"");", uClass_Name, fkcsBy, csType, fk.Columns[0].Name, UFString(fk.ReferencedTable.ClassName), fk.ReferencedColumns[0].Name);
 					}
 				}
 				// m -> n
@@ -1767,8 +1782,8 @@ namespace {0}.BLL {{
 
 					string civ = string.Format(GetCSTypeValue(fk2[0].ReferencedTable.PrimaryKeys[0].Type), CodeBuild.UFString(fk2[0].ReferencedTable.PrimaryKeys[0].Name));
 					sb1.AppendFormat(@"
-		public static {0}SelectBuild SelectBy{1}(params {2}Info[] {5}s) => Select.Where{1}({5}s);
-		public static {0}SelectBuild SelectBy{1}_{4}(params {3}[] {5}_ids) => Select.Where{1}_{4}({5}_ids);", uClass_Name, fkcsBy, orgInfo,
+		public static SelectBuild SelectBy{1}(params {2}Info[] {5}s) => Select.Where{1}({5}s);
+		public static SelectBuild SelectBy{1}_{4}(params {3}[] {5}_ids) => Select.Where{1}_{4}({5}_ids);", uClass_Name, fkcsBy, orgInfo,
 		GetCSType(fk2[0].ReferencedTable.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].ReferencedTable.ClassName) + fk2[0].ReferencedTable.PrimaryKeys[0].Name.ToUpper(), fk2[0].ReferencedTable.PrimaryKeys[0].SqlType).Replace("?", ""), 
 		table.PrimaryKeys[0].Name, LFString(orgInfo));
 
@@ -1787,17 +1802,17 @@ namespace {0}.BLL {{
 						_f9 = GetCSType(fk2[0].Table.PrimaryKeys[0].Type, CodeBuild.UFString(fk2[0].Table.ClassName) + fk2[0].Table.PrimaryKeys[0].Name.ToUpper(), fk2[0].Table.PrimaryKeys[0].SqlType).Replace("?", "");
 					}
 					sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params {2}Info[] {10}s) => Where{1}({10}s?.ToArray(), null);
-		public {0}SelectBuild Where{1}_{7}(params {9}[] {10}_ids) => Where{1}_{7}({10}_ids?.ToArray(), null);
-		public {0}SelectBuild Where{1}({2}Info[] {10}s, Action<{5}SelectBuild> subCondition) => Where{1}_{7}({10}s?.Where<{2}Info>(a => a != null).Select<{2}Info, {9}>(a => a.{3}).ToArray(), subCondition);
-		public {0}SelectBuild Where{1}_{7}({9}[] {10}_ids, Action<{5}SelectBuild> subCondition) {{
-			if ({10}_ids == null || {10}_ids.Length == 0) return this;
-			{5}SelectBuild subConditionSelect = {5}.Select.Where(string.Format(""`{6}` = a . `{7}` AND `{8}` IN ('{{0}}')"", string.Join(""','"", {10}_ids.Select(a => string.Concat(a).Replace(""'"", ""''"")))));
-			if (subCondition != null) subCondition(subConditionSelect);
-			var subConditionSql = subConditionSelect.ToString(""`{6}`"").Replace("" a \r\nWHERE ("", "" WHERE ("");
-			if (subCondition != null) subConditionSql = subConditionSql.Replace(""a.`"", ""`{12}`.`"");
-			return base.Where($""EXISTS({{subConditionSql}})"");
-		}}", uClass_Name, fkcsBy, orgInfo, civ, string.Empty, CodeBuild.UFString(t2.ClassName), _f6, _f7, _f8, _f9, LFString(orgInfo), t2.Owner, t2.Name);
+			public SelectBuild Where{1}(params {2}Info[] {10}s) => Where{1}({10}s?.ToArray(), null);
+			public SelectBuild Where{1}_{7}(params {9}[] {10}_ids) => Where{1}_{7}({10}_ids?.ToArray(), null);
+			public SelectBuild Where{1}({2}Info[] {10}s, Action<{5}.SelectBuild> subCondition) => Where{1}_{7}({10}s?.Where<{2}Info>(a => a != null).Select<{2}Info, {9}>(a => a.{3}).ToArray(), subCondition);
+			public SelectBuild Where{1}_{7}({9}[] {10}_ids, Action<{5}.SelectBuild> subCondition) {{
+				if ({10}_ids == null || {10}_ids.Length == 0) return this;
+				{5}.SelectBuild subConditionSelect = {5}.Select.Where(string.Format(""`{6}` = a . `{7}` AND `{8}` IN ('{{0}}')"", string.Join(""','"", {10}_ids.Select(a => string.Concat(a).Replace(""'"", ""''"")))));
+				subCondition?.Invoke(subConditionSelect);
+				var subConditionSql = subConditionSelect.ToString(""`{6}`"").Replace("" a \r\nWHERE ("", "" WHERE ("");
+				if (subCondition != null) subConditionSql = subConditionSql.Replace(""a.`"", ""`{12}`.`"");
+				return base.Where($""EXISTS({{subConditionSql}})"");
+			}}", uClass_Name, fkcsBy, orgInfo, civ, string.Empty, CodeBuild.UFString(t2.ClassName), _f6, _f7, _f8, _f9, LFString(orgInfo), t2.Owner, t2.Name);
 				});
 
 				table.Columns.ForEach(delegate (ColumnInfo col) {
@@ -1812,141 +1827,92 @@ namespace {0}.BLL {{
 
 					string comment = _column_coments.ContainsKey(table.FullName) && _column_coments[table.FullName].ContainsKey(col.Name) ? _column_coments[table.FullName][col.Name] : col.Name;
 					string prototype_comment = comment == col.Name ? "" : string.Format(@"/// <summary>
-		/// {0}，多个参数等于 OR 查询
-		/// </summary>
-		", comment.Replace("\r\n", "\n").Replace("\n", "\r\n		/// "));
+			/// {0}，多个参数等于 OR 查询
+			/// </summary>
+			", comment.Replace("\r\n", "\n").Replace("\n", "\r\n			/// "));
 
 					if (csType == "bool?" || csType == "Guid?") {
 						sb6.AppendFormat(@"
-		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) {{
-			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name, prototype_comment);
+			{4}public SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(""a.`{3}` = {{0}}"", {1});", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name, prototype_comment);
 						return;
 					}
 					if (col.Type == MySqlDbType.Byte || col.Type == MySqlDbType.Int16 || col.Type == MySqlDbType.Int24 || col.Type == MySqlDbType.Int32 || col.Type == MySqlDbType.Int64 ||
 						col.Type == MySqlDbType.UByte || col.Type == MySqlDbType.UInt16 || col.Type == MySqlDbType.UInt24 || col.Type == MySqlDbType.UInt32 || col.Type == MySqlDbType.UInt64 ||
 						col.Type == MySqlDbType.Year) {
 						sb6.AppendFormat(@"
-		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) {{
-			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name, prototype_comment);
+			{4}public SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(""a.`{3}` = {{0}}"", {1});", uClass_Name, fkcsBy, col.IsPrimaryKey ? csType.Replace("?", "") : csType, col.Name, prototype_comment);
 						return;
 					}
 					if (col.Type == MySqlDbType.Double || col.Type == MySqlDbType.Float || col.Type == MySqlDbType.Decimal) {
 						sb6.AppendFormat(@"
-		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) {{
-			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
+			{4}public SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(""a.`{3}` = {{0}}"", {1});", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}Range({2} begin) {{
-			return base.Where(""a.`{3}` >= {{0}}"", begin);
-		}}
-		public {0}SelectBuild Where{1}Range({2} begin, {2} end) {{
-			if (end == null) return Where{1}Range(begin);
-			return base.Where(""a.`{3}` between {{0}} and {{1}}"", begin, end);
-		}}", uClass_Name, fkcsBy, csType, col.Name);
+			public SelectBuild Where{1}Range({2} begin) => base.Where(""a.`{3}` >= {{0}}"", begin);
+			public SelectBuild Where{1}Range({2} begin, {2} end) => end == null ? Where{1}Range(begin) : base.Where(""a.`{3}` between {{0}} and {{1}}"", begin, end);", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 					if (col.Type == MySqlDbType.Date || col.Type == MySqlDbType.Time || col.Type == MySqlDbType.Timestamp || col.Type == MySqlDbType.Datetime) {
 						if (col.IsPrimaryKey)
 							sb6.AppendFormat(@"
-		{4}public {0}SelectBuild Where{1}({2} {1}) {{
-			return base.Where(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
+			{4}public SelectBuild Where{1}({2} {1}) => base.Where(""a.`{3}` = {{0}}"", {1});", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}Range({2} begin) {{
-			return base.Where(""a.`{3}` >= {{0}}"", begin);
-		}}
-		public {0}SelectBuild Where{1}Range({2} begin, {2} end) {{
-			if (end == null) return Where{1}Range(begin);
-			return base.Where(""a.`{3}` between {{0}} and {{1}}"", begin, end);
-		}}", uClass_Name, fkcsBy, csType, col.Name);
+			public SelectBuild Where{1}Range({2} begin) => base.Where(""a.`{3}` >= {{0}}"", begin);
+			public SelectBuild Where{1}Range({2} begin, {2} end) => end == null ? Where{1}Range(begin) : base.Where(""a.`{3}` between {{0}} and {{1}}"", begin, end);", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 					if ((col.Type == MySqlDbType.UInt32 || col.Type == MySqlDbType.UInt64) && (lname == "status" || lname.StartsWith("status_") || lname.EndsWith("_status"))) {
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}(params int[] _0_16) {{
-			if (_0_16 == null || _0_16.Length == 0) return this;
-			{2}[] copy = new {2}[_0_16.Length];
-			for (int a = 0; a < _0_16.Length; a++) copy[a] = ({2})Math.Pow(2, _0_16[a]);
-			return this.Where1Or(""(a.`{3}` & {{0}}) = {{0}}"", copy);
-		}}", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name);
+			public SelectBuild Where{1}(params int[] _0_16) {{
+				if (_0_16 == null || _0_16.Length == 0) return this;
+				{2}[] copy = new {2}[_0_16.Length];
+				for (int a = 0; a < _0_16.Length; a++) copy[a] = ({2})Math.Pow(2, _0_16[a]);
+				return this.Where1Or(""(a.`{3}` & {{0}}) = {{0}}"", copy);
+			}}", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name);
 						return;
 					}
 					if (col.Type == MySqlDbType.Set) {
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}_IN(params {2}[] {1}s) {{
-			return this.Where1Or(""(a.`{3}` & {{0}}) = {{0}}"", {1}s);
-		}}
-		{4}public {0}SelectBuild Where{1}({2} {1}1) {{
-			return this.Where{1}_IN({1}1);
-		}}
-		#region Where{1}
-		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2) {{
-			return this.Where{1}_IN({1}1, {1}2);
-		}}
-		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3) {{
-			return this.Where{1}_IN({1}1, {1}2, {1}3);
-		}}
-		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4) {{
-			return this.Where{1}_IN({1}1, {1}2, {1}3, {1}4);
-		}}
-		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4, {2} {1}5) {{
-			return this.Where{1}_IN({1}1, {1}2, {1}3, {1}4, {1}5);
-		}}
-		#endregion", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name, prototype_comment);
+			public SelectBuild Where{1}_IN(params {2}[] {1}s) => this.Where1Or(""(a.`{3}` & {{0}}) = {{0}}"", {1}s);
+			{4}public SelectBuild Where{1}({2} {1}1) => this.Where{1}_IN({1}1);
+			#region Where{1}
+			public SelectBuild Where{1}({2} {1}1, {2} {1}2) => this.Where{1}_IN({1}1, {1}2);
+			public SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3) => this.Where{1}_IN({1}1, {1}2, {1}3);
+			public SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4) => this.Where{1}_IN({1}1, {1}2, {1}3, {1}4);
+			public SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4, {2} {1}5) => this.Where{1}_IN({1}1, {1}2, {1}3, {1}4, {1}5);
+			#endregion", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name, prototype_comment);
 						return;
 					}
 					if (col.Type == MySqlDbType.Enum) {
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}_IN(params {2}?[] {1}s) {{
-			return this.Where1Or(""a.`{3}` = {{0}}"", {1}s);
-		}}
-		{4}public {0}SelectBuild Where{1}({2} {1}1) {{
-			return this.Where{1}_IN({1}1);
-		}}
-		#region Where{1}
-		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2) {{
-			return this.Where{1}_IN({1}1, {1}2);
-		}}
-		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3) {{
-			return this.Where{1}_IN({1}1, {1}2, {1}3);
-		}}
-		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4) {{
-			return this.Where{1}_IN({1}1, {1}2, {1}3, {1}4);
-		}}
-		public {0}SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4, {2} {1}5) {{
-			return this.Where{1}_IN({1}1, {1}2, {1}3, {1}4, {1}5);
-		}}
-		#endregion", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name, prototype_comment);
+			public SelectBuild Where{1}_IN(params {2}?[] {1}s) => this.Where1Or(""a.`{3}` = {{0}}"", {1}s);
+			{4}public SelectBuild Where{1}({2} {1}1) => this.Where{1}_IN({1}1);
+			#region Where{1}
+			public SelectBuild Where{1}({2} {1}1, {2} {1}2) => this.Where{1}_IN({1}1, {1}2);
+			public SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3) => this.Where{1}_IN({1}1, {1}2, {1}3);
+			public SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4) => this.Where{1}_IN({1}1, {1}2, {1}3, {1}4);
+			public SelectBuild Where{1}({2} {1}1, {2} {1}2, {2} {1}3, {2} {1}4, {2} {1}5) => this.Where{1}_IN({1}1, {1}2, {1}3, {1}4, {1}5);
+			#endregion", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name, prototype_comment);
 						return;
 					}
 					if (csType == "MygisPoint") {
 						sb6.AppendFormat(@"
-		/// <summary>
-		/// 查找地理位置多少米范围内的记录，距离由近到远排序
-		/// </summary>
-		/// <param name=""point"">经纬度</param>
-		/// <param name=""meter"">米(=0时无限制)</param>
-		/// <returns></returns>
-		public {0}SelectBuild Where{1}MbrContains(MygisPoint point, double meter = 0) {{
-			return this.Where(meter > 0, @""MBRContains(LineString(
+			/// <summary>
+			/// 查找地理位置多少米范围内的记录，距离由近到远排序
+			/// </summary>
+			/// <param name=""point"">经纬度</param>
+			/// <param name=""meter"">米(=0时无限制)</param>
+			/// <returns></returns>
+			public SelectBuild Where{1}MbrContains(MygisPoint point, double meter = 0) => this.Where(meter > 0, @""MBRContains(LineString(
   Point({{0}} + 10 / ( 111.1 / COS(RADIANS({{1}}))), {{1}} + 10 / 111.1),
-  Point({{0}} - 10 / ( 111.1 / COS(RADIANS({{1}}))), {{1}} - 10 / 111.1)), a.`{3}`)"", point.X, point.Y, meter);
-		}}", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name);
+  Point({{0}} - 10 / ( 111.1 / COS(RADIANS({{1}}))), {{1}} - 10 / 111.1)), a.`{3}`)"", point.X, point.Y, meter);", uClass_Name, fkcsBy, csType.Replace("?", ""), col.Name);
 						return;
 					}
 					if (csType == "string") {
 						if (col.Length > 0 && col.Length < 301)
 							sb6.AppendFormat(@"
-		{4}public {0}SelectBuild Where{1}(params {2}[] {1}) {{
-			return this.Where1Or(""a.`{3}` = {{0}}"", {1});
-		}}", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
+			{4}public SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(""a.`{3}` = {{0}}"", {1});", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
-		public {0}SelectBuild Where{1}Like(params {2}[] {1}) {{
-			if ({1} == null || {1}.Where(a => !string.IsNullOrEmpty(a)).Any() == false) return this;
-			return this.Where1Or(@""a.`{3}` LIKE {{0}}"", {1}.Select(a => ""%"" + a + ""%"").ToArray());
-		}}", uClass_Name, fkcsBy, csType, col.Name);
+			public SelectBuild Where{1}Like(string pattern, bool isNotLike = false) => this.Where($@""a.`{3}` {{(isNotLike ? ""LIKE"" : ""NOT LIKE"")}} {{{{0}}}}"", pattern);", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 				});
@@ -1955,9 +1921,10 @@ namespace {0}.BLL {{
 
 		#region async{3}
 		#endregion
-	}}
-	public partial class {0}SelectBuild : SelectBuild<{0}Info, {0}SelectBuild> {{{2}
-		public {0}SelectBuild(IDAL dal) : base(dal, SqlHelper.Instance) {{ }}
+
+		public partial class SelectBuild : SelectBuild<{0}Info, SelectBuild> {{{2}
+			public SelectBuild(IDAL dal) : base(dal, SqlHelper.Instance) {{ }}
+		}}
 	}}
 }}", uClass_Name, solutionName, sb6.ToString(), bll_async_code);
 
