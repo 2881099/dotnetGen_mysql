@@ -1123,7 +1123,7 @@ namespace {0}.Module.Admin.Controllers {{
 		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
 
 		[HttpGet]
-		async public Task<ActionResult> List([FromServices]IConfiguration cfg, {12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
+		async public Task<ActionResult> List({12}[FromQuery] int limit = 20, [FromQuery] int page = 1) {{
 			var select = {19}{1}.Select{8};{9}
 			var items = await select.Count(out var count){14}.Page(page, limit).ToListAsync();
 			ViewBag.items = items;
@@ -1427,7 +1427,7 @@ namespace {0}.Module.Test.Controllers {{
 		public {1}Controller(ILogger<{1}Controller> logger) : base(logger) {{ }}
 
 		[HttpGet]
-		public APIReturn List([FromServices]IConfiguration cfg) {{
+		public APIReturn List() {{
 			return APIReturn.成功;
 		}}
 	}}
