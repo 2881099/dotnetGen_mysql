@@ -2057,8 +2057,10 @@ namespace {0}.BLL {{
 						", comment);
 							str_listTd += string.Format(@"<td>[@item.{0}] @item.Obj_{1}{2}</td>
 								", csUName, memberName, string.IsNullOrEmpty(strName) ? "" : ("?" + strName));
+				//			str_controller_list_join += string.Format(@"
+				//.LeftJoin<{0}>(""{3}"", ""{3}.{1} = a.{2}"")", CodeBuild.UFString(fks[0].ReferencedTable.ClassName), fks[0].ReferencedColumns[0].Name, fks[0].Columns[0].Name, (char)++str_controller_list_join_alias);
 							str_controller_list_join += string.Format(@"
-				.LeftJoin<{0}>(""{3}"", ""{3}.{1} = a.{2}"")", CodeBuild.UFString(fks[0].ReferencedTable.ClassName), fks[0].ReferencedColumns[0].Name, fks[0].Columns[0].Name, (char)++str_controller_list_join_alias);
+				.LeftJoin(a => a.Obj_{0}.{1} == a.{2})", fks[0].ReferencedTable.ClassName, UFString(fks[0].ReferencedColumns[0].Name), UFString(fks[0].Columns[0].Name), (char)++str_controller_list_join_alias);
 							if (str_listCms2FilterFK_fkitems.Contains("	var fk_" + CodeBuild.LFString(fks[0].ReferencedTable.ClassName) + "s = ") == false)
 								str_listCms2FilterFK_fkitems += string.Format(@"
 	var fk_{1}s = {2}{0}.Select.ToList();", CodeBuild.UFString(fks[0].ReferencedTable.ClassName), CodeBuild.LFString(fks[0].ReferencedTable.ClassName), CodeBuild.UFString(fks[0].ReferencedTable.ClassName) == "User" ? solutionName + ".BLL." : "");
@@ -2882,10 +2884,10 @@ List<UserInfo> users1 = User.Select.WhereUsername(""2881099@qq.com"").WherePassw
 var users2 = User.Select.WhereStatus(正常).Aggregate<(int id, string title)>(""id,title"");
 
 //多表查询，只返回 a 表字段
-var users3 = User.Select.From<User_group>(""b"").Where(""a.group_id = b.id"").ToList();
+var users3 = User.Select.Where(a => a.Obj_user_group.Id == a.Group_id).ToList();
 
 //join查询，返回 a, b 表字段 ，b 表结果填充至 a.Obj_user_group 对象，类似 ef.Include
-var users4 = User.Select.InnerJoin<User_group>(""b"", ""a.group_id = b.id"").ToList();
+var users4 = User.Select.InnerJoin(a => a.Obj_user_group.Id == a.Group_id).ToList();
 
 //分组查询
 var users5 = User.Select.GroupBy(""group_id"").Aggregate<(int groupId, int count)>(""group_id, count(1)"");

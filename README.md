@@ -246,10 +246,10 @@ List<UserInfo> users1 = User.Select.WhereUsername("2881099@qq.com").WherePasswor
 var users2 = User.Select.WhereStatus(正常).Aggregate<(int id, string title)>("id,title");
 
 //多表查询，只返回 a 表字段
-var users3 = User.Select.From<User_group>("b").Where("a.group_id = b.id").ToList();
+var users3 = User.Select.Where(a => a.Obj_user_group.Id == a.Group_id).ToList();
 
 //join查询，返回 a, b 表字段 ，b 表结果填充至 a.Obj_user_group 对象，类似 ef.Include
-var users4 = User.Select.InnerJoin<User_group>("b", "a.group_id = b.id").ToList();
+var users4 = User.Select.InnerJoin(a => a.Obj_user_group.Id == a.Group_id).ToList();
 
 //分组查询
 var users5 = User.Select.GroupBy("group_id").Aggregate<(int groupId, int count)>("group_id, count(1)");
