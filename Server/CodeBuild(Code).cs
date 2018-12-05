@@ -353,9 +353,9 @@ namespace {0}.Model {{
 						string FK_uEntry_Name = fk.ReferencedTable != null ? CodeBuild.GetCSName(fk.ReferencedTable.Name) :
 							CodeBuild.GetCSName(TableInfo.GetEntryName(fk.ReferencedTableName));
 						string tableNamefe3 = fk.ReferencedTable != null ? fk.ReferencedTable.Name : FK_uEntry_Name;
-						string memberName = fk.Columns[0].Name.IndexOf(tableNamefe3) == -1 ? CodeBuild.LFString(tableNamefe3) :
-							(CodeBuild.LFString(fk.Columns[0].Name.Substring(0, fk.Columns[0].Name.IndexOf(tableNamefe3)) + tableNamefe3));
-						if (fk.Columns[0].Name.IndexOf(tableNamefe3) == 0 && fk.ReferencedTable != null) memberName = CodeBuild.LFString(fk.ReferencedTable.ClassName);
+						string memberName = fk.Columns[0].Name.IndexOf(tableNamefe3) == -1 ? tableNamefe3 :
+							(fk.Columns[0].Name.Substring(0, fk.Columns[0].Name.IndexOf(tableNamefe3)) + tableNamefe3);
+						if (fk.Columns[0].Name.IndexOf(tableNamefe3) == 0 && fk.ReferencedTable != null) memberName = fk.ReferencedTable.ClassName;
 
 						tsvarr.Add(string.Format(@"_obj_{0} = null;", memberName));
 						if (fkc1idx == fk.Columns.Count) {
@@ -736,7 +736,7 @@ namespace {0}.Model {{
 							//}
 							string objs_value = string.Format(@"
 		private List<{0}Info> _obj_{1}s;
-		public List<{0}Info> Obj_{1}s => _obj_{1}s ?? (_obj_{1}s = BLL.{0}.SelectBy{5}_{4}({3}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname), solutionName, civ, fk2[0].ReferencedTable.PrimaryKeys[0].Name, CodeBuild.UFString(f5));
+		public List<{0}Info> Obj_{1}s => _obj_{1}s ?? (_obj_{1}s = BLL.{0}.SelectBy{5}_{4}({3}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), addname, solutionName, civ, fk2[0].ReferencedTable.PrimaryKeys[0].Name, CodeBuild.UFString(f5));
 							//如果中间表字段 > 2，那么应该把其中间表也查询出来
 							if (t2.Columns.Count > 2) {
 								string _f6 = fk.Columns[0].Name;
@@ -758,24 +758,24 @@ namespace {0}.Model {{
 		/// <summary>
 		/// 遍历时，可通过 Obj_{3} 可获取中间表数据
 		/// </summary>
-		public List<{0}Info> Obj_{1}s =>_obj_{1}s ?? (_obj_{1}s = BLL.{0}.Select.InnerJoin<BLL.{2}>(""b"", ""b.`{6}` = a.`{5}`"").Where(""b.`{4}` = {{0}}"", {7}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), CodeBuild.LFString(addname_schema), CodeBuild.UFString(t2.ClassName), CodeBuild.LFString(t2.ClassName),
+		public List<{0}Info> Obj_{1}s =>_obj_{1}s ?? (_obj_{1}s = BLL.{0}.Select.InnerJoin<BLL.{2}>(""b"", ""b.`{6}` = a.`{5}`"").Where(""b.`{4}` = {{0}}"", {7}).ToList());", CodeBuild.UFString(fk2[0].ReferencedTable.ClassName), addname_schema, CodeBuild.UFString(t2.ClassName), t2.ClassName,
 			_f6, _f7, _f8, civ.Replace(".Value", ""));
 							}
-							string objs_key = string.Format("Obj_{0}s", CodeBuild.LFString(addname));
+							string objs_key = string.Format("Obj_{0}s", addname);
 							if (dic_objs.ContainsKey(objs_key))
 								dic_objs[objs_key] = objs_value;
 							else
 								dic_objs.Add(objs_key, objs_value);
 						}
 					} else {
-						string f2 = fk.Columns[0].Name.CompareTo("parent_id") == 0 ? t2name : fk.Columns[0].Name.Replace(tablename + "_" + table.PrimaryKeys[0].Name, "") + CodeBuild.LFString(t2name);
+						string f2 = fk.Columns[0].Name.CompareTo("parent_id") == 0 ? t2name : fk.Columns[0].Name.Replace(tablename + "_" + table.PrimaryKeys[0].Name, "") + t2name;
 						if (fk.Columns[0].IsPrimaryKey && fk.Table.PrimaryKeys.Count == 1) { //1对1关系，不应该生成 obj_xxxs
 							string obj_value = string.Format(@"
 		private {0}Info _obj_{1};
 		public {0}Info Obj_{1} {{
 			get {{ return _obj_{1} ?? (_{4} == null ? null : (_obj_{1} = BLL.{0}.GetItem(_{5}))); }}
 			internal set {{ _obj_{1} = value; }}
-		}}", CodeBuild.UFString(t2.ClassName), CodeBuild.LFString(t2.ClassName), solutionName, CodeBuild.UFString(fk.Columns[0].Name), CodeBuild.UFString(fk.ReferencedColumns[0].Name), string.Format(GetCSTypeValue(fk.ReferencedColumns[0].Type), UFString(fk.ReferencedColumns[0].Name)));
+		}}", CodeBuild.UFString(t2.ClassName), t2.ClassName, solutionName, CodeBuild.UFString(fk.Columns[0].Name), CodeBuild.UFString(fk.ReferencedColumns[0].Name), string.Format(GetCSTypeValue(fk.ReferencedColumns[0].Type), UFString(fk.ReferencedColumns[0].Name)));
 							string objs_key = string.Format("Obj_{0}s", f2);
 							if (!dic_objs.ContainsKey(objs_key))
 								dic_objs.Add(objs_key, obj_value);
@@ -2022,9 +2022,9 @@ namespace {0}.BLL {{
 							FK_uEntry_Name = fk.ReferencedTable != null ? CodeBuild.GetCSName(fk.ReferencedTable.Name) :
 								CodeBuild.GetCSName(TableInfo.GetEntryName(fk.ReferencedTableName));
 							tableNamefe3 = fk.ReferencedTable != null ? fk.ReferencedTable.Name : FK_uEntry_Name;
-							memberName = fk.Columns[0].Name.IndexOf(tableNamefe3) == -1 ? CodeBuild.LFString(tableNamefe3) :
-								(CodeBuild.LFString(fk.Columns[0].Name.Substring(0, fk.Columns[0].Name.IndexOf(tableNamefe3)) + tableNamefe3));
-							if (fk.Columns[0].Name.IndexOf(tableNamefe3) == 0 && fk.ReferencedTable != null) memberName = CodeBuild.LFString(fk.ReferencedTable.ClassName);
+							memberName = fk.Columns[0].Name.IndexOf(tableNamefe3) == -1 ? tableNamefe3 :
+								(fk.Columns[0].Name.Substring(0, fk.Columns[0].Name.IndexOf(tableNamefe3)) + tableNamefe3);
+							if (fk.Columns[0].Name.IndexOf(tableNamefe3) == 0 && fk.ReferencedTable != null) memberName = fk.ReferencedTable.ClassName;
 
 							ColumnInfo strNameCol = null;
 							if (fk.ReferencedTable != null) {
