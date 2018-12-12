@@ -205,6 +205,7 @@ namespace Server {
 					}
 					pkCsParam = pkCsParam.Substring(0, pkCsParam.Length - 2);
 					pkCsParamNoType = pkCsParamNoType.Substring(0, pkCsParamNoType.Length - 2);
+					pkCsParamNoTypeFieldInit = pkCsParamNoTypeFieldInit.Substring(0, pkCsParamNoTypeFieldInit.Length - 2);
 					pkCsParamNoTypeByval = pkCsParamNoTypeByval.Substring(0, pkCsParamNoTypeByval.Length - 2);
 					pkSqlParamFormat = pkSqlParamFormat.Substring(0, pkSqlParamFormat.Length - 5);
 					pkSqlParam = pkSqlParam.Substring(0, pkSqlParam.Length - 5);
@@ -1486,15 +1487,15 @@ namespace {0}.BLL {{
 		}}", parms, parmsNoneType, cs[0].IsPrimaryKey ? string.Empty : parmsBy, uClass_Name, parmsNewItem);
 
 					sb3.AppendFormat(@"
-		public static {1}Info GetItem{2}({4}) => SqlHelper.CacheShell(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, () => Select{7}.ToOne(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
+		public static {1}Info GetItem{2}({4}) => SqlHelper.CacheShell(string.Concat(""{0}_BLL:{1}{2}:"", {3}), itemCacheTimeout, () => Select{7}.ToOne(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
 		parms, parmsNoneType, cacheCond, whereCondi);
 
 					bll_async_code += string.Format(@"
-		async public static Task<{1}Info> GetItem{2}Async({4}) => await SqlHelper.CacheShellAsync(string.Concat(""{0}_BLL_{1}{2}_"", {3}), itemCacheTimeout, () => Select{7}.ToOneAsync(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
+		async public static Task<{1}Info> GetItem{2}Async({4}) => await SqlHelper.CacheShellAsync(string.Concat(""{0}_BLL:{1}{2}:"", {3}), itemCacheTimeout, () => Select{7}.ToOneAsync(), item => item?.Stringify() ?? ""null"", str => str == ""null"" ? null : {1}Info.Parse(str));", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove.Replace("item.", ""),
 		parms, parmsNoneType, cacheCond, whereCondi);
 
 					sb4.AppendFormat(@"
-				keys[keysIdx++] = string.Concat(""{0}_BLL_{1}{2}_"", {3});", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove);
+				keys[keysIdx++] = string.Concat(""{0}_BLL:{1}{2}:"", {3});", solutionName, uClass_Name, cs[0].IsPrimaryKey ? string.Empty : parmsBy, parmsNodeTypeUpdateCacheRemove);
 				}
 
 				if (table.PrimaryKeys.Count > 0) {
@@ -1530,7 +1531,7 @@ namespace {0}.BLL {{
 						sb1.AppendFormat(@"
 		public static int Update({1}Info item, _ ignore1 = 0, _ ignore2 = 0, _ ignore3 = 0) => Update(item, new[] {{ ignore1, ignore2, ignore3 }});
 		public static int Update({1}Info item, _[] ignore) => dal.Update(item, ignore?.Where(a => a > 0).Select(a => Enum.GetName(typeof(_), a)).ToArray()).ExecuteNonQuery();
-		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ itemCacheTimeout > 0 ? new {1}Info {{ {4} }} : GetItem({3}) }});
+		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy({2}) => new {0}.DAL.{1}.SqlUpdateBuild(new List<{1}Info> {{ itemCacheTimeout <= 0 ? new {1}Info {{ {4} }} : GetItem({3}) }});
 		public static {0}.DAL.{1}.SqlUpdateBuild UpdateDiy(List<{1}Info> dataSource) => new {0}.DAL.{1}.SqlUpdateBuild(dataSource);
 		/// <summary>
 		/// 用于批量更新，不会更新缓存
@@ -1912,7 +1913,7 @@ namespace {0}.BLL {{
 							sb6.AppendFormat(@"
 			{4}public SelectBuild Where{1}(params {2}[] {1}) => this.Where1Or(""a.`{3}` = {{0}}"", {1});", uClass_Name, fkcsBy, csType, col.Name, prototype_comment);
 						sb6.AppendFormat(@"
-			public SelectBuild Where{1}Like(string pattern, bool isNotLike = false) => this.Where($@""a.`{3}` {{(isNotLike ? ""LIKE"" : ""NOT LIKE"")}} {{{{0}}}}"", pattern);", uClass_Name, fkcsBy, csType, col.Name);
+			public SelectBuild Where{1}Like(string pattern, bool isNotLike = false) => this.Where($@""a.`{3}` {{(isNotLike ? ""NOT LIKE"" : ""LIKE"")}} {{{{0}}}}"", pattern);", uClass_Name, fkcsBy, csType, col.Name);
 						return;
 					}
 				});
