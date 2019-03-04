@@ -37,7 +37,7 @@ GenMy 数据库ip[:3306] -U 登陆名 -P 密码 -D 数据库1[,数据库2] -N �
 GenMy 数据库ip[:3306] -U 登陆名 -P 密码 -D 数据库1[,数据库2] -N 命名空间 -R -S -A
 ```
 
-dotnetGen 保持相同的开发与使用习惯，现实了面向 mysql、SQLServer、PostgreSQL 三种数据库快速开发，也可混合使用。
+dotnetGen 保持相同的开发与使用习惯，实现了面向 mysql、SQLServer、PostgreSQL 三种数据库快速开发，也可混合使用。
 
 | <font color=gray>功能对比</font> | [dotnetGen_mysql](https://github.com/2881099/dotnetGen_mysql) | [dotnetGen_sqlserver](https://github.com/2881099/dotnetGen_sqlserver) | [dotnetGen_postgresql](https://github.com/2881099/dotnetGen_postgresql) |
 | ----------------: | --------------: | -------------------: | -------------------: |
@@ -292,7 +292,7 @@ BLL Select.ToList(10, "cache_key")，将查询结果缓存10秒，需要手工�
 
 ## 读写分离
 
-内置现实读和写分离，一个【主库】多个【从库】，【从库】的查询策略为随机方式。
+内置实现读和写分离，一个【主库】多个【从库】，【从库】的查询策略为随机方式。
 
 若某【从库】发生故障，将切换到其他可用【从库】，若已全部不可用则使用【主库】查询。
 
