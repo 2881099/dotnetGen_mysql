@@ -441,6 +441,7 @@ namespace Server {
         }
 
         protected static string UFString(string text) {
+			text = Regex.Replace(text, @"[^\w]", "_");
 			if (text.Length <= 1) return text.ToUpper();
 			else return text.Substring(0, 1).ToUpper() + text.Substring(1, text.Length - 1);
 		}

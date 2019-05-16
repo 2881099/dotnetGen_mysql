@@ -1444,7 +1444,8 @@ namespace {0}.BLL {{
 						parmsNodeTypeUpdateCacheRemove += "item." + CodeBuild.UFString(columnInfo.Name) + ", \"_,_\", ";
 						cacheCond += CodeBuild.UFString(columnInfo.Name) + " == null || ";
 						whereCondi += string.Format(".Where{0}({1})", CodeBuild.UFString(columnInfo.Name),
-							getcstype.Contains("?") && !cs[0].IsPrimaryKey ? string.Concat("new ", getcstype, "(", CodeBuild.UFString(columnInfo.Name), ")") : CodeBuild.UFString(columnInfo.Name));
+							//getcstype.Contains("?") ? string.Concat("new ", getcstype, "(", CodeBuild.UFString(columnInfo.Name), ")") : 
+							CodeBuild.UFString(columnInfo.Name));
 					}
 					parms = parms.Substring(0, parms.Length - 2);
 					parmsNewItem = parmsNewItem.Substring(0, parmsNewItem.Length - 2);
